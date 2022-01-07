@@ -7,7 +7,7 @@ val logbackVersion = "1.2.10"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.37.3"
 val hikariVersion = "5.0.0"
-val flywayVersion = "8.3.0"
+val flywayVersion = "8.4.0"
 
 plugins {
     application
