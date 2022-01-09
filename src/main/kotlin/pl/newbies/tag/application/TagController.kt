@@ -9,8 +9,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.pagination
 import pl.newbies.plugins.AresPrincipal
@@ -24,7 +22,7 @@ fun Application.tagRoutes() {
     val tagService: TagService by inject()
 
     routing {
-        route("/tags") {
+        route("/api/v1/tags") {
             get {
                 val (page, size) = call.pagination()
 

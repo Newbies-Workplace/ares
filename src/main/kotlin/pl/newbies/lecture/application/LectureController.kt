@@ -25,7 +25,7 @@ fun Application.lectureRoutes() {
     val lectureConverter: LectureConverter by inject()
 
     routing {
-        route("/lectures") {
+        route("/api/v1/lectures") {
             get {
                 val (page, size) = call.pagination()
 

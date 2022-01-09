@@ -28,6 +28,10 @@ repositories {
 }
 
 dependencies {
+    //kotlin
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+
+    //ktor
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
@@ -42,7 +46,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.4")
 

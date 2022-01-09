@@ -1,6 +1,6 @@
 package pl.newbies.user.domain.model
 
-import java.time.Instant
+import kotlinx.datetime.Instant
 import java.util.*
 
 data class User(

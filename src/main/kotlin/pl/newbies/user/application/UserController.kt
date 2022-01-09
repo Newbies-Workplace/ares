@@ -25,7 +25,7 @@ fun Application.userRoutes() {
     val userService by inject<UserService>()
 
     routing {
-        route("/users") {
+        route("/api/v1/users") {
             get("/{id}") {
                 val id = call.parameters.getOrFail("id")
                 val user = transaction { UserDAO.findById(id)?.toUser() }

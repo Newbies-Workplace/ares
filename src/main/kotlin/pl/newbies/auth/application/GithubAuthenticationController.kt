@@ -12,9 +12,10 @@ import io.ktor.server.auth.*
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.auth.domain.UnauthorizedException
 import pl.newbies.auth.domain.service.AuthService
-import pl.newbies.auth.domain.model.GithubUser
+import pl.newbies.auth.application.model.GithubUser
 import pl.newbies.plugins.inject
 import pl.newbies.user.domain.service.UserService
 import pl.newbies.user.infrastructure.repository.UserDAO
@@ -59,13 +60,14 @@ fun Application.githubAuthentication() {
                     bearerAuth(token)
                 }.body()
 
-                val user = UserDAO.find { Users.githubId eq githubUser.id }.singleOrNull()?.toUser()
-                    ?: userService.createUser(
-                        nickname = githubUser.login,
-                        githubId = githubUser.id,
-                    )
+                val user = transaction {
+                    UserDAO.find { Users.githubId eq githubUser.id }.singleOrNull()?.toUser()
+                } ?: userService.createUser(
+                    nickname = githubUser.login,
+                    githubId = githubUser.id,
+                )
 
-                val response = authService.generateResponse(user)
+                val response = authService.generateResponse(user, refreshToken = null)
 
                 call.respond(response)
             }

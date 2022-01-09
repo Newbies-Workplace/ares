@@ -6,6 +6,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.jwt
 import pl.newbies.auth.application.githubAuthentication
+import pl.newbies.auth.application.authenticationRoutes
 
 fun Application.configureSecurity() {
     val config = environment.config
@@ -32,6 +33,8 @@ fun Application.configureSecurity() {
 
         githubAuthentication()
     }
+
+    authenticationRoutes()
 }
 
 class AresPrincipal(

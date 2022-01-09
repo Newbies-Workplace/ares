@@ -1,5 +1,8 @@
-package pl.newbies.auth.domain.model
+package pl.newbies.auth.application.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class GithubUser(
     val id: String,
     val login: String,

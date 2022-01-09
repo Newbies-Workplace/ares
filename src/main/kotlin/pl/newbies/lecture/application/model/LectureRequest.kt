@@ -1,12 +1,14 @@
 package pl.newbies.lecture.application.model
 
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import org.valiktor.functions.isNotBlank
 import org.valiktor.functions.isPositiveOrZero
 import org.valiktor.validate
 import pl.newbies.common.validator.distinct
 import pl.newbies.tag.application.model.TagRequest
-import java.time.Instant
 
+@Serializable
 data class LectureRequest(
     val title: String,
     val subtitle: String?,
@@ -23,11 +25,13 @@ data class LectureRequest(
     }
 }
 
+@Serializable
 data class TimeFrameRequest(
     val startDate: Instant,
     val finishDate: Instant?,
 )
 
+@Serializable
 data class AddressRequest(
     val city: String,
     val place: String,
@@ -42,6 +46,7 @@ data class AddressRequest(
     }
 }
 
+@Serializable
 data class CoordinatesRequest(
     val latitude: Double,
     val longitude: Double,

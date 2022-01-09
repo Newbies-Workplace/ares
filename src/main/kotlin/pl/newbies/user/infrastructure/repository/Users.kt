@@ -1,14 +1,14 @@
 package pl.newbies.user.infrastructure.repository
 
+import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import pl.newbies.plugins.StringUUIDEntity
 import pl.newbies.plugins.StringUUIDEntityClass
 import pl.newbies.plugins.StringUUIDTable
 import pl.newbies.user.domain.model.AuthAccountsDTO
 import pl.newbies.user.domain.model.ContactDTO
 import pl.newbies.user.domain.model.User
-import java.time.Instant
 
 object Users : StringUUIDTable() {
     val nickname = varchar("nickname", length = 50)
@@ -24,7 +24,7 @@ object Users : StringUUIDTable() {
     val twitter = varchar("contactTwitter", length = 50).nullable()
 
     val createDate = timestamp("createDate")
-        .clientDefault { Instant.now() }
+        .clientDefault { Clock.System.now() }
 }
 
 class UserDAO(id: EntityID<String>) : StringUUIDEntity(id) {
