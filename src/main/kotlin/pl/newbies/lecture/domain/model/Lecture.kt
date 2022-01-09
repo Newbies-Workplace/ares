@@ -1,7 +1,7 @@
 package pl.newbies.lecture.domain.model
 
+import kotlinx.datetime.Instant
 import pl.newbies.tag.domain.model.Tag
-import java.time.Instant
 import java.util.*
 
 data class Lecture(

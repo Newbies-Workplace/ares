@@ -28,10 +28,10 @@ repositories {
 }
 
 dependencies {
-    //kotlin
+    // kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
 
-    //ktor
+    // ktor
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
@@ -42,7 +42,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
 
-    //database
+    // database
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
@@ -53,11 +53,11 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")
 
-    //di
+    // di
     implementation("io.insert-koin:koin-core:$koinVersion")
     implementation("io.insert-koin:koin-ktor:$koinVersion")
 
-    //validation
+    // validation
     implementation("org.valiktor:valiktor-core:$valiktorVersion")
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")

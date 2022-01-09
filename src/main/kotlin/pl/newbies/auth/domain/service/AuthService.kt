@@ -33,7 +33,7 @@ class AuthService(
             .sign(Algorithm.HMAC256(jwtSecret))
 
         val token = refreshToken ?: transaction {
-             RefreshTokenDAO.new(UUID.randomUUID().toString()) {
+            RefreshTokenDAO.new(UUID.randomUUID().toString()) {
                 this.userId = user.id
             }.toRefreshToken()
         }
