@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.0.0-beta-1"
+val ktorVersion = "2.0-eap-290"
 val koinVersion = "3.1.4"
 val kotlinVersion = "1.6.10"
 val logbackVersion = "1.2.10"
