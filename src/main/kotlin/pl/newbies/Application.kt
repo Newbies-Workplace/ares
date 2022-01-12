@@ -24,6 +24,7 @@ fun Application.module() {
 
     install(KoinPlugin) {
         modules(
+            org.koin.dsl.module { single { environment.config }},
             authModule,
             userModule,
             tagModule,

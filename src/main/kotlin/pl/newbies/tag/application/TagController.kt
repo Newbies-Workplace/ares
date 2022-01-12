@@ -40,8 +40,9 @@ fun Application.tagRoutes() {
 
                 val foundTags = transaction {
                     FollowedTagDAO.find { FollowedTags.user eq userId }
+                        .map { it.toFollowedTag() }
                 }
-                val followedTags = foundTags.map { tagConverter.convert(it.toFollowedTag().tag) }
+                val followedTags = foundTags.map { tagConverter.convert(it.tag) }
 
                 call.respond(followedTags)
             }

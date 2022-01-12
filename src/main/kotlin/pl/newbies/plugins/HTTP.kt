@@ -7,5 +7,6 @@ import io.ktor.server.plugins.CORS
 fun Application.configureHTTP() {
     install(CORS) {
         anyHost()
+        header("*")
     }
 }
