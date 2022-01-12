@@ -9,7 +9,7 @@ import pl.newbies.plugins.StringUUIDEntityClass
 import pl.newbies.plugins.StringUUIDTable
 
 object RefreshTokens : StringUUIDTable() {
-    val userId = varchar("userId", 36).uniqueIndex()
+    val userId = varchar("userId", 36)
 
     val dateCreated = timestamp("dateCreated")
         .clientDefault { Clock.System.now() }
