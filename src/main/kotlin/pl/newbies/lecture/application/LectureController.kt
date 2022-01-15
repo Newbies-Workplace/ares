@@ -25,12 +25,13 @@ fun Application.lectureRoutes() {
     val lectureConverter: LectureConverter by inject()
 
     routing {
-        route("/lectures") {
+        route("/api/v1/lectures") {
             get {
                 val (page, size) = call.pagination()
 
-                val lectures = transaction { LectureDAO.all().limit(size.toInt(), page * size) }
-                    .map { lectureConverter.convert(it.toLecture()) }
+                val lectures = transaction {
+                    LectureDAO.all().limit(size.toInt(), page * size).map { it.toLecture() }
+                }.map { lectureConverter.convert(it) }
 
                 call.respond(lectures)
             }

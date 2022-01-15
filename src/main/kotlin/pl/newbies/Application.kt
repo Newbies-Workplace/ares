@@ -24,6 +24,7 @@ fun Application.module() {
 
     install(KoinPlugin) {
         modules(
+            configModule(environment.config),
             authModule,
             userModule,
             tagModule,

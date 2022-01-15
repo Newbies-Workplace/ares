@@ -4,6 +4,7 @@ import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import pl.newbies.auth.infrastructure.repository.RefreshTokens
 import pl.newbies.lecture.infrastructure.repository.LectureTags
 import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.tag.infrastructure.repository.FollowedTags
@@ -19,7 +20,8 @@ class V1__init: BaseJavaMigration() {
                 Tags,
                 FollowedTags,
                 Lectures,
-                LectureTags
+                LectureTags,
+                RefreshTokens,
             )
         }
     }

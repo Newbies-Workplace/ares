@@ -1,6 +1,6 @@
 package pl.newbies.lecture.domain.model
 
-import java.time.Instant
+import kotlinx.datetime.Instant
 
 data class TimeFrameDTO(
     var startDate: Instant,

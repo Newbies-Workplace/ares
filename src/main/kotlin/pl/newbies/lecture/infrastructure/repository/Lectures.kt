@@ -1,8 +1,9 @@
 package pl.newbies.lecture.infrastructure.repository
 
+import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import pl.newbies.lecture.domain.model.AddressDTO
 import pl.newbies.lecture.domain.model.CoordinatesDTO
 import pl.newbies.lecture.domain.model.Lecture
@@ -14,7 +15,6 @@ import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
-import java.time.Instant
 
 object Lectures : StringUUIDTable() {
     val title = varchar("title", 100)
@@ -31,7 +31,7 @@ object Lectures : StringUUIDTable() {
 
 
     val createDate = timestamp("createDate")
-        .clientDefault { Instant.now() }
+        .clientDefault { Clock.System.now() }
 }
 
 object LectureTags : Table() {

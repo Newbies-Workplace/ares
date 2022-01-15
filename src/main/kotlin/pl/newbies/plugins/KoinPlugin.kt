@@ -12,6 +12,7 @@ import org.koin.core.context.stopKoin
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.scope.Scope
+import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent.getKoin
 
 //workaround until koin supports ktor 2.0
@@ -49,3 +50,7 @@ inline fun <reified T : Any> get(
 
 fun Scope.prop(key: String) =
     get<ApplicationConfig>().property(key)
+
+fun configModule(config: ApplicationConfig) = module {
+    single { config }
+}
