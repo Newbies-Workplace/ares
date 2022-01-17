@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     // kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 
     // ktor
     implementation("io.ktor:ktor-server-core:$ktorVersion")
