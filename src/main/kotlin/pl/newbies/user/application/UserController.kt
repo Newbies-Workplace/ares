@@ -6,10 +6,7 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.get
-import io.ktor.server.routing.put
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
+import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.plugins.AresPrincipal
@@ -43,11 +40,22 @@ fun Application.userRoutes() {
                     call.respond(userConverter.convert(user))
                 }
 
+                patch("/@me") {
+                    val id = call.principal<AresPrincipal>()!!.userId
+                    val changes = call.receive<Map<String, String?>>()
+                    val user = transaction { UserDAO.findById(id)?.toUser() }
+                        ?: throw UserNotFoundException(id)
+
+                    val updatedUser = userService.updateUser(user, changes)
+
+                    call.respond(userConverter.convert(updatedUser))
+                }
+
                 put("/@me") {
                     val id = call.principal<AresPrincipal>()!!.userId
                     val userRequest = call.receive<UserRequest>()
 
-                    val updatedUser = userService.updateUser(id, userRequest)
+                    val updatedUser = userService.replaceUser(id, userRequest)
 
                     call.respond(userConverter.convert(updatedUser))
                 }

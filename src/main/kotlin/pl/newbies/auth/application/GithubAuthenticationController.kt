@@ -67,9 +67,9 @@ fun Application.githubAuthentication() {
                 val token = call.principal<OAuthAccessTokenResponse.OAuth2>()?.accessToken
                     ?: throw UnauthorizedException("Failed to get github auth token")
 
-                val githubUser: GithubUser = httpClient.get(userApiUrl) {
+                val githubUser = httpClient.get(userApiUrl) {
                     bearerAuth(token)
-                }.body()
+                }.body<GithubUser>()
 
                 val user = transaction {
                     UserDAO.find { Users.githubId eq githubUser.id }.singleOrNull()?.toUser()
