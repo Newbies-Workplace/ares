@@ -1,7 +1,6 @@
 package pl.newbies.user.domain.service
 
 import org.jetbrains.exposed.sql.transactions.transaction
-import pl.newbies.auth.infrastructure.repository.RefreshTokens.userId
 import pl.newbies.common.logger
 import pl.newbies.user.application.model.UserRequest
 import pl.newbies.user.domain.UserNotFoundException
