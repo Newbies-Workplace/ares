@@ -1,6 +1,5 @@
 package pl.newbies.lecture.infrastructure.repository
 
-import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
@@ -28,7 +27,6 @@ object Lectures : StringUUIDTable() {
     val place = varchar("place", 50).nullable()
     val latitude = double("latitude").nullable()
     val longitude = double("longitude").nullable()
-
 
     val createDate = timestamp("createDate")
     val updateDate = timestamp("updateDate")
