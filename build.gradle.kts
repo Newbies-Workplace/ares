@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.0.0-beta-1"
+val ktorVersion = "2.0-eap-298"
 val koinVersion = "3.1.4"
 val kotlinVersion = "1.6.10"
 val logbackVersion = "1.2.10"
@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     // kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 
     // ktor
     implementation("io.ktor:ktor-server-core:$ktorVersion")
