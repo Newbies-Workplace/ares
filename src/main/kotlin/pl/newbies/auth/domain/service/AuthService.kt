@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import kotlinx.datetime.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.auth.application.model.AuthResponse
+import pl.newbies.auth.application.model.PropertiesResponse
 import pl.newbies.auth.domain.model.RefreshToken
 import pl.newbies.auth.infrastructure.repository.RefreshTokenDAO
 import pl.newbies.auth.infrastructure.repository.toRefreshToken
@@ -43,6 +44,9 @@ class AuthService(
             accessToken = accessToken,
             refreshToken = token.token,
             expiresIn = EXPIRE_IN_SECONDS,
+            properties = PropertiesResponse(
+                isInitialized = user.createDate != user.updateDate,
+            )
         )
     }
 

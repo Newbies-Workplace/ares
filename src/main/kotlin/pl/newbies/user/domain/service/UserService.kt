@@ -1,5 +1,6 @@
 package pl.newbies.user.domain.service
 
+import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.logger
 import pl.newbies.user.application.model.UserRequest
@@ -21,9 +22,14 @@ class UserService(
     ): User = transaction {
         logger.info("Creating user (githubId = $githubId)")
 
+        val now = Clock.System.now()
+
         UserDAO.new(UUID.randomUUID().toString()) {
             this.nickname = nickname
             this.githubId = githubId
+
+            this.createDate = now
+            this.updateDate = now
         }.toUser()
     }
 
@@ -43,6 +49,8 @@ class UserService(
                 mail = updatedUser.contact.mail
                 github = updatedUser.contact.github
                 twitter = updatedUser.contact.twitter
+
+                updateDate = Clock.System.now()
             }
             ?.toUser()
             ?: throw UserNotFoundException(user.id)
@@ -62,6 +70,8 @@ class UserService(
                 linkedin = userRequest.contact.linkedin
                 mail = userRequest.contact.mail
                 twitter = userRequest.contact.twitter
+
+                updateDate = Clock.System.now()
             }
             ?.toUser()
             ?: throw UserNotFoundException(userId)

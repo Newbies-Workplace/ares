@@ -1,18 +1,16 @@
 package pl.newbies.user.domain.model
 
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.util.*
 
 data class User(
-    var id: String = UUID.randomUUID().toString(),
-
+    val id: String = UUID.randomUUID().toString(),
     var nickname: String,
+    var description: String? = null,
+    val contact: ContactDTO = ContactDTO(),
+    val accounts: AuthAccountsDTO = AuthAccountsDTO(),
 
-    var accounts: AuthAccountsDTO = AuthAccountsDTO(),
-
-    var contact: ContactDTO = ContactDTO(),
-
-    var description: String? = null
-) {
-    lateinit var createDate: Instant
-}
+    val createDate: Instant = Clock.System.now(),
+    var updateDate: Instant = createDate
+)

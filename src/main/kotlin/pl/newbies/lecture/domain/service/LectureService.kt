@@ -1,5 +1,6 @@
 package pl.newbies.lecture.domain.service
 
+import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -21,6 +22,8 @@ class LectureService {
         val tags = TagDAO.find { Tags.id inList request.tags.map { it.id } }
             .toMutableList()
 
+        val now = Clock.System.now()
+
         LectureDAO.new(UUID.randomUUID().toString()) {
             this.title = title
             this.subtitle = subtitle
@@ -38,6 +41,9 @@ class LectureService {
                 }
             }
             this.tags = SizedCollection(tags)
+
+            this.createDate = now
+            this.updateDate = now
         }.toLecture()
     }
 
@@ -62,6 +68,8 @@ class LectureService {
                     }
                 }
                 this.tags = SizedCollection(tags)
+
+                this.updateDate = Clock.System.now()
             }
             ?.toLecture()
             ?: throw LectureNotFoundException(lecture.id)

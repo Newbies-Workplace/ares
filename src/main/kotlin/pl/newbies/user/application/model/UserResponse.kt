@@ -10,6 +10,7 @@ data class UserResponse(
     val description: String?,
     val contact: ContactResponse,
     val createDate: Instant,
+    val updateDate: Instant,
 )
 
 @Serializable

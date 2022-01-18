@@ -1,6 +1,5 @@
 package pl.newbies.user.infrastructure.repository
 
-import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import pl.newbies.plugins.StringUUIDEntity
@@ -24,7 +23,7 @@ object Users : StringUUIDTable() {
     val twitter = varchar("contactTwitter", length = 50).nullable()
 
     val createDate = timestamp("createDate")
-        .clientDefault { Clock.System.now() }
+    val updateDate = timestamp("updateDate")
 }
 
 class UserDAO(id: EntityID<String>) : StringUUIDEntity(id) {
@@ -41,6 +40,7 @@ class UserDAO(id: EntityID<String>) : StringUUIDEntity(id) {
     var twitter by Users.twitter
 
     var createDate by Users.createDate
+    var updateDate by Users.updateDate
 }
 
 fun UserDAO.toUser() = User(
@@ -56,6 +56,6 @@ fun UserDAO.toUser() = User(
         twitter = twitter,
     ),
     description = description,
-).apply {
-    createDate = this@toUser.createDate
-}
+    createDate = createDate,
+    updateDate = updateDate,
+)

@@ -39,5 +39,6 @@ class LectureConverter(
                 tagConverter.convert(it)
             },
             createDate = lecture.createDate,
+            updateDate = lecture.updateDate,
         )
 }

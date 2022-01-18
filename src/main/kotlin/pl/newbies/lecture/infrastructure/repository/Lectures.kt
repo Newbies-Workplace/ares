@@ -31,7 +31,7 @@ object Lectures : StringUUIDTable() {
 
 
     val createDate = timestamp("createDate")
-        .clientDefault { Clock.System.now() }
+    val updateDate = timestamp("updateDate")
 }
 
 object LectureTags : Table() {
@@ -60,6 +60,7 @@ class LectureDAO(id: EntityID<String>) : StringUUIDEntity(id) {
     var tags by TagDAO via LectureTags
 
     var createDate by Lectures.createDate
+    var updateDate by Lectures.updateDate
 }
 
 fun LectureDAO.toLecture() = Lecture(
@@ -82,5 +83,7 @@ fun LectureDAO.toLecture() = Lecture(
                 )
             } else null
         )
-    } else null
+    } else null,
+    createDate = createDate,
+    updateDate = updateDate,
 )
