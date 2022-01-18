@@ -9,7 +9,9 @@ import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.toUser
 import java.util.*
 
-class UserService {
+class UserService(
+    private val userEditor: UserEditor,
+) {
 
     private val logger = logger()
 
@@ -26,10 +28,31 @@ class UserService {
     }
 
     fun updateUser(
+        user: User,
+        changes: Map<String, String?>,
+    ): User = transaction {
+        logger.info("Updating user (id = ${user.id})")
+
+        val updatedUser = userEditor.update(user, changes)
+
+        UserDAO.findById(user.id)
+            ?.apply {
+                nickname = updatedUser.nickname
+                description = updatedUser.description
+                linkedin = updatedUser.contact.linkedin
+                mail = updatedUser.contact.mail
+                github = updatedUser.contact.github
+                twitter = updatedUser.contact.twitter
+            }
+            ?.toUser()
+            ?: throw UserNotFoundException(user.id)
+    }
+
+    fun replaceUser(
         userId: String,
         userRequest: UserRequest,
     ): User = transaction {
-        logger.info("Updating user (id = $userId)")
+        logger.info("Replacing user (id = $userId)")
 
         UserDAO.findById(userId)
             ?.apply {
