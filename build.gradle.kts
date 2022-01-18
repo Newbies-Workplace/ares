@@ -6,7 +6,7 @@ val kotlinVersion = "1.6.10"
 val logbackVersion = "1.2.10"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.37.3"
-val hikariVersion = "5.0.0"
+val hikariVersion = "5.0.1"
 val flywayVersion = "8.4.1"
 
 plugins {
