@@ -8,6 +8,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
+import kotlinx.serialization.json.JsonElement
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
@@ -42,7 +43,7 @@ fun Application.userRoutes() {
 
                 patch("/@me") {
                     val id = call.principal<AresPrincipal>()!!.userId
-                    val changes = call.receive<Map<String, String?>>()
+                    val changes = call.receive<JsonElement>()
                     val user = transaction { UserDAO.findById(id)?.toUser() }
                         ?: throw UserNotFoundException(id)
 

@@ -1,6 +1,7 @@
 package pl.newbies.user.domain.service
 
 import kotlinx.datetime.Clock
+import kotlinx.serialization.json.JsonElement
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.logger
 import pl.newbies.user.application.model.UserRequest
@@ -35,7 +36,7 @@ class UserService(
 
     fun updateUser(
         user: User,
-        changes: Map<String, String?>,
+        changes: JsonElement,
     ): User = transaction {
         logger.info("Updating user (id = ${user.id})")
 

@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class PropertiesResponse(
-    val isInitialized: Boolean
+    val isInitialized: Boolean,
 )
