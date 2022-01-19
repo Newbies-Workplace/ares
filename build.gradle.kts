@@ -8,6 +8,8 @@ val valiktorVersion = "0.12.0"
 val exposedVersion = "0.37.3"
 val hikariVersion = "5.0.1"
 val flywayVersion = "8.4.1"
+val h2Version = "2.0.206"
+val junitVersion = "5.8.2"
 
 plugins {
     application
@@ -67,8 +69,10 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
+    testRuntimeOnly("com.h2database:h2:$h2Version")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 }
 
 java {
@@ -79,4 +83,8 @@ tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "11"
     }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

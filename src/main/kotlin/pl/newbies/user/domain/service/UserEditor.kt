@@ -35,7 +35,7 @@ class UserEditor {
         var contact = user.contact
 
         value.jsonObject.entries.forEach { (key, value) ->
-            contact = when(key.lowercase()) {
+            contact = when (key.lowercase()) {
                 "github" -> contact.copy(github = value.jsonPrimitive.contentOrNull)
                 "linkedin" -> contact.copy(linkedin = value.jsonPrimitive.contentOrNull)
                 "mail" -> contact.copy(mail = value.jsonPrimitive.contentOrNull)
