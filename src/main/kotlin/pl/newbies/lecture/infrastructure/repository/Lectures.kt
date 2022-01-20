@@ -1,6 +1,5 @@
 package pl.newbies.lecture.infrastructure.repository
 
-import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
@@ -29,9 +28,8 @@ object Lectures : StringUUIDTable() {
     val latitude = double("latitude").nullable()
     val longitude = double("longitude").nullable()
 
-
     val createDate = timestamp("createDate")
-        .clientDefault { Clock.System.now() }
+    val updateDate = timestamp("updateDate")
 }
 
 object LectureTags : Table() {
@@ -60,6 +58,7 @@ class LectureDAO(id: EntityID<String>) : StringUUIDEntity(id) {
     var tags by TagDAO via LectureTags
 
     var createDate by Lectures.createDate
+    var updateDate by Lectures.updateDate
 }
 
 fun LectureDAO.toLecture() = Lecture(
@@ -82,5 +81,7 @@ fun LectureDAO.toLecture() = Lecture(
                 )
             } else null
         )
-    } else null
+    } else null,
+    createDate = createDate,
+    updateDate = updateDate,
 )

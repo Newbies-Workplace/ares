@@ -10,4 +10,5 @@ data class AuthResponse(
     val refreshToken: String = "todo",
     val tokenType: String = "Bearer",
     val expiresIn: Long,
+    val properties: PropertiesResponse,
 )

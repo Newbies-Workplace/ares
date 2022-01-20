@@ -14,6 +14,7 @@ data class LectureResponse(
     val address: AddressResponse?,
     val tags: List<TagResponse>,
     val createDate: Instant,
+    val updateDate: Instant,
 )
 
 @Serializable

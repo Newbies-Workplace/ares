@@ -18,5 +18,6 @@ class UserConverter {
                 twitter = user.contact.twitter,
             ),
             createDate = user.createDate,
+            updateDate = user.updateDate,
         )
 }
