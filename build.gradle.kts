@@ -8,7 +8,7 @@ val valiktorVersion = "0.12.0"
 val exposedVersion = "0.37.3"
 val hikariVersion = "5.0.1"
 val flywayVersion = "8.4.2"
-val h2Version = "2.0.206"
+val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
 
 plugins {
