@@ -49,7 +49,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposedVersion")
 
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.5")
+    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
 
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")
