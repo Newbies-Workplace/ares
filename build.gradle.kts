@@ -10,6 +10,7 @@ val hikariVersion = "5.0.1"
 val flywayVersion = "8.4.2"
 val h2Version = "2.0.206"
 val junitVersion = "5.8.2"
+val testContainers = "1.16.3"
 
 plugins {
     application
@@ -69,9 +70,10 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
-    testRuntimeOnly("com.h2database:h2:$h2Version")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testImplementation("org.testcontainers:mariadb:$testContainers")
+    testImplementation("org.testcontainers:junit-jupiter:$testContainers")
     testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
 }
 

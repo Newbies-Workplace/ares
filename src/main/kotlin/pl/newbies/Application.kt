@@ -1,7 +1,12 @@
 package pl.newbies
 
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.apache.Apache
+import io.ktor.client.plugins.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.*
 import io.ktor.server.application.Application
+import kotlinx.serialization.json.Json
 import pl.newbies.auth.authModule
 import pl.newbies.lecture.application.lectureRoutes
 import pl.newbies.lecture.lectureModule
@@ -15,8 +20,8 @@ fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
 
 @Suppress("unused")
-fun Application.module() {
-    configureSecurity()
+fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
+    configureSecurity(oauthClient)
     configureHTTP()
     configureSerialization()
     configureDatabase()
@@ -35,4 +40,14 @@ fun Application.module() {
     userRoutes()
     tagRoutes()
     lectureRoutes()
+}
+
+val oauthHttpClient = HttpClient(Apache) {
+    install(ContentNegotiation) {
+        json(Json {
+            encodeDefaults = true
+            isLenient = true
+            ignoreUnknownKeys = true
+        })
+    }
 }

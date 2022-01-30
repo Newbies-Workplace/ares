@@ -1,30 +1,25 @@
 package pl.newbies
 
-import io.ktor.server.config.MapApplicationConfig
-import io.ktor.server.testing.testApplication
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import pl.newbies.util.IntegrationTest
+import pl.newbies.util.pongModule
 
-val defaultConfig = MapApplicationConfig(
-    "database.driverClassName" to "org.h2.Driver",
-    "database.jdbcUrl" to "jdbc:h2:mem:test",
-    "jwt.realm" to "Test Realm",
-    "jwt.secret" to "secret",
-    "jwt.issuer" to "Test issuer",
-    "oauth.github.userUrl" to "",
-    "database.username" to "root",
-    "database.password" to "",
-)
-
-class ApplicationTest {
+class ApplicationTest : IntegrationTest() {
 
     @Test
-    fun testRoot() {
-        testApplication {
-            application {
-                testModule()
-                module()
-            }
-            environment { config = defaultConfig }
-        }
+    fun `should load all test modules`() = withAres {
+        // given
+        application { pongModule() }
+
+        // when
+        val response = client.get("/ping")
+
+        // then
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertEquals("pong", response.bodyAsText())
     }
 }

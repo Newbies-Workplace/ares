@@ -15,7 +15,7 @@ class V1__init: BaseJavaMigration() {
 
     override fun migrate(context: Context?) {
         transaction {
-            SchemaUtils.create(
+            SchemaUtils.createMissingTablesAndColumns(
                 Users,
                 Tags,
                 FollowedTags,

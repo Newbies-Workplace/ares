@@ -2,13 +2,11 @@ package pl.newbies.tag.application
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
+import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.get
-import io.ktor.server.routing.put
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
+import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.pagination
 import pl.newbies.plugins.AresPrincipal
@@ -27,38 +25,46 @@ fun Application.tagRoutes() {
                 val (page, size) = call.pagination()
 
                 val foundTags = transaction {
-                    TagDAO.all().limit(page.toInt(), page * size)
+                    TagDAO.all()
+                        .limit(page.toInt(), page * size)
+                        .map { it.toTag() }
                 }
 
-                val tags = foundTags.map { tagConverter.convert(it.toTag()) }
+                val tags = foundTags.map { tagConverter.convert(it) }
 
                 call.respond(tags)
             }
 
-            get("/@me") {
-                val userId = call.principal<AresPrincipal>()!!.userId
-
-                val foundTags = transaction {
-                    FollowedTagDAO.find { FollowedTags.user eq userId }
-                        .map { it.toFollowedTag() }
-                }
-                val followedTags = foundTags.map { tagConverter.convert(it.tag) }
-
-                call.respond(followedTags)
-            }
-
-            put("/@me") {
-                val userId = call.principal<AresPrincipal>()!!.userId
-                val tags = call.receive<List<TagRequest>>().distinct()
-                val foundTags = transaction {
-                    TagDAO.find { Tags.id inList tags.map { it.id } }
-                        .map { it.toTag() }
+            authenticate("jwt") {
+                post {
+                    // todo
                 }
 
-                val followedTags = tagService.putFollowedTags(userId, foundTags)
-                    .map { tagConverter.convert(it.tag) }
+                get("/@me") {
+                    val userId = call.principal<AresPrincipal>()!!.userId
 
-                call.respond(followedTags)
+                    val foundTags = transaction {
+                        FollowedTagDAO.find { FollowedTags.user eq userId }
+                            .map { it.toFollowedTag() }
+                    }
+                    val followedTags = foundTags.map { tagConverter.convert(it.tag) }
+
+                    call.respond(followedTags)
+                }
+
+                put("/@me") {
+                    val userId = call.principal<AresPrincipal>()!!.userId
+                    val tags = call.receive<List<TagRequest>>().distinct()
+                    val foundTags = transaction {
+                        TagDAO.find { Tags.id inList tags.map { it.id } }
+                            .map { it.toTag() }
+                    }
+
+                    val followedTags = tagService.putFollowedTags(userId, foundTags)
+                        .map { tagConverter.convert(it.tag) }
+
+                    call.respond(followedTags)
+                }
             }
         }
     }

@@ -7,11 +7,10 @@ import io.ktor.server.application.log
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
-import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.*
-import java.util.*
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Database
 
 private fun Application.createHikariDataSource(): HikariDataSource {
     val config = environment.config

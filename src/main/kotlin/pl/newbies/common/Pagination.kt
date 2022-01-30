@@ -9,7 +9,7 @@ import org.valiktor.validate
 
 private const val MIN_PAGE = 1L
 private const val MIN_PAGE_SIZE = 10L
-private const val MAX_PAGE_SIZE = 50L
+private const val MAX_PAGE_SIZE = 100L
 
 @Serializable
 data class Pagination(
