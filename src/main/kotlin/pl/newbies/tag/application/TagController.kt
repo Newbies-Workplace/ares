@@ -1,5 +1,6 @@
 package pl.newbies.tag.application
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -7,10 +8,12 @@ import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.*
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
-import pl.newbies.common.pagination
+import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
+import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
 import pl.newbies.tag.domain.service.TagService
 import pl.newbies.tag.infrastructure.repository.*
@@ -22,11 +25,9 @@ fun Application.tagRoutes() {
     routing {
         route("/api/v1/tags") {
             get {
-                val (page, size) = call.pagination()
-
                 val foundTags = transaction {
                     TagDAO.all()
-                        .limit(page.toInt(), page * size)
+                        .orderBy(Tags.name to SortOrder.ASC)
                         .map { it.toTag() }
                 }
 
@@ -37,7 +38,11 @@ fun Application.tagRoutes() {
 
             authenticate("jwt") {
                 post {
-                    // todo
+                    val tagRequest = call.receive<TagCreateRequest>()
+
+                    val createdTag = tagService.createTag(tagRequest.name)
+
+                    call.respond(tagConverter.convert(createdTag))
                 }
 
                 get("/@me") {
@@ -64,6 +69,15 @@ fun Application.tagRoutes() {
                         .map { tagConverter.convert(it.tag) }
 
                     call.respond(followedTags)
+                }
+
+                delete("/@me") {
+                    val userId = call.principal<AresPrincipal>()!!.userId
+                    val tags = call.receive<List<TagRequest>>().distinct()
+
+                    tagService.removeFollowedTags(userId, tags.map { it.id })
+
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }

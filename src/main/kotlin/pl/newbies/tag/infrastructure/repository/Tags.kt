@@ -1,6 +1,7 @@
 package pl.newbies.tag.infrastructure.repository
 
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.ReferenceOption
 import pl.newbies.plugins.StringUUIDEntity
 import pl.newbies.plugins.StringUUIDEntityClass
 import pl.newbies.plugins.StringUUIDTable
@@ -11,25 +12,24 @@ import pl.newbies.user.infrastructure.repository.Users
 import pl.newbies.user.infrastructure.repository.toUser
 
 object Tags : StringUUIDTable() {
-    val name = varchar("name", length = 50)
+    val name = varchar("name", length = 50, collate = "utf8_general_ci").uniqueIndex()
 }
 
 class TagDAO(id: EntityID<String>) : StringUUIDEntity(id) {
     companion object : StringUUIDEntityClass<TagDAO>(Tags)
 
-    val name by Tags.name
+    var name by Tags.name
 }
 
 object FollowedTags : StringUUIDTable() {
     val user = reference("user", Users)
-    val tag = reference("tag", Tags)
+    val tag = reference("tag", Tags, onDelete = ReferenceOption.CASCADE)
 }
 
 class FollowedTagDAO(id: EntityID<String>) : StringUUIDEntity(id) {
     companion object : StringUUIDEntityClass<FollowedTagDAO>(FollowedTags)
 
     var user by UserDAO referencedOn FollowedTags.user
-
     var tag by TagDAO referencedOn FollowedTags.tag
 }
 

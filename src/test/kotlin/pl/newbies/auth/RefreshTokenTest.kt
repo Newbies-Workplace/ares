@@ -12,6 +12,8 @@ import org.junit.jupiter.api.assertThrows
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.util.IntegrationTest
 import pl.newbies.util.TestData
+import pl.newbies.util.httpClient
+import pl.newbies.util.loginAs
 import java.util.*
 
 class RefreshTokenTest : IntegrationTest() {
@@ -112,7 +114,7 @@ class RefreshTokenTest : IntegrationTest() {
                 }
             }
 
-            //then
+            // then
             assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
         }
     }

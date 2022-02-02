@@ -15,7 +15,6 @@ fun Application.configureSecurity(oauthClient: HttpClient) {
     val jwtSecret = config.property("jwt.secret").getString()
     val jwtIssuer = config.property("jwt.issuer").getString()
 
-
     authentication {
         jwt("jwt") {
             realm = jwtRealm

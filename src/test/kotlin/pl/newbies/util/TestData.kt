@@ -1,6 +1,10 @@
 package pl.newbies.util
 
+import kotlinx.datetime.Instant
 import pl.newbies.auth.application.model.GithubUser
+import pl.newbies.lecture.application.model.AddressRequest
+import pl.newbies.lecture.application.model.LectureRequest
+import pl.newbies.lecture.application.model.TimeFrameRequest
 
 object TestData {
 
@@ -29,5 +33,25 @@ object TestData {
         testUser1,
         testUser2,
         testUser3,
+    )
+
+    fun createLectureRequest(
+        title: String = "Lecture with name",
+        subtitle: String? = null,
+        timeFrameRequest: TimeFrameRequest = TimeFrameRequest(
+            startDate = Instant.fromEpochMilliseconds(1_000L),
+            finishDate = Instant.fromEpochMilliseconds(4_000L),
+        ),
+        address: AddressRequest? = AddressRequest(
+            city = "Warszawa",
+            place = "Kolońska 45/2",
+            coordinates = null,
+        ),
+    ) = LectureRequest(
+        title = title,
+        subtitle = subtitle,
+        timeFrame = timeFrameRequest,
+        address = address,
+        tags = emptyList()
     )
 }

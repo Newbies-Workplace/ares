@@ -17,6 +17,8 @@ import pl.newbies.user.application.model.UserRequest
 import pl.newbies.user.application.model.UserResponse
 import pl.newbies.util.IntegrationTest
 import pl.newbies.util.TestData
+import pl.newbies.util.httpClient
+import pl.newbies.util.loginAs
 import java.util.*
 
 class UserTest : IntegrationTest() {

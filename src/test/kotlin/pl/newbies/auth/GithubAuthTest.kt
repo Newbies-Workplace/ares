@@ -12,15 +12,17 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import pl.newbies.util.IntegrationTest
 import pl.newbies.util.TestData
+import pl.newbies.util.httpClient
+import pl.newbies.util.loginAs
 
 class GithubAuthTest : IntegrationTest() {
 
     @Nested
-    inner class Login  {
+    inner class Login {
         @Test
         fun `redirects on login called`() = withAres {
             // when
-            val response = client.get("/oauth/login/github")
+            val response = httpClient.get("/oauth/login/github")
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)

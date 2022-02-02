@@ -4,7 +4,7 @@ on: push
 
 jobs:
   unit-test:
-    name: Unit tests
+    name: Tests
     runs-on: ubuntu-latest
 
     steps:

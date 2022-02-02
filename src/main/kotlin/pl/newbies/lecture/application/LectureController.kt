@@ -1,5 +1,6 @@
 package pl.newbies.lecture.application
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -8,6 +9,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.ForbiddenException
 import pl.newbies.common.pagination
@@ -16,6 +18,7 @@ import pl.newbies.lecture.domain.LectureNotFoundException
 import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
+import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
@@ -30,7 +33,10 @@ fun Application.lectureRoutes() {
                 val (page, size) = call.pagination()
 
                 val lectures = transaction {
-                    LectureDAO.all().limit(size.toInt(), page * size).map { it.toLecture() }
+                    LectureDAO.all()
+                        .orderBy(Lectures.createDate to SortOrder.ASC)
+                        .limit(size.toInt(), (page - 1) * size)
+                        .map { it.toLecture() }
                 }.map { lectureConverter.convert(it) }
 
                 call.respond(lectures)
@@ -84,6 +90,8 @@ fun Application.lectureRoutes() {
                     principal.assertLectureWriteAccess(lecture)
 
                     lectureService.deleteLecture(lecture)
+
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }
