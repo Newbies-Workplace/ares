@@ -6,14 +6,13 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
+import kotlinx.coroutines.delay
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import pl.newbies.util.IntegrationTest
-import pl.newbies.util.TestData
-import pl.newbies.util.httpClient
-import pl.newbies.util.loginAs
+import pl.newbies.util.*
 
 class GithubAuthTest : IntegrationTest() {
 
@@ -43,6 +42,7 @@ class GithubAuthTest : IntegrationTest() {
 
             // then
             assertEquals(user.name, response.username)
+            assertDoesNotThrow { getUser(response.getUserId()) }
         }
 
         @Test
@@ -50,12 +50,16 @@ class GithubAuthTest : IntegrationTest() {
             // given
             clearTable("Users")
             val user = TestData.testUser1
-            loginAs(user)
+            val authResponse = loginAs(user)
+            val createdUser = getUser(authResponse.getUserId())
+            delay(1_000)
 
             // when
             val response = loginAs(user)
+            val loggedUser = getUser(response.getUserId())
 
             // then
+            assertEquals(createdUser.createDate, loggedUser.createDate)
             assertEquals(user.name, response.username)
         }
 

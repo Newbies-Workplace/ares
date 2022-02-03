@@ -1,11 +1,8 @@
 package pl.newbies.util
 
 import io.ktor.client.call.body
-import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.*
 import io.ktor.client.request.forms.submitForm
-import io.ktor.client.request.post
-import io.ktor.client.request.put
-import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.Parameters
 import io.ktor.http.contentType
@@ -17,6 +14,7 @@ import pl.newbies.lecture.application.model.LectureResponse
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
 import pl.newbies.tag.application.model.TagResponse
+import pl.newbies.user.application.model.UserResponse
 import java.util.*
 
 suspend fun ApplicationTestBuilder.loginAs(
@@ -69,6 +67,12 @@ suspend fun ApplicationTestBuilder.createLecture(
         contentType(ContentType.Application.Json)
         bearerAuth(authResponse.accessToken)
     }
+
+    return response.body()
+}
+
+suspend fun ApplicationTestBuilder.getUser(id: String): UserResponse {
+    val response = httpClient.get("api/v1/users/$id")
 
     return response.body()
 }
