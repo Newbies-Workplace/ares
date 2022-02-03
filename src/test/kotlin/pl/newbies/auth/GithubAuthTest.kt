@@ -20,7 +20,7 @@ class GithubAuthTest : IntegrationTest() {
     @Nested
     inner class Login {
         @Test
-        fun `redirects on login called`() = withAres {
+        fun `should redirect when login called`() = withAres {
             // when
             val response = httpClient.get("/oauth/login/github")
 
@@ -33,8 +33,9 @@ class GithubAuthTest : IntegrationTest() {
     @Nested
     inner class Callback {
         @Test
-        fun `creates account when called with new user`() = withAres {
+        fun `should create account when called with new user`() = withAres {
             // given
+            clearTable("Users")
             val user = TestData.testUser1
 
             // when
@@ -45,9 +46,11 @@ class GithubAuthTest : IntegrationTest() {
         }
 
         @Test
-        fun `returns existing account when called with existing github user`() = withAres {
+        fun `should return existing account when called with existing github user`() = withAres {
             // given
+            clearTable("Users")
             val user = TestData.testUser1
+            loginAs(user)
 
             // when
             val response = loginAs(user)
@@ -57,7 +60,7 @@ class GithubAuthTest : IntegrationTest() {
         }
 
         @Test
-        fun `returns 401 on invalid data`() = withAres {
+        fun `should return 401 when called with invalid data`() = withAres {
             // then
             val exception = assertThrows<ClientRequestException> {
                 client.submitForm(

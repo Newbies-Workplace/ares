@@ -10,7 +10,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
-import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
 import pl.newbies.tag.application.model.TagCreateRequest

@@ -306,7 +306,6 @@ class LectureTest : IntegrationTest() {
 
             // then
             assertEquals(HttpStatusCode.NotFound, exception.response.status)
-
         }
 
         @Test

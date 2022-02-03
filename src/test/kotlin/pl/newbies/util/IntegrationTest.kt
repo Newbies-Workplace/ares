@@ -8,10 +8,12 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.config.HoconApplicationConfig
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
+import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.MariaDBContainer
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.module
 
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 abstract class IntegrationTest {
 
     fun AuthResponse.getUserId(): String =
