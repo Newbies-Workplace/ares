@@ -3,15 +3,16 @@ package pl.newbies.plugins
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationStopping
 import io.ktor.server.application.log
 import org.flywaydb.core.Flyway
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
-import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.*
-import java.util.*
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 private fun Application.createHikariDataSource(): HikariDataSource {
     val config = environment.config
@@ -60,5 +61,9 @@ fun Application.configureDatabase() {
     val dataSource = createHikariDataSource()
 
     Database.connect(dataSource)
+    environment.monitor.subscribe(ApplicationStopping) {
+        TransactionManager.currentOrNull()?.close()
+        dataSource.close()
+    }
     runMigrations(dataSource)
 }

@@ -1,19 +1,16 @@
 package pl.newbies.lecture.domain.service
 
 import kotlinx.datetime.Clock
-import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.transactions.transaction
-import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.domain.LectureNotFoundException
+import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
-import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.user.infrastructure.repository.UserDAO
-import pl.newbies.user.infrastructure.repository.Users
 import java.util.*
 
 class LectureService {
@@ -25,9 +22,9 @@ class LectureService {
         val now = Clock.System.now()
 
         LectureDAO.new(UUID.randomUUID().toString()) {
-            this.title = title
-            this.subtitle = subtitle
-            this.author = UserDAO(EntityID(authorId, Users))
+            this.title = request.title
+            this.subtitle = request.subtitle
+            this.author = UserDAO[authorId]
             request.timeFrame.let { frame ->
                 this.startDate = frame.startDate
                 this.finishDate = frame.finishDate
@@ -53,8 +50,8 @@ class LectureService {
 
         LectureDAO.findById(lecture.id)
             ?.apply {
-                this.title = title
-                this.subtitle = subtitle
+                this.title = request.title
+                this.subtitle = request.subtitle
                 request.timeFrame.let { frame ->
                     this.startDate = frame.startDate
                     this.finishDate = frame.finishDate
@@ -76,7 +73,6 @@ class LectureService {
     }
 
     fun deleteLecture(lecture: Lecture) = transaction {
-        LectureDAO(EntityID(lecture.id, Lectures))
-            .delete()
+        LectureDAO[lecture.id].delete()
     }
 }

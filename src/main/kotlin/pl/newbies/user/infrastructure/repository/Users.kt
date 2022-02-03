@@ -10,17 +10,17 @@ import pl.newbies.user.domain.model.ContactDTO
 import pl.newbies.user.domain.model.User
 
 object Users : StringUUIDTable() {
-    val nickname = varchar("nickname", length = 50)
-    val description = varchar("description", length = 255).nullable()
+    val nickname = varchar("nickname", length = 50, collate = "utf8_general_ci")
+    val description = varchar("description", length = 255, collate = "utf8_general_ci").nullable()
 
     //accounts
     val githubId = varchar("githubId", length = 30).nullable()
 
     //contact
-    val github = varchar("contactGithub", length = 50).nullable()
-    val linkedin = varchar("contactLinkedin", length = 50).nullable()
-    val mail = varchar("contactMail", length = 50).nullable()
-    val twitter = varchar("contactTwitter", length = 50).nullable()
+    val github = varchar("contactGithub", length = 50, collate = "utf8_general_ci").nullable()
+    val linkedin = varchar("contactLinkedin", length = 50, collate = "utf8_general_ci").nullable()
+    val mail = varchar("contactMail", length = 50, collate = "utf8_general_ci").nullable()
+    val twitter = varchar("contactTwitter", length = 50, collate = "utf8_general_ci").nullable()
 
     val createDate = timestamp("createDate")
     val updateDate = timestamp("updateDate")

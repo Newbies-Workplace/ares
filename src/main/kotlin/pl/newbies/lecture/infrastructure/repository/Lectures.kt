@@ -16,15 +16,15 @@ import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
 
 object Lectures : StringUUIDTable() {
-    val title = varchar("title", 100)
-    val subtitle = varchar("subtitle", 100).nullable()
+    val title = varchar("title", length = 100, collate = "utf8_general_ci")
+    val subtitle = varchar("subtitle", length = 100, collate = "utf8_general_ci").nullable()
     val author = reference("author", Users)
 
     val startDate = timestamp("startDate")
     val finishDate = timestamp("finishDate").nullable()
 
-    val city = varchar("city", 50).nullable()
-    val place = varchar("place", 50).nullable()
+    val city = varchar("city", length = 50, collate = "utf8_general_ci").nullable()
+    val place = varchar("place", length = 50, collate = "utf8_general_ci").nullable()
     val latitude = double("latitude").nullable()
     val longitude = double("longitude").nullable()
 

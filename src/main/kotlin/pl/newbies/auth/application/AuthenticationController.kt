@@ -1,5 +1,6 @@
 package pl.newbies.auth.application
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
@@ -53,6 +54,8 @@ fun Application.authenticationRoutes() {
                 }
 
                 authService.deleteRefreshToken(token)
+
+                call.respond(HttpStatusCode.OK)
             }
         }
     }
