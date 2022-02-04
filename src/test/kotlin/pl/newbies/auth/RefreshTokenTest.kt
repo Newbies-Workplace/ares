@@ -35,6 +35,7 @@ class RefreshTokenTest : IntegrationTest() {
             assertEquals(HttpStatusCode.OK, response.status)
             val responseBody = response.body<AuthResponse>()
             assertNotEquals(refreshToken, responseBody)
+            assertEquals(authResponse.getUserId(), responseBody.user.id)
         }
 
         @Test
