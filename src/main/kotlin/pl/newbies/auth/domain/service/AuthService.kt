@@ -9,12 +9,14 @@ import pl.newbies.auth.application.model.PropertiesResponse
 import pl.newbies.auth.domain.model.RefreshToken
 import pl.newbies.auth.infrastructure.repository.RefreshTokenDAO
 import pl.newbies.auth.infrastructure.repository.toRefreshToken
+import pl.newbies.user.application.UserConverter
 import pl.newbies.user.domain.model.User
 import java.util.*
 
 class AuthService(
     private val jwtSecret: String,
     private val jwtIssuer: String,
+    private val userConverter: UserConverter,
 ) {
 
     fun generateResponse(user: User, refreshToken: RefreshToken?): AuthResponse {
@@ -44,6 +46,7 @@ class AuthService(
             accessToken = accessToken,
             refreshToken = token.token,
             expiresIn = EXPIRE_IN_SECONDS,
+            user = userConverter.convert(user),
             properties = PropertiesResponse(
                 isInitialized = user.createDate != user.updateDate,
             )
