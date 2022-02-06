@@ -91,7 +91,6 @@ class GraphQLPlugin(val schema: Schema) {
                     if (call.request.path() == config.endpoint) {
                         application.log.error("GraphQL error:")
                         context.respond(HttpStatusCode.OK, e.serialize())
-
                     } else throw e
                 }
             }
