@@ -7,6 +7,7 @@ import com.apurebase.kgraphql.schema.dsl.SchemaConfigurationDSL
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
+import io.ktor.server.request.path
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
@@ -87,8 +88,11 @@ class GraphQLPlugin(val schema: Schema) {
                         proceed()
                     }
                 } catch (e: Throwable) {
-                    application.log.error("GraphQL error:", e)
-                    context.respond(HttpStatusCode.OK, e.serialize())
+                    if (call.request.path() == config.endpoint) {
+                        application.log.error("GraphQL error:")
+                        context.respond(HttpStatusCode.OK, e.serialize())
+
+                    } else throw e
                 }
             }
             return GraphQLPlugin(schema)
