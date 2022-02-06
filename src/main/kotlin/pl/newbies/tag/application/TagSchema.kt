@@ -4,6 +4,7 @@ import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.pagination
+import pl.newbies.common.principal
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
 import pl.newbies.tag.application.model.TagCreateRequest
@@ -30,7 +31,7 @@ fun SchemaBuilder.tagSchema() {
 
     query("followedTags") {
         resolver { page: Int?, size: Int?, context: Context ->
-            val principal = context.get<AresPrincipal>()!!
+            val principal = context.principal()
             val pagination = (page to size).pagination()
 
             transaction {
@@ -53,7 +54,7 @@ fun SchemaBuilder.tagSchema() {
 
     mutation("followTags") {
         resolver { request: List<TagRequest>, context: Context ->
-            val principal = context.get<AresPrincipal>()!!
+            val principal = context.principal()
 
             val foundTags = transaction {
                 TagDAO.find { Tags.id inList request.distinct().map { it.id } }
@@ -67,7 +68,7 @@ fun SchemaBuilder.tagSchema() {
 
     mutation("unfollowTags") {
         resolver { request: List<TagRequest>, context: Context ->
-            val principal = context.get<AresPrincipal>()!!
+            val principal = context.principal()
 
             tagService.removeFollowedTags(principal.userId, request.distinct().map { it.id })
 
@@ -77,7 +78,7 @@ fun SchemaBuilder.tagSchema() {
 
     mutation("createTag") {
         resolver { request: TagCreateRequest, context: Context ->
-            context.get<AresPrincipal>()!!
+            context.principal()
 
             val tag = tagService.createTag(request.name)
 

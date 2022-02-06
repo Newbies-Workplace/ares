@@ -4,6 +4,7 @@ import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.pagination
+import pl.newbies.common.principal
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.application.model.LectureResponse
 import pl.newbies.lecture.domain.LectureNotFoundException
@@ -41,7 +42,7 @@ fun SchemaBuilder.lectureSchema() {
 
     mutation("createLecture") {
         resolver { request: LectureRequest, context: Context ->
-            val principal = context.get<AresPrincipal>()!!
+            val principal = context.principal()
 
             val lecture = lectureService.createLecture(request, principal.userId)
 
@@ -51,7 +52,7 @@ fun SchemaBuilder.lectureSchema() {
 
     mutation("replaceLecture") {
         resolver { id: String, request: LectureRequest, context: Context ->
-            val principal = context.get<AresPrincipal>()!!
+            val principal = context.principal()
             val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
                 ?: throw LectureNotFoundException(id)
 
@@ -65,7 +66,7 @@ fun SchemaBuilder.lectureSchema() {
 
     mutation("deleteLecture") {
         resolver { id: String, context: Context ->
-            val principal = context.get<AresPrincipal>()!!
+            val principal = context.principal()
             val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
                 ?: throw LectureNotFoundException(id)
 

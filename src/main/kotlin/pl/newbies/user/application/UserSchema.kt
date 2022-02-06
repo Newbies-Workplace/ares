@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonElement
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.Pagination
 import pl.newbies.common.pagination
+import pl.newbies.common.principal
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
 import pl.newbies.user.application.model.UserRequest
@@ -46,26 +47,13 @@ fun SchemaBuilder.userSchema() {
 
     mutation("replaceMyUser") {
         resolver { request: UserRequest, context: Context ->
-            val principal = context.get<AresPrincipal>()!!
+            val principal = context.principal()
 
             val updatedUser = userService.replaceUser(principal.userId, request)
 
             userConverter.convert(updatedUser)
         }
     }
-
-    /*mutation("updateMyUser") {
-        resolver { request: JsonElement, context: Context ->
-            val principal = context.get<AresPrincipal>()!!
-
-            val user = transaction { UserDAO.findById(principal.userId)?.toUser() }
-                ?: throw UserNotFoundException(principal.userId)
-
-            val updatedUser = userService.updateUser(user, request)
-
-            userConverter.convert(updatedUser)
-        }
-    }*/
 
     inputType<UserRequest>()
     type<UserResponse>()
