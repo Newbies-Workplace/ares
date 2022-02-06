@@ -11,7 +11,6 @@ import pl.newbies.lecture.domain.LectureNotFoundException
 import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
 import pl.newbies.lecture.infrastructure.repository.toLecture
-import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
 
 fun SchemaBuilder.lectureSchema() {

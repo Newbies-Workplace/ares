@@ -23,7 +23,7 @@ import kotlinx.serialization.json.put
 // workaround for https://github.com/aPureBase/KGraphQL/pull/179
 class GraphQLPlugin(val schema: Schema) {
 
-    class Configuration: SchemaConfigurationDSL() {
+    class Configuration : SchemaConfigurationDSL() {
         fun schema(block: SchemaBuilder.() -> Unit) {
             schemaBlock = block
         }
@@ -45,7 +45,7 @@ class GraphQLPlugin(val schema: Schema) {
         internal var schemaBlock: (SchemaBuilder.() -> Unit)? = null
     }
 
-    companion object Feature: ApplicationPlugin<Application, Configuration, GraphQLPlugin> {
+    companion object Feature : ApplicationPlugin<Application, Configuration, GraphQLPlugin> {
         override val key = AttributeKey<GraphQLPlugin>("KGraphQL")
 
         override fun install(pipeline: Application, configure: Configuration.() -> Unit): GraphQLPlugin {
@@ -87,29 +87,28 @@ class GraphQLPlugin(val schema: Schema) {
                         proceed()
                     }
                 } catch (e: Throwable) {
-                    if (e is GraphQLError) {
-                        context.respond(HttpStatusCode.OK, e.serialize())
-                    } else throw e
+                    application.log.error("GraphQL error:", e)
+                    context.respond(HttpStatusCode.OK, e.serialize())
                 }
             }
             return GraphQLPlugin(schema)
         }
 
-        private fun GraphQLError.serialize(): String = buildJsonObject {
+        private fun Throwable.serialize(): String = buildJsonObject {
             put("errors", buildJsonArray {
                 addJsonObject {
                     put("message", message)
-                    put("locations", buildJsonArray {
-                        locations?.forEach {
-                            addJsonObject {
-                                put("line", it.line)
-                                put("column", it.column)
+                    if (this@serialize is GraphQLError) {
+                        put("locations", buildJsonArray {
+                            locations?.forEach {
+                                addJsonObject {
+                                    put("line", it.line)
+                                    put("column", it.column)
+                                }
                             }
-                        }
-                    })
-                    put("path", buildJsonArray {
-
-                    })
+                        })
+                    }
+                    put("path", buildJsonArray { })
                 }
             })
         }.toString()

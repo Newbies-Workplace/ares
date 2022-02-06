@@ -2,19 +2,12 @@ package pl.newbies.user.application
 
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import io.ktor.server.application.call
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import kotlinx.serialization.json.JsonElement
 import org.jetbrains.exposed.sql.transactions.transaction
-import pl.newbies.common.Pagination
 import pl.newbies.common.pagination
 import pl.newbies.common.principal
-import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
 import pl.newbies.user.application.model.UserRequest
 import pl.newbies.user.application.model.UserResponse
-import pl.newbies.user.domain.UserNotFoundException
 import pl.newbies.user.domain.service.UserService
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.toUser

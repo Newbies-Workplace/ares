@@ -5,7 +5,6 @@ import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.pagination
 import pl.newbies.common.principal
-import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
