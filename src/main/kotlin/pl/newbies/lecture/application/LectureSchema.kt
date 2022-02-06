@@ -12,10 +12,15 @@ import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.plugins.inject
+import pl.newbies.user.application.UserConverter
+import pl.newbies.user.application.model.UserResponse
+import pl.newbies.user.infrastructure.repository.UserDAO
+import pl.newbies.user.infrastructure.repository.toUser
 
 fun SchemaBuilder.lectureSchema() {
     val lectureConverter: LectureConverter by inject()
     val lectureService: LectureService by inject()
+    val userConverter: UserConverter by inject()
 
     query("lectures") {
         resolver { page: Int?, size: Int? ->
@@ -78,5 +83,13 @@ fun SchemaBuilder.lectureSchema() {
     }
 
     inputType<LectureRequest>()
-    type<LectureResponse>()
+    type<LectureResponse> {
+        property<UserResponse>(name = "author") {
+            resolver {
+                val user = transaction { UserDAO[it.authorId].toUser() }
+
+                userConverter.convert(user)
+            }
+        }
+    }
 }
