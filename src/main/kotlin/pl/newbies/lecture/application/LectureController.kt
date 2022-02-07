@@ -30,12 +30,12 @@ fun Application.lectureRoutes() {
     routing {
         route("/api/v1/lectures") {
             get {
-                val (page, size) = call.pagination()
+                val pagination = call.pagination()
 
                 val lectures = transaction {
                     LectureDAO.all()
                         .orderBy(Lectures.createDate to SortOrder.ASC)
-                        .limit(size.toInt(), (page - 1) * size)
+                        .limit(pagination.limit, pagination.offset)
                         .map { it.toLecture() }
                 }.map { lectureConverter.convert(it) }
 
@@ -73,12 +73,12 @@ fun Application.lectureRoutes() {
 
                     principal.assertLectureWriteAccess(lecture)
 
-                    val createdLecture = lectureService.updateLecture(
+                    val updatedLecture = lectureService.updateLecture(
                         lecture = lecture,
                         request = request,
                     )
 
-                    call.respond(lectureConverter.convert(createdLecture))
+                    call.respond(lectureConverter.convert(updatedLecture))
                 }
 
                 delete("/{id}") {

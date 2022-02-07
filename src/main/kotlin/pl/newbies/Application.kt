@@ -4,16 +4,22 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.plugins.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.*
 import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.authentication
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import pl.newbies.auth.authModule
 import pl.newbies.lecture.application.lectureRoutes
+import pl.newbies.lecture.application.lectureSchema
 import pl.newbies.lecture.lectureModule
 import pl.newbies.plugins.*
 import pl.newbies.tag.application.tagRoutes
+import pl.newbies.tag.application.tagSchema
 import pl.newbies.tag.tagModule
 import pl.newbies.user.application.userRoutes
+import pl.newbies.user.application.userSchema
 import pl.newbies.user.userModule
 
 fun main(args: Array<String>): Unit =
@@ -35,6 +41,32 @@ fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
             tagModule,
             lectureModule,
         )
+    }
+
+    install(GraphQLPlugin) {
+        playground = true
+        useDefaultPrettyPrinter = true
+
+        wrap {
+            authenticate("jwt", optional = true, build = it)
+        }
+
+        context { call ->
+            call.authentication.principal<AresPrincipal>()?.let {
+                inject(it)
+            }
+        }
+
+        schema {
+            stringScalar<Instant> {
+                serialize = { date -> date.toString() }
+                deserialize = { dateString -> Instant.parse(dateString) }
+            }
+
+            userSchema()
+            tagSchema()
+            lectureSchema()
+        }
     }
 
     userRoutes()

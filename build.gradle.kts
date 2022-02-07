@@ -11,6 +11,7 @@ val flywayVersion = "8.4.4"
 val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
 val testContainers = "1.16.3"
+val kGraphQLVersion = "0.17.14"
 
 plugins {
     application
@@ -69,6 +70,8 @@ dependencies {
     implementation("io.ktor:ktor-client-apache:$ktorVersion")
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("com.apurebase:kgraphql:$kGraphQLVersion")
+    implementation("com.apurebase:kgraphql-ktor:$kGraphQLVersion")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")

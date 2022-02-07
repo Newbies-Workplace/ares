@@ -15,7 +15,7 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent.getKoin
 
-//workaround until koin supports ktor 2.0
+// workaround for https://github.com/InsertKoinIO/koin/pull/1266
 object KoinPlugin : ApplicationPlugin<Application, KoinApplication, Unit> {
 
     override val key: AttributeKey<Unit>
