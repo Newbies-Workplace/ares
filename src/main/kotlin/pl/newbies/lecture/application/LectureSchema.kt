@@ -2,6 +2,7 @@ package pl.newbies.lecture.application
 
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.pagination
 import pl.newbies.common.principal
@@ -10,6 +11,7 @@ import pl.newbies.lecture.application.model.LectureResponse
 import pl.newbies.lecture.domain.LectureNotFoundException
 import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
+import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.plugins.inject
 import pl.newbies.user.application.UserConverter
@@ -28,6 +30,7 @@ fun SchemaBuilder.lectureSchema() {
 
             transaction {
                 LectureDAO.all()
+                    .orderBy(Lectures.createDate to SortOrder.ASC)
                     .limit(pagination.limit, pagination.offset)
                     .map { it.toLecture() }
             }.map { lectureConverter.convert(it) }

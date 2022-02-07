@@ -2,6 +2,7 @@ package pl.newbies.tag.application
 
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.pagination
 import pl.newbies.common.principal
@@ -22,6 +23,7 @@ fun SchemaBuilder.tagSchema() {
 
             transaction {
                 TagDAO.all()
+                    .orderBy(Tags.name to SortOrder.ASC)
                     .limit(pagination.limit, pagination.offset)
                     .map { it.toTag() }
             }.map { tagConverter.convert(it) }

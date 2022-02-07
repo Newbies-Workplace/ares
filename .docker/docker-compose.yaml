@@ -13,8 +13,7 @@ services:
     ports:
       - "3306:3306"
   ares-service:
-    build: ../
-#    image: ghcr.io/newbies-workplace/ares:latest
+    image: ghcr.io/newbies-workplace/ares:latest
     restart: unless-stopped
     container_name: ares-service
     environment:
