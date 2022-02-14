@@ -1,5 +1,9 @@
 name: Deploy service
 
+concurrency:
+  group: prod
+  cancel-in-progress: true
+
 on:
   push:
     tags:
@@ -26,7 +30,7 @@ jobs:
           distribution: adopt
           java-version: 11
 
-      - name: Gradle test
+      - name: Gradle create image
         run: bash ./gradlew installDist
 
       - name: Log in to the Container registry
@@ -49,3 +53,22 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  install-package:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs:
+      - publish-package
+
+    steps:
+      - name: Deploy package to production
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          script: |
+            docker-compose down --rmi all
+            docker image rm ghcr.io/newbies-workplace/ares
+            docker pull ghcr.io/newbies-workplace/ares:latest
+            docker-compose up -d
