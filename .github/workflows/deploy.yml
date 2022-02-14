@@ -68,7 +68,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           password: ${{ secrets.DEPLOY_PASSWORD }}
           script: |
-            docker-compose down --rmi all
+            docker-compose down
             docker image rm ghcr.io/newbies-workplace/ares
             docker pull ghcr.io/newbies-workplace/ares:latest
             docker-compose up -d
