@@ -3,6 +3,7 @@ package pl.newbies.lecture.application
 import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.pagination
 import pl.newbies.common.principal
@@ -11,11 +12,13 @@ import pl.newbies.lecture.application.model.LectureResponse
 import pl.newbies.lecture.domain.LectureNotFoundException
 import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
+import pl.newbies.lecture.infrastructure.repository.LectureFollows
 import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.plugins.inject
 import pl.newbies.user.application.UserConverter
 import pl.newbies.user.application.model.UserResponse
+import pl.newbies.user.domain.UserNotFoundException
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.toUser
 
@@ -85,6 +88,36 @@ fun SchemaBuilder.lectureSchema() {
         }
     }
 
+    mutation("followLecture") {
+        resolver { id: String, context: Context ->
+            val principal = context.principal()
+
+            val user = transaction { UserDAO.findById(principal.userId)?.toUser() }
+                ?: throw UserNotFoundException(principal.userId)
+            val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
+                ?: throw LectureNotFoundException(id)
+
+            lectureService.followLecture(user, lecture)
+
+            true
+        }
+    }
+
+    mutation("unfollowLecture") {
+        resolver { id: String, context: Context ->
+            val principal = context.principal()
+
+            val user = transaction { UserDAO.findById(principal.userId)?.toUser() }
+                ?: throw UserNotFoundException(principal.userId)
+            val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
+                ?: throw LectureNotFoundException(id)
+
+            lectureService.unfollowLecture(user, lecture)
+
+            true
+        }
+    }
+
     inputType<LectureRequest>()
     type<LectureResponse> {
         property<UserResponse>(name = "author") {
@@ -92,6 +125,20 @@ fun SchemaBuilder.lectureSchema() {
                 val user = transaction { UserDAO[it.authorId].toUser() }
 
                 userConverter.convert(user)
+            }
+        }
+
+        property<Boolean>(name = "isFollowed") {
+            resolver { response: LectureResponse, context: Context ->
+                val principal = context.principal()
+
+                val lectureFollow = transaction {
+                    LectureDAO.find {
+                        (LectureFollows.user eq principal.userId) and (LectureFollows.lecture eq response.id)
+                    }.firstOrNull()
+                }
+
+                lectureFollow != null
             }
         }
     }

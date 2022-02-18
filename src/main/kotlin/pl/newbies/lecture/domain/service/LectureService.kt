@@ -2,14 +2,16 @@ package pl.newbies.lecture.domain.service
 
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.SizedCollection
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.domain.LectureNotFoundException
 import pl.newbies.lecture.domain.model.Lecture
-import pl.newbies.lecture.infrastructure.repository.LectureDAO
-import pl.newbies.lecture.infrastructure.repository.toLecture
+import pl.newbies.lecture.domain.model.LectureFollow
+import pl.newbies.lecture.infrastructure.repository.*
 import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
+import pl.newbies.user.domain.model.User
 import pl.newbies.user.infrastructure.repository.UserDAO
 import java.util.*
 
@@ -74,5 +76,28 @@ class LectureService {
 
     fun deleteLecture(lecture: Lecture) = transaction {
         LectureDAO[lecture.id].delete()
+    }
+
+    fun followLecture(user: User, lecture: Lecture): LectureFollow =
+        transaction {
+            LectureFollowDAO.find { (LectureFollows.user eq user.id) and (LectureFollows.lecture eq lecture.id) }
+                .firstOrNull()
+                ?.toLectureFollow()
+                ?.let { return@transaction it }
+
+            LectureFollowDAO.new(UUID.randomUUID().toString()) {
+                this.user = UserDAO[user.id]
+                this.lecture = LectureDAO[lecture.id]
+
+                this.followDate = Clock.System.now()
+            }.toLectureFollow()
+        }
+
+    fun unfollowLecture(user: User, lecture: Lecture) {
+        transaction {
+            LectureFollowDAO.find { (LectureFollows.user eq user.id) and (LectureFollows.lecture eq lecture.id) }
+                .firstOrNull()
+                ?.delete()
+        }
     }
 }

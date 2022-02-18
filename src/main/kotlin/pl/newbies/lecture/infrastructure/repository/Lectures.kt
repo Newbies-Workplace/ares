@@ -3,10 +3,7 @@ package pl.newbies.lecture.infrastructure.repository
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
-import pl.newbies.lecture.domain.model.AddressDTO
-import pl.newbies.lecture.domain.model.CoordinatesDTO
-import pl.newbies.lecture.domain.model.Lecture
-import pl.newbies.lecture.domain.model.TimeFrameDTO
+import pl.newbies.lecture.domain.model.*
 import pl.newbies.plugins.StringUUIDEntity
 import pl.newbies.plugins.StringUUIDEntityClass
 import pl.newbies.plugins.StringUUIDTable
@@ -14,6 +11,7 @@ import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
+import pl.newbies.user.infrastructure.repository.toUser
 
 object Lectures : StringUUIDTable() {
     val title = varchar("title", length = 100, collate = "utf8_general_ci")
@@ -39,6 +37,33 @@ object LectureTags : Table() {
     override val primaryKey: PrimaryKey =
         PrimaryKey(lecture, tag, name = "id")
 }
+
+object LectureFollows : StringUUIDTable() {
+    val lecture = reference("lecture", Lectures)
+    val user = reference("user", Users)
+
+    val followDate = timestamp("followDate")
+
+    init {
+        uniqueIndex(lecture, user)
+    }
+}
+
+class LectureFollowDAO(id: EntityID<String>) : StringUUIDEntity(id) {
+    companion object: StringUUIDEntityClass<LectureFollowDAO>(LectureFollows)
+
+    var lecture by LectureDAO referencedOn LectureFollows.lecture
+    var user by UserDAO referencedOn LectureFollows.user
+
+    var followDate by LectureFollows.followDate
+}
+
+fun LectureFollowDAO.toLectureFollow() =
+    LectureFollow(
+        user = user.toUser(),
+        lecture = lecture.toLecture(),
+        followDate = followDate
+    )
 
 class LectureDAO(id: EntityID<String>) : StringUUIDEntity(id) {
     companion object : StringUUIDEntityClass<LectureDAO>(Lectures)
