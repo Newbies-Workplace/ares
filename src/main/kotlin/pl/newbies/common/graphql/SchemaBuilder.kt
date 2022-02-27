@@ -33,4 +33,3 @@ class SchemaBuilder(
 
     fun getGraphQLObject(): GraphQL = GraphQL.newGraphQL(graphQLSchema).build()
 }
-

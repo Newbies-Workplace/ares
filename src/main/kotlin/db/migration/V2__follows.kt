@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.lecture.infrastructure.repository.LectureFollows
 
-class V2__follows: BaseJavaMigration() {
+class V2__follows : BaseJavaMigration() {
 
     override fun migrate(context: Context?) {
         transaction {

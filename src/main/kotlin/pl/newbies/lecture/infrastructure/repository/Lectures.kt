@@ -50,7 +50,7 @@ object LectureFollows : StringUUIDTable() {
 }
 
 class LectureFollowDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object: StringUUIDEntityClass<LectureFollowDAO>(LectureFollows)
+    companion object : StringUUIDEntityClass<LectureFollowDAO>(LectureFollows)
 
     var lecture by LectureDAO referencedOn LectureFollows.lecture
     var user by UserDAO referencedOn LectureFollows.user

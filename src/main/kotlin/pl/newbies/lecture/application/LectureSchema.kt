@@ -124,7 +124,9 @@ class LectureSchema(
         override fun getDataLoader(): DataLoader<String, UserResponse> =
             DataLoaderFactory.newDataLoader { authorIds ->
                 CompletableFuture.supplyAsync {
-                    val users = transaction { UserDAO.forIds(authorIds).map { it.toUser() } }
+                    val users = transaction {
+                        UserDAO.forIds(authorIds).map { it.toUser() }
+                    }
                     
                     users.map { userConverter.convert(it) }
                 }
