@@ -7,7 +7,7 @@ val logbackVersion = "1.2.10"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.37.3"
 val hikariVersion = "5.0.1"
-val flywayVersion = "8.5.0"
+val flywayVersion = "8.5.1"
 val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
 val testContainers = "1.16.3"
@@ -54,6 +54,7 @@ dependencies {
 
     // graphql
     implementation("com.expediagroup:graphql-kotlin-server:$kotlinGraphQL")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
 

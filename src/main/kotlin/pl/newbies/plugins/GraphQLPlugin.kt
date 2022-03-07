@@ -6,6 +6,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.application.pluginOrNull
+import io.ktor.server.auth.authenticate
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
@@ -25,8 +26,10 @@ fun Application.graphQLModule(
     pluginOrNull(Routing) ?: install(Routing)
 
     routing {
-        post(graphQLEndpoint) {
-            graphQLHandler.handle(call)
+        authenticate("jwt", optional = true) {
+            post(graphQLEndpoint) {
+                graphQLHandler.handle(call)
+            }
         }
 
         get("sdl") {

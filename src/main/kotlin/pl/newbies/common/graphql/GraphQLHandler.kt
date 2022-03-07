@@ -1,20 +1,20 @@
 package pl.newbies.common.graphql
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.response.respond
 
 class GraphQLHandler(
+    private val objectMapper: ObjectMapper,
     private val ktorGraphQLServer: KtorGraphQLServer,
 ) {
-    private val mapper = jacksonObjectMapper()
 
     suspend fun handle(applicationCall: ApplicationCall) {
         val result = ktorGraphQLServer.execute(applicationCall.request)
 
         if (result != null) {
-            val json = mapper.writeValueAsString(result)
+            val json = objectMapper.writeValueAsString(result)
 
             applicationCall.response.call.respond(json)
         } else {
