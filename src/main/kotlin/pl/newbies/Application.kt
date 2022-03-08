@@ -12,6 +12,8 @@ import pl.newbies.common.commonModule
 import pl.newbies.lecture.application.lectureRoutes
 import pl.newbies.lecture.lectureModule
 import pl.newbies.plugins.*
+import pl.newbies.storage.application.storageRoutes
+import pl.newbies.storage.storageModule
 import pl.newbies.tag.application.tagRoutes
 import pl.newbies.tag.tagModule
 import pl.newbies.user.application.userRoutes
@@ -36,6 +38,7 @@ fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
             userModule,
             tagModule,
             lectureModule,
+            storageModule,
         )
     }
 
@@ -44,6 +47,7 @@ fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
     userRoutes()
     tagRoutes()
     lectureRoutes()
+    storageRoutes()
 }
 
 val oauthHttpClient = HttpClient(Apache) {

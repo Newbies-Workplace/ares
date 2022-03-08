@@ -81,6 +81,18 @@ fun Application.lectureRoutes() {
                     call.respond(lectureConverter.convert(updatedLecture))
                 }
 
+                put("/{id}/theme") {
+                    val id = call.parameters.getOrFail("id")
+                    val principal = call.principal<AresPrincipal>()!!
+                    val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
+                        ?: throw LectureNotFoundException(id)
+
+                    principal.assertLectureWriteAccess(lecture)
+
+
+                    //todo
+                }
+
                 delete("/{id}") {
                     val id = call.parameters.getOrFail("id")
                     val principal = call.principal<AresPrincipal>()!!
