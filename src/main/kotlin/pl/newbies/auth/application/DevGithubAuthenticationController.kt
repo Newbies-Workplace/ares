@@ -33,7 +33,7 @@ fun Application.devGithubAuthentication(oauthClient: HttpClient) {
 
     authentication {
         oauth("devgithub") {
-            urlProvider = { "http://jeteo.newbies.pl/auth/callback/devgithub" }
+            urlProvider = { "http://127.0.0.1:8080/auth/callback/devgithub" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "devgithub",
