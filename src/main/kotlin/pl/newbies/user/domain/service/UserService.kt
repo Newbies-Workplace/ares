@@ -19,15 +19,18 @@ class UserService(
 
     fun createUser(
         nickname: String,
-        githubId: String,
+        githubId: String? = null,
+        devgithubId: String? = null,
     ): User = transaction {
-        logger.info("Creating user (githubId = $githubId)")
+        logger.info("Creating user (githubId = $githubId, devgithubId = $devgithubId)")
 
         val now = Clock.System.now()
 
         UserDAO.new(UUID.randomUUID().toString()) {
             this.nickname = nickname
+
             this.githubId = githubId
+            this.devGithubId = devgithubId
 
             this.createDate = now
             this.updateDate = now

@@ -15,6 +15,7 @@ object Users : StringUUIDTable() {
 
     //accounts
     val githubId = varchar("githubId", length = 30).nullable()
+    val devGithubId = varchar("devGithubId", length = 30).nullable()
 
     //contact
     val github = varchar("contactGithub", length = 50, collate = "utf8_general_ci").nullable()
@@ -33,6 +34,7 @@ class UserDAO(id: EntityID<String>) : StringUUIDEntity(id) {
     var description by Users.description
 
     var githubId by Users.githubId
+    var devGithubId by Users.devGithubId
 
     var github by Users.github
     var linkedin by Users.linkedin
@@ -48,6 +50,7 @@ fun UserDAO.toUser() = User(
     nickname = nickname,
     accounts = AuthAccountsDTO(
         githubId = githubId,
+        devGithubId = devGithubId,
     ),
     contact = ContactDTO(
         github = github,
