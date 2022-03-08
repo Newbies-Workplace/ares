@@ -54,7 +54,7 @@ dependencies {
 
     // graphql
     implementation("com.expediagroup:graphql-kotlin-server:$kotlinGraphQL")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
 
