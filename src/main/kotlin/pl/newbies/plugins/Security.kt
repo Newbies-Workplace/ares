@@ -4,10 +4,12 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.client.HttpClient
 import io.ktor.server.application.Application
-import io.ktor.server.auth.*
+import io.ktor.server.auth.Principal
+import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.jwt
-import pl.newbies.auth.application.githubAuthentication
 import pl.newbies.auth.application.authenticationRoutes
+import pl.newbies.auth.application.devGithubAuthentication
+import pl.newbies.auth.application.githubAuthentication
 
 fun Application.configureSecurity(oauthClient: HttpClient) {
     val config = environment.config
@@ -29,6 +31,7 @@ fun Application.configureSecurity(oauthClient: HttpClient) {
         }
 
         githubAuthentication(oauthClient)
+        devGithubAuthentication(oauthClient)
     }
 
     authenticationRoutes()
