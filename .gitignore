@@ -3,3 +3,7 @@ build/
 
 # Project exclude paths
 /.gradle/
+
+# DEV file storage path
+/ares-storage
+/test-ares-storage

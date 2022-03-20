@@ -2,7 +2,10 @@ package pl.newbies.auth
 
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.request.*
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.delete
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
@@ -27,7 +30,7 @@ class RefreshTokenTest : IntegrationTest() {
             val refreshToken = authResponse.refreshToken
 
             // when
-            val response = httpClient.post("api/refresh") {
+            val response = httpClient.post("api/v1/refresh") {
                 setBody(refreshToken)
             }
 
@@ -45,7 +48,7 @@ class RefreshTokenTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/refresh") {
+                httpClient.post("api/v1/refresh") {
                     setBody(randomRefreshToken)
                 }
             }
@@ -64,13 +67,13 @@ class RefreshTokenTest : IntegrationTest() {
             val refreshToken = authResponse.refreshToken
 
             // when
-            val response = httpClient.delete("api/logout") {
+            val response = httpClient.delete("api/v1/logout") {
                 setBody(refreshToken)
                 bearerAuth(authResponse.accessToken)
             }
             assertEquals(HttpStatusCode.OK, response.status)
             val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/refresh") {
+                httpClient.post("api/v1/refresh") {
                     setBody(refreshToken)
                 }
             }
@@ -86,13 +89,13 @@ class RefreshTokenTest : IntegrationTest() {
             val refreshToken = authResponse.refreshToken
 
             // when
-            val response = httpClient.delete("api/logout") {
+            val response = httpClient.delete("api/v1/logout") {
                 setBody(refreshToken)
                 bearerAuth(authResponse.accessToken)
             }
             assertEquals(HttpStatusCode.OK, response.status)
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/logout") {
+                httpClient.delete("api/v1/logout") {
                     setBody(refreshToken)
                     bearerAuth(authResponse.accessToken)
                 }
@@ -110,7 +113,7 @@ class RefreshTokenTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/logout") {
+                httpClient.delete("api/v1/logout") {
                     setBody(refreshToken)
                 }
             }

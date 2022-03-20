@@ -1,9 +1,6 @@
 package pl.newbies.lecture.application
 
-import pl.newbies.lecture.application.model.AddressResponse
-import pl.newbies.lecture.application.model.CoordinatesResponse
-import pl.newbies.lecture.application.model.LectureResponse
-import pl.newbies.lecture.application.model.TimeFrameResponse
+import pl.newbies.lecture.application.model.*
 import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.tag.application.TagConverter
 
@@ -37,6 +34,13 @@ class LectureConverter(
             },
             tags = lecture.tags.map {
                 tagConverter.convert(it)
+            },
+            theme = lecture.theme.let {
+                ThemeResponse(
+                    primaryColor = it.primaryColor,
+                    secondaryColor = it.secondaryColor,
+                    image = it.image,
+                )
             },
             createDate = lecture.createDate,
             updateDate = lecture.updateDate,

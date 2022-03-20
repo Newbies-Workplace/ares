@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.lecture.application.model.LectureRequest
-import pl.newbies.lecture.domain.LectureNotFoundException
+import pl.newbies.lecture.application.model.LectureThemeRequest
 import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.domain.model.LectureFollow
 import pl.newbies.lecture.infrastructure.repository.*
@@ -50,8 +50,8 @@ class LectureService {
         val tags = TagDAO.find { Tags.id inList request.tags.map { it.id } }
             .toMutableList()
 
-        LectureDAO.findById(lecture.id)
-            ?.apply {
+        LectureDAO[lecture.id]
+            .apply {
                 this.title = request.title
                 this.subtitle = request.subtitle
                 request.timeFrame.let { frame ->
@@ -70,8 +70,16 @@ class LectureService {
 
                 this.updateDate = Clock.System.now()
             }
-            ?.toLecture()
-            ?: throw LectureNotFoundException(lecture.id)
+            .toLecture()
+    }
+
+    fun updateTheme(lecture: Lecture, request: LectureThemeRequest): Lecture = transaction {
+        LectureDAO[lecture.id]
+            .apply {
+                this.primaryColor = request.primaryColor
+                this.secondaryColor = request.secondaryColor
+            }
+            .toLecture()
     }
 
     fun deleteLecture(lecture: Lecture) = transaction {

@@ -16,14 +16,6 @@ import io.ktor.server.routing.routing
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-fun Application.pongModule() {
-    routing {
-        get("/ping") {
-            call.respond("pong")
-        }
-    }
-}
-
 fun Application.githubModule() {
     install(ContentNegotiation) {
         json()

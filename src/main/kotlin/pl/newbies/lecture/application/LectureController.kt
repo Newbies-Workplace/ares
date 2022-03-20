@@ -1,17 +1,21 @@
 package pl.newbies.lecture.application
 
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.PartData
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.receive
+import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.ForbiddenException
+import pl.newbies.common.extension
 import pl.newbies.common.pagination
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.domain.LectureNotFoundException
@@ -22,9 +26,11 @@ import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
+import pl.newbies.storage.domain.StorageService
 
 fun Application.lectureRoutes() {
     val lectureService: LectureService by inject()
+    val storageService: StorageService by inject()
     val lectureConverter: LectureConverter by inject()
 
     routing {
@@ -81,7 +87,7 @@ fun Application.lectureRoutes() {
                     call.respond(lectureConverter.convert(updatedLecture))
                 }
 
-                put("/{id}/theme") {
+                put("/{id}/theme/image") {
                     val id = call.parameters.getOrFail("id")
                     val principal = call.principal<AresPrincipal>()!!
                     val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
@@ -89,8 +95,17 @@ fun Application.lectureRoutes() {
 
                     principal.assertLectureWriteAccess(lecture)
 
+                    val part = (call.receiveMultipart().readPart() as? PartData.FileItem)
+                        ?: throw BadRequestException("Part is not a file.")
 
-                    //todo
+                    storageService.assertSupportedImageType(part.extension)
+
+                    //todo future image url
+                    call.respond("future url")
+
+                    val tempFilePath = storageService.saveTempFile(part)
+
+                    //todo convert image, save it and link to lecture
                 }
 
                 delete("/{id}") {

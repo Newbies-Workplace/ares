@@ -14,6 +14,8 @@ data class Lecture(
     val authorId: String,
     var tags: MutableList<Tag> = mutableListOf(),
 
+    val theme: ThemeDTO = ThemeDTO(),
+
     val createDate: Instant,
     var updateDate: Instant,
 )

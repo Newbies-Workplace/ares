@@ -1,20 +1,30 @@
 package pl.newbies.storage.application
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.http.content.files
-import io.ktor.server.http.content.static
-import io.ktor.server.routing.route
+import io.ktor.server.application.ApplicationStopPreparing
+import io.ktor.server.application.call
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondFile
+import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import pl.newbies.plugins.inject
+import pl.newbies.storage.domain.StorageService
 
 fun Application.storageRoutes() {
+    val service: StorageService by inject()
+
+    environment.monitor.subscribe(ApplicationStopPreparing) {
+        service.cleanupTempDirectory()
+    }
 
     routing {
-        static {
-            files(".")
-        }
+        get("/api/v1/file/{path...}") {
+            val path = call.parameters.getAll("path")?.joinToString("/")!!
 
-        route("/api/v1/file/{name}") {
-            //todo
+            service.getFile(path)?.let {
+                call.respondFile(it)
+            } ?: call.respond(HttpStatusCode.NotFound)
         }
     }
 }
