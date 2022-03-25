@@ -9,8 +9,8 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="notprivacysafe.graphql" level="ERROR"/>
-    <logger name="graphql" level="ERROR"/>
+    <logger name="notprivacysafe.graphql" level="INFO"/>
+    <logger name="graphql" level="INFO"/>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
     <logger name="com.zaxxer.hikari" level="INFO"/>
