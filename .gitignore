@@ -6,4 +6,4 @@ build/
 
 # DEV file storage path
 /ares-storage
-/test-ares-storage
+/ares-test-storage

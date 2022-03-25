@@ -9,6 +9,7 @@ import io.ktor.server.response.respondFile
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import pl.newbies.plugins.inject
+import pl.newbies.storage.application.StorageController.DOWNLOAD_FILE_V1_PATH
 import pl.newbies.storage.domain.StorageService
 
 fun Application.storageRoutes() {
@@ -19,7 +20,7 @@ fun Application.storageRoutes() {
     }
 
     routing {
-        get("/api/v1/file/{path...}") {
+        get("$DOWNLOAD_FILE_V1_PATH/{path...}") {
             val path = call.parameters.getAll("path")?.joinToString("/")!!
 
             service.getFile(path)?.let {
@@ -27,4 +28,8 @@ fun Application.storageRoutes() {
             } ?: call.respond(HttpStatusCode.NotFound)
         }
     }
+}
+
+object StorageController {
+    const val DOWNLOAD_FILE_V1_PATH = "/api/v1/files/"
 }

@@ -4,12 +4,12 @@ import io.ktor.http.content.PartData
 import io.ktor.http.content.streamProvider
 import pl.newbies.common.FileTypeNotSupportedException
 import pl.newbies.common.extension
+import pl.newbies.storage.domain.model.FileResource
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
-import kotlin.io.path.Path
-import kotlin.io.path.createFile
+import kotlin.io.path.*
 
 class StorageService(mainStoragePath: String) {
 
@@ -39,6 +39,22 @@ class StorageService(mainStoragePath: String) {
         return newFile
     }
 
+    fun saveFile(file: File, resource: FileResource) {
+        storageRoot.resolve(resource.storagePath).createDirectories()
+
+        val targetFile = storageRoot.resolve(resource.pathWithName)
+
+        file.inputStream().use { inp ->
+            targetFile.outputStream().buffered().use {
+                inp.copyTo(it)
+            }
+        }
+    }
+
+    fun removeResource(resource: FileResource) {
+        storageRoot.resolve(resource.pathWithName).deleteIfExists()
+    }
+
     fun assertSupportedImageType(extension: String) {
         if (extension !in ALLOWED_IMAGE_TYPES) {
             throw FileTypeNotSupportedException(extension, ALLOWED_IMAGE_TYPES)
@@ -46,13 +62,17 @@ class StorageService(mainStoragePath: String) {
     }
 
     //todo tests
-    //todo disable temp download
-    //todo disable root download
+    //todo strip meta tags
     fun getFile(stringPath: String): File? {
         val path = Path(stringPath).normalize()
         val file = File(storageRoot.toFile(), path.toString())
 
+        // Make sure file is somewhere in the storage root
         if (!file.canonicalPath.startsWith(storageRoot.toFile().canonicalPath)) {
+            return null
+        }
+        // Make sure user can't download temp files
+        if (file.canonicalPath.startsWith(tempDir.toFile().canonicalPath)) {
             return null
         }
         if (!file.exists() || file.isDirectory) {
@@ -69,6 +89,7 @@ class StorageService(mainStoragePath: String) {
             "jpg",
             "png",
             "jpeg",
+            "webp",
         )
     }
 }

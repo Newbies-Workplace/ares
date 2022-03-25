@@ -26,12 +26,14 @@ import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
+import pl.newbies.storage.application.FileUrlConverter
 import pl.newbies.storage.domain.StorageService
 
 fun Application.lectureRoutes() {
     val lectureService: LectureService by inject()
     val storageService: StorageService by inject()
     val lectureConverter: LectureConverter by inject()
+    val fileUrlConverter: FileUrlConverter by inject()
 
     routing {
         route("/api/v1/lectures") {
@@ -100,12 +102,37 @@ fun Application.lectureRoutes() {
 
                     storageService.assertSupportedImageType(part.extension)
 
-                    //todo future image url
-                    call.respond("future url")
+                    val fileResource = lectureService.getThemeImageFileResource(lecture)
+                        ?.let { TODO("remove") }
 
+                    TODO("create")
+
+                    val urlResponse = fileUrlConverter.convert(call, fileResource)
+
+                    // todo saveWithTransformation?
                     val tempFilePath = storageService.saveTempFile(part)
 
-                    //todo convert image, save it and link to lecture
+                    storageService.saveFile(tempFilePath.toFile(), fileResource)
+                    // todo remove temp file
+                    lectureService.updateThemeImage(lecture, fileResource)
+
+                    call.respond(urlResponse)
+                }
+
+                delete("/{id}/theme/image") {
+                    val id = call.parameters.getOrFail("id")
+                    val principal = call.principal<AresPrincipal>()!!
+                    val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
+                        ?: throw LectureNotFoundException(id)
+
+                    principal.assertLectureWriteAccess(lecture)
+
+                    val fileResource = getThemeImageFileResource(lecture.id)
+
+                    storageService.removeResource(fileResource)
+                    lectureService.updateThemeImage(lecture, null)
+
+                    call.respond(HttpStatusCode.OK)
                 }
 
                 delete("/{id}") {

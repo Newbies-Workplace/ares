@@ -9,6 +9,7 @@ import pl.newbies.lecture.application.model.LectureThemeRequest
 import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.domain.model.LectureFollow
 import pl.newbies.lecture.infrastructure.repository.*
+import pl.newbies.storage.domain.model.FileResource
 import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.user.domain.model.User
@@ -82,6 +83,14 @@ class LectureService {
             .toLecture()
     }
 
+    fun updateThemeImage(lecture: Lecture, fileResource: FileResource?): Lecture = transaction {
+        LectureDAO[lecture.id]
+            .apply {
+                this.image = fileResource?.pathWithName
+            }
+            .toLecture()
+    }
+
     fun deleteLecture(lecture: Lecture) = transaction {
         LectureDAO[lecture.id].delete()
     }
@@ -107,5 +116,17 @@ class LectureService {
                 .firstOrNull()
                 ?.delete()
         }
+    }
+
+    fun getThemeImageFileResource(lecture: Lecture): FileResource? {
+        if (lecture.theme.image == null) return null
+
+        val storagePath = "lectures/${lecture.id}/"
+        val fileName = lecture.theme.image.substringAfter(storagePath)
+
+        return FileResource(
+            storagePath = storagePath,
+            name = fileName
+        )
     }
 }
