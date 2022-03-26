@@ -1,10 +1,19 @@
 package pl.newbies.storage.domain.model
 
-data class FileResource(
+open class FileResource(
     val storagePath: String,
-    val name: String,
+    val nameWithExtension: String,
 ) {
 
     val pathWithName: String
-        get() = "$storagePath$name"
+        get() = "$storagePath$nameWithExtension"
 }
+
+class TempFileResource(
+    nameWithExtension: String
+): FileResource("temp/", nameWithExtension)
+
+class LectureImageFileResource(
+    lectureId: String,
+    nameWithExtension: String,
+): FileResource("lectures/$lectureId/", nameWithExtension)

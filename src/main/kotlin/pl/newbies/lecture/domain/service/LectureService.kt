@@ -10,6 +10,7 @@ import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.domain.model.LectureFollow
 import pl.newbies.lecture.infrastructure.repository.*
 import pl.newbies.storage.domain.model.FileResource
+import pl.newbies.storage.domain.model.LectureImageFileResource
 import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.user.domain.model.User
@@ -118,15 +119,13 @@ class LectureService {
         }
     }
 
-    fun getThemeImageFileResource(lecture: Lecture): FileResource? {
-        if (lecture.theme.image == null) return null
+    fun getThemeImageFileResource(lecture: Lecture): LectureImageFileResource? {
+        val nameWithExtension = lecture.theme.image?.substringAfterLast('/')
+            ?: return null
 
-        val storagePath = "lectures/${lecture.id}/"
-        val fileName = lecture.theme.image.substringAfter(storagePath)
-
-        return FileResource(
-            storagePath = storagePath,
-            name = fileName
+        return LectureImageFileResource(
+            lectureId = lecture.id,
+            nameWithExtension = nameWithExtension,
         )
     }
 }

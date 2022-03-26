@@ -16,6 +16,7 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.ForbiddenException
 import pl.newbies.common.extension
+import pl.newbies.common.nameWithExtension
 import pl.newbies.common.pagination
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.domain.LectureNotFoundException
@@ -28,6 +29,8 @@ import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
 import pl.newbies.storage.application.FileUrlConverter
 import pl.newbies.storage.domain.StorageService
+import pl.newbies.storage.domain.model.LectureDirectoryResource
+import pl.newbies.storage.domain.model.LectureImageFileResource
 
 fun Application.lectureRoutes() {
     val lectureService: LectureService by inject()
@@ -103,20 +106,16 @@ fun Application.lectureRoutes() {
                     storageService.assertSupportedImageType(part.extension)
 
                     val fileResource = lectureService.getThemeImageFileResource(lecture)
-                        ?.let { TODO("remove") }
+                        ?.also { res -> storageService.removeResource(res) }
+                        ?: LectureImageFileResource(lecture.id, part.nameWithExtension)
 
-                    TODO("create")
+                    val tempFileResource = storageService.saveTempFile(part)
 
-                    val urlResponse = fileUrlConverter.convert(call, fileResource)
+                    call.respond(fileUrlConverter.convert(call, fileResource))
 
-                    // todo saveWithTransformation?
-                    val tempFilePath = storageService.saveTempFile(part)
-
-                    storageService.saveFile(tempFilePath.toFile(), fileResource)
-                    // todo remove temp file
+                    storageService.saveFile(tempFileResource, fileResource)
+                    storageService.removeResource(tempFileResource)
                     lectureService.updateThemeImage(lecture, fileResource)
-
-                    call.respond(urlResponse)
                 }
 
                 delete("/{id}/theme/image") {
@@ -127,10 +126,10 @@ fun Application.lectureRoutes() {
 
                     principal.assertLectureWriteAccess(lecture)
 
-                    val fileResource = getThemeImageFileResource(lecture.id)
-
-                    storageService.removeResource(fileResource)
-                    lectureService.updateThemeImage(lecture, null)
+                    lectureService.getThemeImageFileResource(lecture)?.let { fileResource ->
+                        storageService.removeResource(fileResource)
+                        lectureService.updateThemeImage(lecture, null)
+                    }
 
                     call.respond(HttpStatusCode.OK)
                 }
@@ -146,6 +145,8 @@ fun Application.lectureRoutes() {
                     lectureService.deleteLecture(lecture)
 
                     call.respond(HttpStatusCode.OK)
+
+                    storageService.removeDirectory(LectureDirectoryResource(lecture.id))
                 }
             }
         }
