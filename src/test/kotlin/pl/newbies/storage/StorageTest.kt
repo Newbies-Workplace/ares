@@ -14,15 +14,16 @@ class StorageTest : IntegrationTest() {
 
     @Nested
     inner class GetFile {
-        @Test
-        fun `should return file when requested`() = withAres {
-            // given
-
-            // when
-            httpClient.get("api/v1/files/somefile.jpg")
-
-            // then
-        }
+        //todo get file test
+//        @Test
+//        fun `should return file when requested`() = withAres {
+//            // given
+//
+//            // when
+//            httpClient.get("api/v1/files/somefile.jpg")
+//
+//            // then
+//        }
 
         @Test
         fun `should return 404 when file does not exists`() = withAres {

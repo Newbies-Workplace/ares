@@ -514,9 +514,14 @@ class LectureTest : IntegrationTest() {
 
         @Test
         fun `should return 404 when called with not existing id`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/lectures/someRandomId/theme/image")
+                httpClient.delete("api/v1/lectures/someRandomId/theme/image") {
+                    bearerAuth(authResponse.accessToken)
+                }
             }
 
             // then
