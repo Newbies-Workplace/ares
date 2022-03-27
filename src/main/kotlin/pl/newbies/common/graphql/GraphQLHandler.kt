@@ -16,9 +16,9 @@ class GraphQLHandler(
         if (result != null) {
             val json = objectMapper.writeValueAsString(result)
 
-            applicationCall.response.call.respond(json)
+            applicationCall.respond(json)
         } else {
-            applicationCall.response.call.respond(HttpStatusCode.BadRequest, "Invalid request")
+            applicationCall.respond(HttpStatusCode.BadRequest, "Invalid request")
         }
     }
 }
