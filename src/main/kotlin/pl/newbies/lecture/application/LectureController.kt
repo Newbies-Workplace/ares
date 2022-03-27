@@ -16,7 +16,6 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.ForbiddenException
 import pl.newbies.common.extension
-import pl.newbies.common.nameWithExtension
 import pl.newbies.common.pagination
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.domain.LectureNotFoundException
@@ -107,13 +106,13 @@ fun Application.lectureRoutes() {
 
                     val fileResource = lectureService.getThemeImageFileResource(lecture)
                         ?.also { res -> storageService.removeResource(res) }
-                        ?: LectureImageFileResource(lecture.id, part.nameWithExtension)
+                        ?: LectureImageFileResource(lecture.id, "image.webp")
 
                     val tempFileResource = storageService.saveTempFile(part)
 
                     call.respond(fileUrlConverter.convert(call, fileResource))
 
-                    storageService.saveFile(tempFileResource, fileResource)
+                    storageService.saveImage(tempFileResource, fileResource)
                     storageService.removeResource(tempFileResource)
                     lectureService.updateThemeImage(lecture, fileResource)
                 }
@@ -144,9 +143,9 @@ fun Application.lectureRoutes() {
 
                     lectureService.deleteLecture(lecture)
 
-                    call.respond(HttpStatusCode.OK)
-
                     storageService.removeDirectory(LectureDirectoryResource(lecture.id))
+
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }

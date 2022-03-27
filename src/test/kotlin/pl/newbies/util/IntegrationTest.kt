@@ -8,7 +8,10 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.config.HoconApplicationConfig
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.TestInstance
+import org.koin.core.context.stopKoin
 import org.testcontainers.containers.MariaDBContainer
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.module
@@ -41,6 +44,11 @@ abstract class IntegrationTest {
         }
     }
 
+    @AfterEach
+    fun cleanup() {
+        stopKoin()
+    }
+
     companion object {
         private val container = MariaDBContainer("mariadb:10.4")
             .withUrlParam("characterEncoding", "utf-8")
@@ -51,11 +59,19 @@ abstract class IntegrationTest {
             .withReuse(true)
 
         fun clearTable(tableName: String) {
+            println("[Test] Removing table $tableName")
+
             container.execInContainer("mysql", "-u", "root", "-p", "-D", "ares", "-e DELETE FROM $tableName;")
         }
 
         init {
             container.start()
+        }
+
+        @AfterAll
+        @JvmStatic
+        fun cleanupStorage() {
+            removeDirectory("")
         }
     }
 }

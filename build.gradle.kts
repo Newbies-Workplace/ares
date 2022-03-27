@@ -7,7 +7,7 @@ val logbackVersion = "1.2.11"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.37.3"
 val hikariVersion = "5.0.1"
-val flywayVersion = "8.5.2"
+val flywayVersion = "8.5.4"
 val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
 val testContainers = "1.16.3"
@@ -54,16 +54,17 @@ dependencies {
 
     // graphql
     implementation("com.expediagroup:graphql-kotlin-server:$kotlinGraphQL")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
-
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")
 
     // di
     implementation("io.insert-koin:koin-core:$koinVersion")
     implementation("io.insert-koin:koin-ktor:$koinVersion")
+
+    implementation("org.sejda.imageio:webp-imageio:0.1.6")
 
     // validation
     implementation("org.valiktor:valiktor-core:$valiktorVersion")
@@ -78,6 +79,7 @@ dependencies {
 
     // tests
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.testcontainers:mariadb:$testContainers")
     testImplementation("org.testcontainers:junit-jupiter:$testContainers")

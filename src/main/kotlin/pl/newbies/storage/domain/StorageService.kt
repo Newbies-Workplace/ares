@@ -40,7 +40,7 @@ class StorageService(mainStoragePath: String) {
         return TempFileResource(fullName)
     }
 
-    fun saveFile(tempFileResource: TempFileResource, targetResource: FileResource) {
+    fun saveImage(tempFileResource: TempFileResource, targetResource: FileResource) {
         storageRoot.resolve(targetResource.storagePath).createDirectories()
 
         val originPath = storageRoot.resolve(tempFileResource.pathWithName)
@@ -62,9 +62,11 @@ class StorageService(mainStoragePath: String) {
 
         assertPathInStorage(path)
 
-        Files.walk(path)
-            .map { it.toFile() }
-            .forEach { it.delete() }
+        runCatching {
+            Files.walk(path)
+                .map { it.toFile() }
+                .forEach { it.delete() }
+        }
     }
 
     fun assertSupportedImageType(extension: String) {

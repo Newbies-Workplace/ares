@@ -2,10 +2,11 @@ package pl.newbies.lecture
 
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.*
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.http.*
 import kotlinx.serialization.json.Json
 import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -13,7 +14,10 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import pl.newbies.lecture.application.model.LectureResponse
+import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.util.*
 import java.util.*
@@ -344,5 +348,183 @@ class LectureTest : IntegrationTest() {
             }
             assertEquals(HttpStatusCode.NotFound, exception.response.status)
         }
+
+        //todo remove directory on delete
+    }
+
+    @Nested
+    inner class PutThemeImage {
+        @Test
+        fun `should return 401 when called without authentication`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse = authResponse)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("api/v1/lectures/${lecture.id}/theme/image")
+            }
+
+            // then
+            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+        }
+
+        @Test
+        fun `should return 404 when called with not existing id`() = withAres {
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("api/v1/lectures/randomid/theme/image")
+            }
+
+            // then
+            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+        }
+
+        @Test
+        fun `should 400 return when called with unsupported file`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse = authResponse)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("/api/v1/lectures/${lecture.id}/theme/image") {
+                    bearerAuth(authResponse.accessToken)
+                    setBody(MultiPartFormDataContent(
+                        parts = formData {
+                            append("image", getResourceFile("images/newbies-logo.gif").readBytes(), Headers.build {
+                                append(HttpHeaders.ContentType, "image/gif")
+                                append(HttpHeaders.ContentDisposition, "filename=newbies-logo.gif")
+                            })
+                        },
+                    ))
+                    onUpload { bytesSentTotal, contentLength ->
+                        println("Sent $bytesSentTotal bytes from $contentLength")
+                    }
+                }
+            }
+
+            // then
+            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+        }
+
+        @Test
+        fun `should 400 return when called without file`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse = authResponse)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("/api/v1/lectures/${lecture.id}/theme/image") {
+                    bearerAuth(authResponse.accessToken)
+                    setBody(MultiPartFormDataContent(parts = listOf()))
+                }
+            }
+
+            // then
+            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+        }
+
+        @Test
+        fun `should return 403 when called by another user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val secondAuthResponse = loginAs(TestData.testUser2)
+            val lecture = createLecture(authResponse = authResponse)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("/api/v1/lectures/${lecture.id}/theme/image") {
+                    bearerAuth(secondAuthResponse.accessToken)
+                    setBody(MultiPartFormDataContent(
+                        parts = formData {
+                            append("image", getResourceFile("images/newbies-logo.png").readBytes(), Headers.build {
+                                append(HttpHeaders.ContentType, "image/png")
+                                append(HttpHeaders.ContentDisposition, "filename=newbies-logo.png")
+                            })
+                        },
+                    ))
+                    onUpload { bytesSentTotal, contentLength ->
+                        println("Sent $bytesSentTotal bytes from $contentLength")
+                    }
+                }
+            }
+
+            // then
+            assertEquals(HttpStatusCode.Forbidden, exception.response.status)
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = [
+            "images/newbies-logo.jpg,image/jpg,newbies-logo.jpg",
+            "images/newbies-logo.png,image/png,newbies-logo.png",
+            "images/newbies-logo.webp,image/webp,newbies-logo.webp",
+        ])
+        fun `should create image on valid request`(
+            imagePath: String,
+            contentType: String,
+            fileName: String,
+        ) = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse = authResponse)
+
+            // when
+            //todo extract to fun
+            val response = httpClient.put("/api/v1/lectures/${lecture.id}/theme/image") {
+                bearerAuth(authResponse.accessToken)
+                setBody(MultiPartFormDataContent(
+                    parts = formData {
+                        append("image", getResourceFile(imagePath).readBytes(), Headers.build {
+                            append(HttpHeaders.ContentType, contentType)
+                            append(HttpHeaders.ContentDisposition, "filename=$fileName")
+                        })
+                    },
+                ))
+                onUpload { bytesSentTotal, contentLength ->
+                    println("Sent $bytesSentTotal bytes from $contentLength")
+                }
+            }
+
+            // then
+            assertEquals(HttpStatusCode.OK, response.status)
+            val responseBody = response.body<FileUrlResponse>()
+            assertEquals(responseBody.url, "http://localhost:80/api/v1/files/lectures/${lecture.id}/image.webp")
+            assertFileExists("lectures/${lecture.id}/image.webp")
+        }
+    }
+
+    @Nested
+    inner class DeleteThemeImage {
+        @Test
+        fun `should return 401 when called without authentication`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse = authResponse)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.delete("api/v1/lectures/${lecture.id}/theme/image")
+            }
+
+            // then
+            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+        }
+
+        @Test
+        fun `should return 404 when called with not existing id`() = withAres {
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.delete("api/v1/lectures/someRandomId/theme/image")
+            }
+
+            // then
+            assertEquals(HttpStatusCode.NotFound, exception.response.status)
+        }
+
+        // todo 403 on no permission
+        // todo ok when removing not existing image
+        // todo ok when removed existing image
     }
 }
