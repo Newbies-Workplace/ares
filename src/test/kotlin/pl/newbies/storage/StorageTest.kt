@@ -2,28 +2,39 @@ package pl.newbies.storage
 
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.get
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import pl.newbies.util.IntegrationTest
-import pl.newbies.util.httpClient
+import pl.newbies.util.*
 
 class StorageTest : IntegrationTest() {
 
     @Nested
     inner class GetFile {
-        //todo get file test
-//        @Test
-//        fun `should return file when requested`() = withAres {
-//            // given
-//
-//            // when
-//            httpClient.get("api/v1/files/somefile.jpg")
-//
-//            // then
-//        }
+        @Test
+        fun `should return file when requested`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse)
+            val url = addLectureImage(
+                authResponse = authResponse,
+                lectureId = lecture.id,
+                imagePath = "images/newbies-logo.png",
+                contentType = "image/png",
+                fileName = "filename=newbies-logo.png",
+            ).url.substringAfter("/api/")
+
+            // when
+            val response = httpClient.get("/api/$url")
+
+            // then
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals(ContentType("image", "webp"), response.contentType())
+        }
 
         @Test
         fun `should return 404 when file does not exists`() = withAres {

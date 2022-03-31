@@ -1,5 +1,6 @@
 package pl.newbies.lecture.application
 
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.server.application.Application
@@ -7,6 +8,7 @@ import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.request.header
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -101,7 +103,10 @@ fun Application.lectureRoutes() {
 
                     val part = (call.receiveMultipart().readPart() as? PartData.FileItem)
                         ?: throw BadRequestException("Part is not a file.")
+                    val contentLength = call.request.header(HttpHeaders.ContentLength)?.toLongOrNull()
+                        ?: throw BadRequestException("Content-Length header not present.")
 
+                    storageService.assertFileSize(contentLength)
                     storageService.assertSupportedImageType(part.extension)
 
                     val fileResource = lectureService.getThemeImageFileResource(lecture)

@@ -2,11 +2,11 @@ package pl.newbies.lecture
 
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
-import io.ktor.http.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
 import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import pl.newbies.lecture.application.model.LectureResponse
-import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.util.*
 import java.util.*
@@ -349,7 +348,29 @@ class LectureTest : IntegrationTest() {
             assertEquals(HttpStatusCode.NotFound, exception.response.status)
         }
 
-        //todo remove directory on delete
+        @Test
+        fun `should delete storage directory when delete called`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse)
+            addLectureImage(
+                authResponse = authResponse,
+                lectureId = lecture.id,
+                imagePath = "images/newbies-logo.webp",
+                contentType = "image/webp",
+                fileName = "filename=newbies-logo.webp",
+            )
+            assertFileExists("lectures/${lecture.id}")
+
+            // when
+            val response = httpClient.delete("api/v1/lectures/${lecture.id}") {
+                bearerAuth(authResponse.accessToken)
+            }
+
+            // then
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertFileNotExists("lectures/${lecture.id}")
+        }
     }
 
     @Nested
@@ -388,20 +409,13 @@ class LectureTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.put("/api/v1/lectures/${lecture.id}/theme/image") {
-                    bearerAuth(authResponse.accessToken)
-                    setBody(MultiPartFormDataContent(
-                        parts = formData {
-                            append("image", getResourceFile("images/newbies-logo.gif").readBytes(), Headers.build {
-                                append(HttpHeaders.ContentType, "image/gif")
-                                append(HttpHeaders.ContentDisposition, "filename=newbies-logo.gif")
-                            })
-                        },
-                    ))
-                    onUpload { bytesSentTotal, contentLength ->
-                        println("Sent $bytesSentTotal bytes from $contentLength")
-                    }
-                }
+                addLectureImage(
+                    authResponse = authResponse,
+                    lectureId = lecture.id,
+                    imagePath = "images/newbies-logo.gif",
+                    contentType = "image/gif",
+                    fileName = "filename=newbies-logo.gif",
+                )
             }
 
             // then
@@ -435,20 +449,13 @@ class LectureTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.put("/api/v1/lectures/${lecture.id}/theme/image") {
-                    bearerAuth(secondAuthResponse.accessToken)
-                    setBody(MultiPartFormDataContent(
-                        parts = formData {
-                            append("image", getResourceFile("images/newbies-logo.png").readBytes(), Headers.build {
-                                append(HttpHeaders.ContentType, "image/png")
-                                append(HttpHeaders.ContentDisposition, "filename=newbies-logo.png")
-                            })
-                        },
-                    ))
-                    onUpload { bytesSentTotal, contentLength ->
-                        println("Sent $bytesSentTotal bytes from $contentLength")
-                    }
-                }
+                addLectureImage(
+                    authResponse = secondAuthResponse,
+                    lectureId = lecture.id,
+                    imagePath = "images/newbies-logo.png",
+                    contentType = "image/png",
+                    fileName = "filename=newbies-logo.png",
+                )
             }
 
             // then
@@ -471,25 +478,15 @@ class LectureTest : IntegrationTest() {
             val lecture = createLecture(authResponse = authResponse)
 
             // when
-            //todo extract to fun
-            val response = httpClient.put("/api/v1/lectures/${lecture.id}/theme/image") {
-                bearerAuth(authResponse.accessToken)
-                setBody(MultiPartFormDataContent(
-                    parts = formData {
-                        append("image", getResourceFile(imagePath).readBytes(), Headers.build {
-                            append(HttpHeaders.ContentType, contentType)
-                            append(HttpHeaders.ContentDisposition, "filename=$fileName")
-                        })
-                    },
-                ))
-                onUpload { bytesSentTotal, contentLength ->
-                    println("Sent $bytesSentTotal bytes from $contentLength")
-                }
-            }
+            val responseBody = addLectureImage(
+                authResponse = authResponse,
+                lectureId = lecture.id,
+                imagePath = imagePath,
+                contentType = contentType,
+                fileName = fileName,
+            )
 
             // then
-            assertEquals(HttpStatusCode.OK, response.status)
-            val responseBody = response.body<FileUrlResponse>()
             assertEquals(responseBody.url, "http://localhost:80/api/v1/files/lectures/${lecture.id}/image.webp")
             assertFileExists("lectures/${lecture.id}/image.webp")
         }
@@ -528,8 +525,68 @@ class LectureTest : IntegrationTest() {
             assertEquals(HttpStatusCode.NotFound, exception.response.status)
         }
 
-        // todo 403 on no permission
-        // todo ok when removing not existing image
-        // todo ok when removed existing image
+        @Test
+        fun `should return 403 when called by another user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val secondAuthResponse = loginAs(TestData.testUser2)
+            val lecture = createLecture(authResponse)
+            addLectureImage(
+                authResponse = authResponse,
+                lectureId = lecture.id,
+                imagePath = "images/newbies-logo.png",
+                contentType = "image/png",
+                fileName = "filename=newbies-logo.png",
+            )
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.delete("api/v1/lectures/${lecture.id}/theme/image") {
+                    bearerAuth(secondAuthResponse.accessToken)
+                }
+            }
+
+            // then
+            assertEquals(HttpStatusCode.Forbidden, exception.response.status)
+        }
+
+        @Test
+        fun `should return 200 when lecture does not have image`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse)
+
+            // when
+            val response = httpClient.delete("api/v1/lectures/${lecture.id}/theme/image") {
+                bearerAuth(authResponse.accessToken)
+            }
+
+            // then
+            assertEquals(HttpStatusCode.OK, response.status)
+        }
+
+        @Test
+        fun `should remove image when called on lecture with image`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val lecture = createLecture(authResponse)
+            addLectureImage(
+                authResponse = authResponse,
+                lectureId = lecture.id,
+                imagePath = "images/newbies-logo.png",
+                contentType = "image/png",
+                fileName = "filename=newbies-logo.png",
+            )
+            assertFileExists("lectures/${lecture.id}/image.webp")
+
+            // when
+            val response = httpClient.delete("api/v1/lectures/${lecture.id}/theme/image") {
+                bearerAuth(authResponse.accessToken)
+            }
+
+            // then
+            assertFileNotExists("lectures/${lecture.id}/image.webp")
+            assertEquals(HttpStatusCode.OK, response.status)
+        }
     }
 }

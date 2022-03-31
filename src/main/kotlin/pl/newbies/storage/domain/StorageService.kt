@@ -48,6 +48,8 @@ class StorageService(mainStoragePath: String) {
 
         // ImageIO strips image metadata on read call
         val image = ImageIO.read(originPath.toFile())
+            ?: throw FileTypeNotSupportedException("null", ALLOWED_IMAGE_TYPES)
+
         ImageIO.write(image, targetPath.extension, targetPath.toFile())
     }
 
@@ -64,6 +66,7 @@ class StorageService(mainStoragePath: String) {
 
         runCatching {
             Files.walk(path)
+                .sorted(Comparator.reverseOrder())
                 .map { it.toFile() }
                 .forEach { it.delete() }
         }
@@ -100,8 +103,15 @@ class StorageService(mainStoragePath: String) {
         }
     }
 
+    fun assertFileSize(contentLength: Long) {
+        if (contentLength >= MAX_FILE_SIZE) {
+            throw SecurityException("File is too big ($contentLength/$MAX_FILE_SIZE)")
+        }
+    }
+
     companion object {
         private const val TEMP_DIRECTORY = "temp"
+        private const val MAX_FILE_SIZE = 3_145_728 // 3MB
 
         private val ALLOWED_IMAGE_TYPES = listOf(
             "jpg",

@@ -11,9 +11,9 @@ open class FileResource(
 
 class TempFileResource(
     nameWithExtension: String
-): FileResource("temp/", nameWithExtension)
+) : FileResource("temp/", nameWithExtension)
 
 class LectureImageFileResource(
     lectureId: String,
     nameWithExtension: String,
-): FileResource("lectures/$lectureId/", nameWithExtension)
+) : FileResource("lectures/$lectureId/", nameWithExtension)

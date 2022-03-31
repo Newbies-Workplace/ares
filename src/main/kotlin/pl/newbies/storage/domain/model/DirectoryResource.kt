@@ -8,4 +8,4 @@ object TempDirectoryResource : DirectoryResource("temp/")
 
 data class LectureDirectoryResource(
     val lectureId: String
-) : DirectoryResource("lectures/$lectureId/")
+) : DirectoryResource("lectures/$lectureId")
