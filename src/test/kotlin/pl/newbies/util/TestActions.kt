@@ -96,13 +96,17 @@ suspend fun ApplicationTestBuilder.addLectureImage(
         bearerAuth(authResponse.accessToken)
         setBody(
             MultiPartFormDataContent(
-            parts = formData {
-                append("image", getResourceFile(imagePath).readBytes(), Headers.build {
-                    append(HttpHeaders.ContentType, contentType)
-                    append(HttpHeaders.ContentDisposition, "filename=$fileName")
-                })
-            },
-        )
+                parts = formData {
+                    append(
+                        key = "image",
+                        value = getResourceFile(imagePath).readBytes(),
+                        headers = Headers.build {
+                            append(HttpHeaders.ContentType, contentType)
+                            append(HttpHeaders.ContentDisposition, "filename=$fileName")
+                        },
+                    )
+                },
+            )
         )
         onUpload { bytesSentTotal, contentLength ->
             println("Sent $bytesSentTotal bytes from $contentLength")
@@ -119,10 +123,10 @@ fun removeDirectory(path: String) {
 
     println("[Test] Removing directory ${storagePath.toFile().path}")
 
-        Files.walk(storagePath)
-            .sorted(Comparator.reverseOrder())
-            .map { it.toFile() }
-            .forEach { it.delete() }
+    Files.walk(storagePath)
+        .sorted(Comparator.reverseOrder())
+        .map { it.toFile() }
+        .forEach { it.delete() }
 }
 
 fun assertFileNotExists(path: String) {
