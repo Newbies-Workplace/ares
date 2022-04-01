@@ -1,17 +1,23 @@
 package pl.newbies.lecture.application
 
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.PartData
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
+import io.ktor.server.plugins.BadRequestException
+import io.ktor.server.request.header
 import io.ktor.server.request.receive
+import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.ForbiddenException
+import pl.newbies.common.extension
 import pl.newbies.common.pagination
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.domain.LectureNotFoundException
@@ -22,10 +28,16 @@ import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
+import pl.newbies.storage.application.FileUrlConverter
+import pl.newbies.storage.domain.StorageService
+import pl.newbies.storage.domain.model.LectureDirectoryResource
+import pl.newbies.storage.domain.model.LectureImageFileResource
 
 fun Application.lectureRoutes() {
     val lectureService: LectureService by inject()
+    val storageService: StorageService by inject()
     val lectureConverter: LectureConverter by inject()
+    val fileUrlConverter: FileUrlConverter by inject()
 
     routing {
         route("/api/v1/lectures") {
@@ -81,6 +93,51 @@ fun Application.lectureRoutes() {
                     call.respond(lectureConverter.convert(updatedLecture))
                 }
 
+                put("/{id}/theme/image") {
+                    val id = call.parameters.getOrFail("id")
+                    val principal = call.principal<AresPrincipal>()!!
+                    val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
+                        ?: throw LectureNotFoundException(id)
+
+                    principal.assertLectureWriteAccess(lecture)
+
+                    val part = (call.receiveMultipart().readPart() as? PartData.FileItem)
+                        ?: throw BadRequestException("Part is not a file.")
+                    val contentLength = call.request.header(HttpHeaders.ContentLength)?.toLongOrNull()
+                        ?: throw BadRequestException("Content-Length header not present.")
+
+                    storageService.assertFileSize(contentLength)
+                    storageService.assertSupportedImageType(part.extension)
+
+                    val fileResource = lectureService.getThemeImageFileResource(lecture)
+                        ?.also { res -> storageService.removeResource(res) }
+                        ?: LectureImageFileResource(lecture.id, "image.webp")
+
+                    val tempFileResource = storageService.saveTempFile(part)
+
+                    call.respond(fileUrlConverter.convert(call, fileResource))
+
+                    storageService.saveImage(tempFileResource, fileResource)
+                    storageService.removeResource(tempFileResource)
+                    lectureService.updateThemeImage(lecture, fileResource)
+                }
+
+                delete("/{id}/theme/image") {
+                    val id = call.parameters.getOrFail("id")
+                    val principal = call.principal<AresPrincipal>()!!
+                    val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
+                        ?: throw LectureNotFoundException(id)
+
+                    principal.assertLectureWriteAccess(lecture)
+
+                    lectureService.getThemeImageFileResource(lecture)?.let { fileResource ->
+                        storageService.removeResource(fileResource)
+                        lectureService.updateThemeImage(lecture, null)
+                    }
+
+                    call.respond(HttpStatusCode.OK)
+                }
+
                 delete("/{id}") {
                     val id = call.parameters.getOrFail("id")
                     val principal = call.principal<AresPrincipal>()!!
@@ -90,6 +147,8 @@ fun Application.lectureRoutes() {
                     principal.assertLectureWriteAccess(lecture)
 
                     lectureService.deleteLecture(lecture)
+
+                    storageService.removeDirectory(LectureDirectoryResource(lecture.id))
 
                     call.respond(HttpStatusCode.OK)
                 }

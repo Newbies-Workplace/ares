@@ -18,6 +18,7 @@ data class LectureResponse(
     val timeFrame: TimeFrameResponse,
     val address: AddressResponse?,
     val tags: List<TagResponse>,
+    val theme: ThemeResponse,
     val createDate: Instant,
     val updateDate: Instant,
 ) {
@@ -48,4 +49,11 @@ data class AddressResponse(
 data class CoordinatesResponse(
     val latitude: Double,
     val longitude: Double,
+)
+
+@Serializable
+data class ThemeResponse(
+    val primaryColor: String?,
+    val secondaryColor: String?,
+    val image: String?,
 )

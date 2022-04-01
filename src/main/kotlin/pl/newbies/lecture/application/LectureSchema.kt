@@ -12,6 +12,7 @@ import pl.newbies.common.pagination
 import pl.newbies.common.principal
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.application.model.LectureResponse
+import pl.newbies.lecture.application.model.LectureThemeRequest
 import pl.newbies.lecture.domain.LectureNotFoundException
 import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
@@ -74,6 +75,23 @@ class LectureSchema(
             val replacedLecture = lectureService.updateLecture(lecture, request)
 
             return lectureConverter.convert(replacedLecture)
+        }
+
+        @GraphQLDescription("Replace lecture theme with new one (PUT equivalent)")
+        fun replaceLectureTheme(
+            id: String,
+            request: LectureThemeRequest,
+            env: DataFetchingEnvironment
+        ): LectureResponse {
+            val principal = env.principal()
+            val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
+                ?: throw LectureNotFoundException(id)
+
+            principal.assertLectureWriteAccess(lecture)
+
+            val updatedLecture = lectureService.updateTheme(lecture, request)
+
+            return lectureConverter.convert(updatedLecture)
         }
 
         @GraphQLDescription("Delete lecture by id")

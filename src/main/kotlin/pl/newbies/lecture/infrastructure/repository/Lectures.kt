@@ -26,6 +26,10 @@ object Lectures : StringUUIDTable() {
     val latitude = double("latitude").nullable()
     val longitude = double("longitude").nullable()
 
+    val primaryColor = varchar("primaryColor", length = 7).nullable()
+    val secondaryColor = varchar("secondaryColor", length = 7).nullable()
+    val image = varchar("image", length = 100).nullable()
+
     val createDate = timestamp("createDate")
     val updateDate = timestamp("updateDate")
 }
@@ -82,6 +86,10 @@ class LectureDAO(id: EntityID<String>) : StringUUIDEntity(id) {
 
     var tags by TagDAO via LectureTags
 
+    var primaryColor by Lectures.primaryColor
+    var secondaryColor by Lectures.secondaryColor
+    var image by Lectures.image
+
     var createDate by Lectures.createDate
     var updateDate by Lectures.updateDate
 }
@@ -107,6 +115,11 @@ fun LectureDAO.toLecture() = Lecture(
             } else null
         )
     } else null,
+    theme = ThemeDTO(
+        primaryColor = primaryColor,
+        secondaryColor = secondaryColor,
+        image = image,
+    ),
     createDate = createDate,
     updateDate = updateDate,
 )

@@ -1,21 +1,29 @@
 package pl.newbies.util
 
 import io.ktor.client.call.body
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitForm
-import io.ktor.http.ContentType
-import io.ktor.http.Parameters
-import io.ktor.http.contentType
+import io.ktor.http.*
 import io.ktor.server.testing.ApplicationTestBuilder
+import org.junit.jupiter.api.Assertions.assertEquals
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.auth.application.model.GithubUser
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.application.model.LectureResponse
+import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.user.application.model.UserResponse
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.exists
 
 suspend fun ApplicationTestBuilder.loginAs(
     githubUser: GithubUser,
@@ -76,3 +84,64 @@ suspend fun ApplicationTestBuilder.getUser(id: String): UserResponse {
 
     return response.body()
 }
+
+suspend fun ApplicationTestBuilder.addLectureImage(
+    authResponse: AuthResponse,
+    lectureId: String,
+    imagePath: String,
+    contentType: String,
+    fileName: String,
+): FileUrlResponse {
+    val response = httpClient.put("/api/v1/lectures/${lectureId}/theme/image") {
+        bearerAuth(authResponse.accessToken)
+        setBody(
+            MultiPartFormDataContent(
+                parts = formData {
+                    append(
+                        key = "image",
+                        value = getResourceFile(imagePath).readBytes(),
+                        headers = Headers.build {
+                            append(HttpHeaders.ContentType, contentType)
+                            append(HttpHeaders.ContentDisposition, "filename=$fileName")
+                        },
+                    )
+                },
+            )
+        )
+        onUpload { bytesSentTotal, contentLength ->
+            println("Sent $bytesSentTotal bytes from $contentLength")
+        }
+    }
+
+    assertEquals(HttpStatusCode.OK, response.status)
+
+    return response.body()
+}
+
+fun removeDirectory(path: String) {
+    val storagePath = Path.of("ares-test-storage").resolve(path)
+
+    println("[Test] Removing directory ${storagePath.toFile().path}")
+
+    Files.walk(storagePath)
+        .sorted(Comparator.reverseOrder())
+        .map { it.toFile() }
+        .forEach { it.delete() }
+}
+
+fun assertFileNotExists(path: String) {
+    val storagePath = Path.of("ares-test-storage").resolve(path)
+    print("[Test] asserting directory NOT exists (${storagePath.toFile().path})")
+
+    assert(!storagePath.exists()) { "Expected file not to exist (${storagePath.toFile().path})" }
+}
+
+fun assertFileExists(path: String) {
+    val storagePath = Path.of("ares-test-storage").resolve(path)
+    print("[Test] asserting directory exists (${storagePath.toFile().path})")
+
+    assert(storagePath.exists()) { "Expected file to exist (${storagePath.toFile().path})" }
+}
+
+fun getResourceFile(path: String): File =
+    Path("src/test/resources/").resolve(path).toFile()

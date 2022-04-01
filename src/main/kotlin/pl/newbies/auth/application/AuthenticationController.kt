@@ -26,7 +26,7 @@ fun Application.authenticationRoutes() {
     val authService: AuthService by inject()
 
     routing {
-        post("/api/refresh") {
+        post("/api/v1/refresh") {
             val refreshToken = call.receive<String>()
             val token = transaction {
                 RefreshTokenDAO.findById(refreshToken)?.toRefreshToken()
@@ -42,7 +42,7 @@ fun Application.authenticationRoutes() {
         }
 
         authenticate("jwt") {
-            delete("/api/logout") {
+            delete("/api/v1/logout") {
                 val refreshToken = call.receive<String>()
                 val principal = call.principal<AresPrincipal>()!!
                 val token = transaction {
