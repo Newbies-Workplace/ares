@@ -56,7 +56,7 @@ dependencies {
     implementation("com.expediagroup:graphql-kotlin-server:$kotlinGraphQL")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
 
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
+    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.4")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")
 
