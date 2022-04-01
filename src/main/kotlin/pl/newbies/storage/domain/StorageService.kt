@@ -111,7 +111,7 @@ class StorageService(mainStoragePath: String) {
 
     companion object {
         private const val TEMP_DIRECTORY = "temp"
-        private const val MAX_FILE_SIZE = 3_145_728 // 3MB
+        private const val MAX_FILE_SIZE = 10_485_760 // 10MB
 
         private val ALLOWED_IMAGE_TYPES = listOf(
             "jpg",
