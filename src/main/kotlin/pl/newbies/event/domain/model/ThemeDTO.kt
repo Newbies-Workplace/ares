@@ -1,4 +1,4 @@
-package pl.newbies.lecture.domain.model
+package pl.newbies.event.domain.model
 
 data class ThemeDTO(
     val primaryColor: String? = null,

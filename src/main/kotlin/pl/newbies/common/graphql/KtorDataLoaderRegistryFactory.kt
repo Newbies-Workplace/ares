@@ -2,15 +2,15 @@ package pl.newbies.common.graphql
 
 import com.expediagroup.graphql.server.execution.DataLoaderRegistryFactory
 import org.dataloader.DataLoaderRegistry
-import pl.newbies.lecture.application.LectureSchema
+import pl.newbies.event.application.EventSchema
 
 class KtorDataLoaderRegistryFactory(
-    private val lectureSchema: LectureSchema
+    private val eventSchema: EventSchema
 ) : DataLoaderRegistryFactory {
 
     override fun generate(): DataLoaderRegistry =
         DataLoaderRegistry().apply {
-            register(lectureSchema.AuthorDataLoader().dataLoaderName, lectureSchema.AuthorDataLoader().getDataLoader())
-            register(lectureSchema.IsFollowedDataLoader().dataLoaderName, lectureSchema.IsFollowedDataLoader().getDataLoader())
+            register(eventSchema.AuthorDataLoader().dataLoaderName, eventSchema.AuthorDataLoader().getDataLoader())
+            register(eventSchema.IsFollowedDataLoader().dataLoaderName, eventSchema.IsFollowedDataLoader().getDataLoader())
         }
 }

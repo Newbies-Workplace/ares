@@ -1,10 +1,10 @@
-package pl.newbies.lecture.domain.model
+package pl.newbies.event.domain.model
 
 import kotlinx.datetime.Instant
 import pl.newbies.user.domain.model.User
 
-data class LectureFollow(
-    val lecture: Lecture,
+data class EventFollow(
+    val event: Event,
     val user: User,
 
     val followDate: Instant,

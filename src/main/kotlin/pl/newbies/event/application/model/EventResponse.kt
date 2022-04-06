@@ -1,4 +1,4 @@
-package pl.newbies.lecture.application.model
+package pl.newbies.event.application.model
 
 import com.expediagroup.graphql.generator.annotations.GraphQLDescription
 import com.expediagroup.graphql.server.extensions.getValueFromDataLoader
@@ -10,7 +10,7 @@ import pl.newbies.user.application.model.UserResponse
 import java.util.concurrent.CompletableFuture
 
 @Serializable
-data class LectureResponse(
+data class EventResponse(
     val id: String,
     val authorId: String,
     val title: String,
@@ -23,13 +23,13 @@ data class LectureResponse(
     val updateDate: Instant,
 ) {
 
-    @GraphQLDescription("Lecture creator")
+    @GraphQLDescription("Event creator")
     fun author(env: DataFetchingEnvironment): CompletableFuture<UserResponse> =
-        env.getValueFromDataLoader("LectureAuthorDataLoader", authorId)
+        env.getValueFromDataLoader("EventAuthorDataLoader", authorId)
 
-    @GraphQLDescription("Is lecture followed by current user")
+    @GraphQLDescription("Is event followed by current user")
     fun isFollowed(env: DataFetchingEnvironment): CompletableFuture<Boolean> =
-        env.getValueFromDataLoader("LectureIsFollowedDataLoader", id)
+        env.getValueFromDataLoader("EventIsFollowedDataLoader", id)
 }
 
 @Serializable

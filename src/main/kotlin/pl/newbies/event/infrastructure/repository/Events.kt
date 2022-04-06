@@ -1,9 +1,9 @@
-package pl.newbies.lecture.infrastructure.repository
+package pl.newbies.event.infrastructure.repository
 
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
-import pl.newbies.lecture.domain.model.*
+import pl.newbies.event.domain.model.*
 import pl.newbies.plugins.StringUUIDEntity
 import pl.newbies.plugins.StringUUIDEntityClass
 import pl.newbies.plugins.StringUUIDTable
@@ -13,7 +13,7 @@ import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
 import pl.newbies.user.infrastructure.repository.toUser
 
-object Lectures : StringUUIDTable() {
+object Events : StringUUIDTable() {
     val title = varchar("title", length = 100, collate = "utf8_general_ci")
     val subtitle = varchar("subtitle", length = 100, collate = "utf8_general_ci").nullable()
     val author = reference("author", Users)
@@ -34,67 +34,67 @@ object Lectures : StringUUIDTable() {
     val updateDate = timestamp("updateDate")
 }
 
-object LectureTags : Table() {
-    val lecture = reference("lecture", Lectures)
+object EventTags : Table() {
+    val event = reference("event", Events)
     val tag = reference("tag", Tags)
 
     override val primaryKey: PrimaryKey =
-        PrimaryKey(lecture, tag, name = "id")
+        PrimaryKey(event, tag, name = "id")
 }
 
-object LectureFollows : StringUUIDTable() {
-    val lecture = reference("lecture", Lectures)
+object EventFollows : StringUUIDTable() {
+    val event = reference("event", Events)
     val user = reference("user", Users)
 
     val followDate = timestamp("followDate")
 
     init {
-        uniqueIndex(lecture, user)
+        uniqueIndex(event, user)
     }
 }
 
-class LectureFollowDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object : StringUUIDEntityClass<LectureFollowDAO>(LectureFollows)
+class EventFollowDAO(id: EntityID<String>) : StringUUIDEntity(id) {
+    companion object : StringUUIDEntityClass<EventFollowDAO>(EventFollows)
 
-    var lecture by LectureDAO referencedOn LectureFollows.lecture
-    var user by UserDAO referencedOn LectureFollows.user
+    var event by EventDAO referencedOn EventFollows.event
+    var user by UserDAO referencedOn EventFollows.user
 
-    var followDate by LectureFollows.followDate
+    var followDate by EventFollows.followDate
 }
 
-fun LectureFollowDAO.toLectureFollow() =
-    LectureFollow(
+fun EventFollowDAO.toEventFollow() =
+    EventFollow(
         user = user.toUser(),
-        lecture = lecture.toLecture(),
+        event = event.toEvent(),
         followDate = followDate
     )
 
-class LectureDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object : StringUUIDEntityClass<LectureDAO>(Lectures)
+class EventDAO(id: EntityID<String>) : StringUUIDEntity(id) {
+    companion object : StringUUIDEntityClass<EventDAO>(Events)
 
-    var title by Lectures.title
-    var subtitle by Lectures.subtitle
-    var author by UserDAO referencedOn Lectures.author
+    var title by Events.title
+    var subtitle by Events.subtitle
+    var author by UserDAO referencedOn Events.author
 
-    var startDate by Lectures.startDate
-    var finishDate by Lectures.finishDate
+    var startDate by Events.startDate
+    var finishDate by Events.finishDate
 
-    var city by Lectures.city
-    var place by Lectures.place
-    var latitude by Lectures.latitude
-    var longitude by Lectures.longitude
+    var city by Events.city
+    var place by Events.place
+    var latitude by Events.latitude
+    var longitude by Events.longitude
 
-    var tags by TagDAO via LectureTags
+    var tags by TagDAO via EventTags
 
-    var primaryColor by Lectures.primaryColor
-    var secondaryColor by Lectures.secondaryColor
-    var image by Lectures.image
+    var primaryColor by Events.primaryColor
+    var secondaryColor by Events.secondaryColor
+    var image by Events.image
 
-    var createDate by Lectures.createDate
-    var updateDate by Lectures.updateDate
+    var createDate by Events.createDate
+    var updateDate by Events.updateDate
 }
 
-fun LectureDAO.toLecture() = Lecture(
+fun EventDAO.toEvent() = Event(
     id = id.value,
     title = title,
     subtitle = subtitle,

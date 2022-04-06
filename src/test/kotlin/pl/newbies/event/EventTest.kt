@@ -1,4 +1,4 @@
-package pl.newbies.lecture
+package pl.newbies.event
 
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -16,22 +16,22 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import pl.newbies.lecture.application.model.LectureResponse
+import pl.newbies.event.application.model.EventResponse
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.util.*
 import java.util.*
 
-class LectureTest : IntegrationTest() {
+class EventTest : IntegrationTest() {
 
     @Nested
     inner class GetAll {
         @Test
-        fun `should return empty list when there are no lectures`() = withAres {
+        fun `should return empty list when there are no events`() = withAres {
             // given
-            clearTable("Lectures")
+            clearTable("Events")
 
             // when
-            val response = httpClient.get("api/v1/lectures")
+            val response = httpClient.get("api/v1/events")
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
@@ -39,80 +39,80 @@ class LectureTest : IntegrationTest() {
         }
 
         @Test
-        fun `should return lectures when there are some`() = withAres {
+        fun `should return events when there are some`() = withAres {
             // given
-            clearTable("Lectures")
+            clearTable("Events")
             val authResponse = loginAs(TestData.testUser1)
-            val createdLectures = buildList {
-                repeat(2) { add(createLecture(authResponse)) }
+            val createdEvents = buildList {
+                repeat(2) { add(createEvent(authResponse)) }
             }
 
             // when
-            val response = httpClient.get("api/v1/lectures")
+            val response = httpClient.get("api/v1/events")
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            val responseBody = response.body<List<LectureResponse>>().map { it.id }
+            val responseBody = response.body<List<EventResponse>>().map { it.id }
             assertEquals(2, responseBody.size)
-            assertTrue(createdLectures[0].id in responseBody)
-            assertTrue(createdLectures[1].id in responseBody)
+            assertTrue(createdEvents[0].id in responseBody)
+            assertTrue(createdEvents[1].id in responseBody)
         }
 
         @Test
         fun `should return next page when there are enough items`() = withAres {
             // given
-            clearTable("Lectures")
+            clearTable("Events")
             val authResponse = loginAs(TestData.testUser1)
-            val createdLectures = buildList {
-                repeat(2) { add(createLecture(authResponse)) }
+            val createdEvents = buildList {
+                repeat(2) { add(createEvent(authResponse)) }
             }
 
             // when
-            val response = httpClient.get("api/v1/lectures") {
+            val response = httpClient.get("api/v1/events") {
                 parameter("page", 2L)
                 parameter("size", 1L)
             }
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            val responseBody = response.body<List<LectureResponse>>().map { it.id }
+            val responseBody = response.body<List<EventResponse>>().map { it.id }
             assertEquals(1, responseBody.size)
-            assertTrue(createdLectures[1].id in responseBody)
+            assertTrue(createdEvents[1].id in responseBody)
         }
 
         @Test
         fun `should return empty list when empty page requested`() = withAres {
             // given
-            clearTable("Lectures")
+            clearTable("Events")
             val authResponse = loginAs(TestData.testUser1)
             repeat(2) {
-                createLecture(authResponse)
+                createEvent(authResponse)
             }
 
             // when
-            val response = httpClient.get("api/v1/lectures") {
+            val response = httpClient.get("api/v1/events") {
                 parameter("page", 3L)
                 parameter("size", 1L)
             }
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            val responseBody = response.body<List<LectureResponse>>()
-            assertEquals(emptyList<List<LectureResponse>>(), responseBody)
+            val responseBody = response.body<List<EventResponse>>()
+            assertEquals(emptyList<List<EventResponse>>(), responseBody)
         }
     }
 
     @Nested
     inner class GetById {
         @Test
-        fun `should return 404 when there is no lecture with given id`() = withAres {
+        fun `should return 404 when there is no event with given id`() = withAres {
             // given
-            clearTable("Lectures")
+            clearTable("Events")
             val randomId = UUID.randomUUID().toString()
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.get("api/v1/lectures/$randomId")
+                httpClient.get("api/v1/events/$randomId")
             }
 
             // then
@@ -120,18 +120,18 @@ class LectureTest : IntegrationTest() {
         }
 
         @Test
-        fun `should return existing lecture when called with valid id`() = withAres {
+        fun `should return existing event when called with valid id`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse)
+            val event = createEvent(authResponse)
 
             // when
-            val response = httpClient.get("api/v1/lectures/${lecture.id}")
+            val response = httpClient.get("api/v1/events/${event.id}")
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            val responseBody = response.body<LectureResponse>()
-            assertEquals(lecture.id, responseBody.id)
+            val responseBody = response.body<EventResponse>()
+            assertEquals(event.id, responseBody.id)
         }
     }
 
@@ -141,8 +141,8 @@ class LectureTest : IntegrationTest() {
         fun `should return 401 when called without authentication`() = withAres {
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/lectures") {
-                    setBody(TestData.createLectureRequest())
+                httpClient.post("api/v1/events") {
+                    setBody(TestData.createEventRequest())
                     contentType(ContentType.Application.Json)
                 }
             }
@@ -162,7 +162,7 @@ class LectureTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/lectures") {
+                httpClient.post("api/v1/events") {
                     setBody(Json.parseToJsonElement(body))
                     contentType(ContentType.Application.Json)
                     bearerAuth(authResponse.accessToken)
@@ -180,11 +180,11 @@ class LectureTest : IntegrationTest() {
         fun `should replace old data when called`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
-            val body = TestData.createLectureRequest(title = "NewTitle")
+            val event = createEvent(authResponse = authResponse)
+            val body = TestData.createEventRequest(title = "NewTitle")
 
             // when
-            val response = httpClient.put("api/v1/lectures/${lecture.id}") {
+            val response = httpClient.put("api/v1/events/${event.id}") {
                 setBody(body)
                 contentType(ContentType.Application.Json)
                 bearerAuth(authResponse.accessToken)
@@ -192,7 +192,7 @@ class LectureTest : IntegrationTest() {
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            val responseBody = response.body<LectureResponse>()
+            val responseBody = response.body<EventResponse>()
             assertEquals(body.title, responseBody.title)
         }
 
@@ -201,14 +201,14 @@ class LectureTest : IntegrationTest() {
         fun `should return 400 when called with invalid data`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
             val body = """
                 {}
             """.trimIndent()
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/lectures/${lecture.id}") {
+                httpClient.put("api/v1/events/${event.id}") {
                     setBody(Json.parseToJsonElement(body))
                     contentType(ContentType.Application.Json)
                     bearerAuth(authResponse.accessToken)
@@ -223,12 +223,12 @@ class LectureTest : IntegrationTest() {
         fun `should return 401 when called without authentication`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/lectures/${lecture.id}") {
-                    setBody(TestData.createLectureRequest(title = "NewTitle"))
+                httpClient.put("api/v1/events/${event.id}") {
+                    setBody(TestData.createEventRequest(title = "NewTitle"))
                     contentType(ContentType.Application.Json)
                 }
             }
@@ -245,8 +245,8 @@ class LectureTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/lectures/$randomId") {
-                    setBody(TestData.createLectureRequest(title = "NewTitle"))
+                httpClient.put("api/v1/events/$randomId") {
+                    setBody(TestData.createEventRequest(title = "NewTitle"))
                     contentType(ContentType.Application.Json)
                     bearerAuth(authResponse.accessToken)
                 }
@@ -260,13 +260,13 @@ class LectureTest : IntegrationTest() {
         fun `should return 403 when called by another user`() = withAres {
             // given
             val firstAuthResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = firstAuthResponse)
+            val event = createEvent(authResponse = firstAuthResponse)
             val secondAuthResponse = loginAs(TestData.testUser2)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/lectures/${lecture.id}") {
-                    setBody(TestData.createLectureRequest(title = "NewTitle"))
+                httpClient.delete("api/v1/events/${event.id}") {
+                    setBody(TestData.createEventRequest(title = "NewTitle"))
                     contentType(ContentType.Application.Json)
                     bearerAuth(secondAuthResponse.accessToken)
                 }
@@ -283,11 +283,11 @@ class LectureTest : IntegrationTest() {
         fun `should return 401 when called without authentication`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/lectures/${lecture.id}")
+                httpClient.delete("api/v1/events/${event.id}")
             }
 
             // then
@@ -302,7 +302,7 @@ class LectureTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/lectures/$randomId") {
+                httpClient.delete("api/v1/events/$randomId") {
                     bearerAuth(authResponse.accessToken)
                 }
             }
@@ -315,12 +315,12 @@ class LectureTest : IntegrationTest() {
         fun `should return 403 when called by another user`() = withAres {
             // given
             val firstAuthResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = firstAuthResponse)
+            val event = createEvent(authResponse = firstAuthResponse)
             val secondAuthResponse = loginAs(TestData.testUser2)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/lectures/${lecture.id}") {
+                httpClient.delete("api/v1/events/${event.id}") {
                     bearerAuth(secondAuthResponse.accessToken)
                 }
             }
@@ -333,17 +333,17 @@ class LectureTest : IntegrationTest() {
         fun `should delete when called by author`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse)
+            val event = createEvent(authResponse)
 
             // when
-            val response = httpClient.delete("api/v1/lectures/${lecture.id}") {
+            val response = httpClient.delete("api/v1/events/${event.id}") {
                 bearerAuth(authResponse.accessToken)
             }
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val exception = assertThrows<ClientRequestException> {
-                httpClient.get("api/v1/lectures/${lecture.id}")
+                httpClient.get("api/v1/events/${event.id}")
             }
             assertEquals(HttpStatusCode.NotFound, exception.response.status)
         }
@@ -352,24 +352,24 @@ class LectureTest : IntegrationTest() {
         fun `should delete storage directory when delete called`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse)
-            addLectureImage(
+            val event = createEvent(authResponse)
+            addEventImage(
                 authResponse = authResponse,
-                lectureId = lecture.id,
+                eventId = event.id,
                 imagePath = "images/newbies-logo.webp",
                 contentType = "image/webp",
                 fileName = "filename=newbies-logo.webp",
             )
-            assertFileExists("lectures/${lecture.id}")
+            assertFileExists("events/${event.id}")
 
             // when
-            val response = httpClient.delete("api/v1/lectures/${lecture.id}") {
+            val response = httpClient.delete("api/v1/events/${event.id}") {
                 bearerAuth(authResponse.accessToken)
             }
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            assertFileNotExists("lectures/${lecture.id}")
+            assertFileNotExists("events/${event.id}")
         }
     }
 
@@ -379,11 +379,11 @@ class LectureTest : IntegrationTest() {
         fun `should return 401 when called without authentication`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/lectures/${lecture.id}/theme/image")
+                httpClient.put("api/v1/events/${event.id}/theme/image")
             }
 
             // then
@@ -394,7 +394,7 @@ class LectureTest : IntegrationTest() {
         fun `should return 404 when called with not existing id`() = withAres {
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/lectures/randomid/theme/image")
+                httpClient.put("api/v1/events/randomid/theme/image")
             }
 
             // then
@@ -405,13 +405,13 @@ class LectureTest : IntegrationTest() {
         fun `should 400 return when called with unsupported file`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                addLectureImage(
+                addEventImage(
                     authResponse = authResponse,
-                    lectureId = lecture.id,
+                    eventId = event.id,
                     imagePath = "images/newbies-logo.gif",
                     contentType = "image/gif",
                     fileName = "filename=newbies-logo.gif",
@@ -426,11 +426,11 @@ class LectureTest : IntegrationTest() {
         fun `should 400 return when called without file`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.put("/api/v1/lectures/${lecture.id}/theme/image") {
+                httpClient.put("/api/v1/events/${event.id}/theme/image") {
                     bearerAuth(authResponse.accessToken)
                     setBody(MultiPartFormDataContent(parts = listOf()))
                 }
@@ -445,13 +445,13 @@ class LectureTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val secondAuthResponse = loginAs(TestData.testUser2)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                addLectureImage(
+                addEventImage(
                     authResponse = secondAuthResponse,
-                    lectureId = lecture.id,
+                    eventId = event.id,
                     imagePath = "images/newbies-logo.png",
                     contentType = "image/png",
                     fileName = "filename=newbies-logo.png",
@@ -475,20 +475,20 @@ class LectureTest : IntegrationTest() {
         ) = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
 
             // when
-            val responseBody = addLectureImage(
+            val responseBody = addEventImage(
                 authResponse = authResponse,
-                lectureId = lecture.id,
+                eventId = event.id,
                 imagePath = imagePath,
                 contentType = contentType,
                 fileName = fileName,
             )
 
             // then
-            assertEquals(responseBody.url, "http://localhost:80/api/v1/files/lectures/${lecture.id}/image.webp")
-            assertFileExists("lectures/${lecture.id}/image.webp")
+            assertEquals(responseBody.url, "http://localhost:80/api/v1/files/events/${event.id}/image.webp")
+            assertFileExists("events/${event.id}/image.webp")
         }
     }
 
@@ -498,11 +498,11 @@ class LectureTest : IntegrationTest() {
         fun `should return 401 when called without authentication`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse = authResponse)
+            val event = createEvent(authResponse = authResponse)
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/lectures/${lecture.id}/theme/image")
+                httpClient.delete("api/v1/events/${event.id}/theme/image")
             }
 
             // then
@@ -516,7 +516,7 @@ class LectureTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/lectures/someRandomId/theme/image") {
+                httpClient.delete("api/v1/events/someRandomId/theme/image") {
                     bearerAuth(authResponse.accessToken)
                 }
             }
@@ -530,10 +530,10 @@ class LectureTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val secondAuthResponse = loginAs(TestData.testUser2)
-            val lecture = createLecture(authResponse)
-            addLectureImage(
+            val event = createEvent(authResponse)
+            addEventImage(
                 authResponse = authResponse,
-                lectureId = lecture.id,
+                eventId = event.id,
                 imagePath = "images/newbies-logo.png",
                 contentType = "image/png",
                 fileName = "filename=newbies-logo.png",
@@ -541,7 +541,7 @@ class LectureTest : IntegrationTest() {
 
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/lectures/${lecture.id}/theme/image") {
+                httpClient.delete("api/v1/events/${event.id}/theme/image") {
                     bearerAuth(secondAuthResponse.accessToken)
                 }
             }
@@ -551,13 +551,13 @@ class LectureTest : IntegrationTest() {
         }
 
         @Test
-        fun `should return 200 when lecture does not have image`() = withAres {
+        fun `should return 200 when event does not have image`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse)
+            val event = createEvent(authResponse)
 
             // when
-            val response = httpClient.delete("api/v1/lectures/${lecture.id}/theme/image") {
+            val response = httpClient.delete("api/v1/events/${event.id}/theme/image") {
                 bearerAuth(authResponse.accessToken)
             }
 
@@ -566,26 +566,26 @@ class LectureTest : IntegrationTest() {
         }
 
         @Test
-        fun `should remove image when called on lecture with image`() = withAres {
+        fun `should remove image when called on event with image`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse)
-            addLectureImage(
+            val event = createEvent(authResponse)
+            addEventImage(
                 authResponse = authResponse,
-                lectureId = lecture.id,
+                eventId = event.id,
                 imagePath = "images/newbies-logo.png",
                 contentType = "image/png",
                 fileName = "filename=newbies-logo.png",
             )
-            assertFileExists("lectures/${lecture.id}/image.webp")
+            assertFileExists("events/${event.id}/image.webp")
 
             // when
-            val response = httpClient.delete("api/v1/lectures/${lecture.id}/theme/image") {
+            val response = httpClient.delete("api/v1/events/${event.id}/theme/image") {
                 bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertFileNotExists("lectures/${lecture.id}/image.webp")
+            assertFileNotExists("events/${event.id}/image.webp")
             assertEquals(HttpStatusCode.OK, response.status)
         }
     }

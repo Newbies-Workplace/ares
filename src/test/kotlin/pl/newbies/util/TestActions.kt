@@ -11,8 +11,8 @@ import io.ktor.server.testing.ApplicationTestBuilder
 import org.junit.jupiter.api.Assertions.assertEquals
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.auth.application.model.GithubUser
-import pl.newbies.lecture.application.model.LectureRequest
-import pl.newbies.lecture.application.model.LectureResponse
+import pl.newbies.event.application.model.EventRequest
+import pl.newbies.event.application.model.EventResponse
 import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
@@ -66,11 +66,11 @@ suspend fun ApplicationTestBuilder.followTags(
     return response.body()
 }
 
-suspend fun ApplicationTestBuilder.createLecture(
+suspend fun ApplicationTestBuilder.createEvent(
     authResponse: AuthResponse,
-    request: LectureRequest = TestData.createLectureRequest()
-): LectureResponse {
-    val response = httpClient.post("api/v1/lectures") {
+    request: EventRequest = TestData.createEventRequest()
+): EventResponse {
+    val response = httpClient.post("api/v1/events") {
         setBody(request)
         contentType(ContentType.Application.Json)
         bearerAuth(authResponse.accessToken)
@@ -85,14 +85,14 @@ suspend fun ApplicationTestBuilder.getUser(id: String): UserResponse {
     return response.body()
 }
 
-suspend fun ApplicationTestBuilder.addLectureImage(
+suspend fun ApplicationTestBuilder.addEventImage(
     authResponse: AuthResponse,
-    lectureId: String,
+    eventId: String,
     imagePath: String,
     contentType: String,
     fileName: String,
 ): FileUrlResponse {
-    val response = httpClient.put("/api/v1/lectures/${lectureId}/theme/image") {
+    val response = httpClient.put("/api/v1/events/${eventId}/theme/image") {
         bearerAuth(authResponse.accessToken)
         setBody(
             MultiPartFormDataContent(

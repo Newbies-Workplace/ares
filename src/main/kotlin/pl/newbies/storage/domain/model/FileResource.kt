@@ -13,7 +13,7 @@ class TempFileResource(
     nameWithExtension: String
 ) : FileResource("temp/", nameWithExtension)
 
-class LectureImageFileResource(
-    lectureId: String,
+class EventImageFileResource(
+    eventId: String,
     nameWithExtension: String,
-) : FileResource("lectures/$lectureId/", nameWithExtension)
+) : FileResource("events/$eventId/", nameWithExtension)

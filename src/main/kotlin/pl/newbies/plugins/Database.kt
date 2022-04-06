@@ -31,6 +31,7 @@ private fun Application.createHikariDataSource(): HikariDataSource {
 
 private fun Application.runMigrations(dataSource: HikariDataSource) {
     val flyway = Flyway.configure()
+//        .locations("db/migration")
         .dataSource(dataSource)
         .load()
 

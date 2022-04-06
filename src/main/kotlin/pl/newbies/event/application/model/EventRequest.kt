@@ -1,4 +1,4 @@
-package pl.newbies.lecture.application.model
+package pl.newbies.event.application.model
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -9,7 +9,7 @@ import pl.newbies.common.validator.distinct
 import pl.newbies.tag.application.model.TagRequest
 
 @Serializable
-data class LectureRequest(
+data class EventRequest(
     val title: String,
     val subtitle: String?,
     val timeFrame: TimeFrameRequest,
@@ -19,8 +19,8 @@ data class LectureRequest(
 
     init {
         validate(this) {
-            validate(LectureRequest::title).isNotBlank()
-            validate(LectureRequest::tags).distinct()
+            validate(EventRequest::title).isNotBlank()
+            validate(EventRequest::tags).distinct()
         }
     }
 }

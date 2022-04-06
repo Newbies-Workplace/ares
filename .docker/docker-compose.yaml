@@ -2,12 +2,13 @@ version: "3"
 
 services:
   ares-db:
-    image: mariadb:10.4
+    image: mariadb:10.7
     restart: unless-stopped
     container_name: ares-db
     volumes:
       - ares-db:/var/lib/mysql
     environment:
+      MARIADB_AUTO_UPGRADE: 1
       MYSQL_ROOT_PASSWORD: ares
       MYSQL_DATABASE: ares
     ports:

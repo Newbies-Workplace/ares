@@ -19,10 +19,10 @@ class StorageTest : IntegrationTest() {
         fun `should return file when requested`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val lecture = createLecture(authResponse)
-            val url = addLectureImage(
+            val event = createEvent(authResponse)
+            val url = addEventImage(
                 authResponse = authResponse,
-                lectureId = lecture.id,
+                eventId = event.id,
                 imagePath = "images/newbies-logo.png",
                 contentType = "image/png",
                 fileName = "filename=newbies-logo.png",
@@ -40,7 +40,7 @@ class StorageTest : IntegrationTest() {
         fun `should return 404 when file does not exists`() = withAres {
             // when
             val exception = assertThrows<ClientRequestException> {
-                httpClient.get("api/v1/files/lecture/nonexisting.jpg")
+                httpClient.get("api/v1/files/events/nonexisting.jpg")
             }
 
             // then
