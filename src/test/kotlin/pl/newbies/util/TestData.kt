@@ -2,9 +2,9 @@ package pl.newbies.util
 
 import kotlinx.datetime.Instant
 import pl.newbies.auth.application.model.GithubUser
-import pl.newbies.lecture.application.model.AddressRequest
-import pl.newbies.lecture.application.model.LectureRequest
-import pl.newbies.lecture.application.model.TimeFrameRequest
+import pl.newbies.event.application.model.AddressRequest
+import pl.newbies.event.application.model.EventRequest
+import pl.newbies.event.application.model.TimeFrameRequest
 
 object TestData {
 
@@ -35,8 +35,8 @@ object TestData {
         testUser3,
     )
 
-    fun createLectureRequest(
-        title: String = "Lecture with name",
+    fun createEventRequest(
+        title: String = "Event with name",
         subtitle: String? = null,
         timeFrameRequest: TimeFrameRequest = TimeFrameRequest(
             startDate = Instant.fromEpochMilliseconds(1_000L),
@@ -47,7 +47,7 @@ object TestData {
             place = "Kolońska 45/2",
             coordinates = null,
         ),
-    ) = LectureRequest(
+    ) = EventRequest(
         title = title,
         subtitle = subtitle,
         timeFrame = timeFrameRequest,

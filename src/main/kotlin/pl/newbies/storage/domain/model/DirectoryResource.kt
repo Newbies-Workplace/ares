@@ -6,6 +6,6 @@ open class DirectoryResource(
 
 object TempDirectoryResource : DirectoryResource("temp/")
 
-data class LectureDirectoryResource(
-    val lectureId: String
-) : DirectoryResource("lectures/$lectureId")
+data class EventDirectoryResource(
+    val eventId: String
+) : DirectoryResource("events/$eventId")

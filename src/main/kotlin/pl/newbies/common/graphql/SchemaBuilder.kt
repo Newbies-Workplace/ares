@@ -6,14 +6,14 @@ import com.expediagroup.graphql.generator.execution.SimpleKotlinDataFetcherFacto
 import com.expediagroup.graphql.generator.toSchema
 import com.fasterxml.jackson.databind.ObjectMapper
 import graphql.GraphQL
-import pl.newbies.lecture.application.LectureSchema
+import pl.newbies.event.application.EventSchema
 import pl.newbies.tag.application.TagSchema
 import pl.newbies.user.application.UserSchema
 
 class SchemaBuilder(
     objectMapper: ObjectMapper,
     tagSchema: TagSchema,
-    lectureSchema: LectureSchema,
+    eventSchema: EventSchema,
     userSchema: UserSchema,
 ) {
     private val config = SchemaGeneratorConfig(
@@ -26,12 +26,12 @@ class SchemaBuilder(
 
     private val queries = listOf(
         TopLevelObject(tagSchema.Query()),
-        TopLevelObject(lectureSchema.Query()),
+        TopLevelObject(eventSchema.Query()),
         TopLevelObject(userSchema.Query())
     )
     private val mutations = listOf(
         TopLevelObject(tagSchema.Mutation()),
-        TopLevelObject(lectureSchema.Mutation()),
+        TopLevelObject(eventSchema.Mutation()),
         TopLevelObject(userSchema.Mutation()),
     )
 

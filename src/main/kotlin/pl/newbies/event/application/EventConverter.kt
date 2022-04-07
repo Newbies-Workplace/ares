@@ -1,26 +1,26 @@
-package pl.newbies.lecture.application
+package pl.newbies.event.application
 
-import pl.newbies.lecture.application.model.*
-import pl.newbies.lecture.domain.model.Lecture
+import pl.newbies.event.application.model.*
+import pl.newbies.event.domain.model.Event
 import pl.newbies.tag.application.TagConverter
 
-class LectureConverter(
+class EventConverter(
     private val tagConverter: TagConverter,
 ) {
 
-    fun convert(lecture: Lecture): LectureResponse =
-        LectureResponse(
-            id = lecture.id,
-            authorId = lecture.authorId,
-            title = lecture.title,
-            subtitle = lecture.subtitle,
-            timeFrame = lecture.timeFrame.let { timeFrame ->
+    fun convert(event: Event): EventResponse =
+        EventResponse(
+            id = event.id,
+            authorId = event.authorId,
+            title = event.title,
+            subtitle = event.subtitle,
+            timeFrame = event.timeFrame.let { timeFrame ->
                 TimeFrameResponse(
                     startDate = timeFrame.startDate,
                     finishDate = timeFrame.finishDate
                 )
             },
-            address = lecture.address?.let { address ->
+            address = event.address?.let { address ->
                 AddressResponse(
                     city = address.city,
                     place = address.place,
@@ -32,17 +32,17 @@ class LectureConverter(
                     }
                 )
             },
-            tags = lecture.tags.map {
+            tags = event.tags.map {
                 tagConverter.convert(it)
             },
-            theme = lecture.theme.let {
+            theme = event.theme.let {
                 ThemeResponse(
                     primaryColor = it.primaryColor,
                     secondaryColor = it.secondaryColor,
                     image = it.image,
                 )
             },
-            createDate = lecture.createDate,
-            updateDate = lecture.updateDate,
+            createDate = event.createDate,
+            updateDate = event.updateDate,
         )
 }

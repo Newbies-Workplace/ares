@@ -1,31 +1,31 @@
-package pl.newbies.lecture.domain.service
+package pl.newbies.event.domain.service
 
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
-import pl.newbies.lecture.application.model.LectureRequest
-import pl.newbies.lecture.application.model.LectureThemeRequest
-import pl.newbies.lecture.domain.model.Lecture
-import pl.newbies.lecture.domain.model.LectureFollow
-import pl.newbies.lecture.infrastructure.repository.*
+import pl.newbies.event.application.model.EventRequest
+import pl.newbies.event.application.model.EventThemeRequest
+import pl.newbies.event.domain.model.Event
+import pl.newbies.event.domain.model.EventFollow
+import pl.newbies.event.infrastructure.repository.*
+import pl.newbies.storage.domain.model.EventImageFileResource
 import pl.newbies.storage.domain.model.FileResource
-import pl.newbies.storage.domain.model.LectureImageFileResource
 import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.user.domain.model.User
 import pl.newbies.user.infrastructure.repository.UserDAO
 import java.util.*
 
-class LectureService {
+class EventService {
 
-    fun createLecture(request: LectureRequest, authorId: String): Lecture = transaction {
+    fun createEvent(request: EventRequest, authorId: String): Event = transaction {
         val tags = TagDAO.find { Tags.id inList request.tags.map { it.id } }
             .toMutableList()
 
         val now = Clock.System.now()
 
-        LectureDAO.new(UUID.randomUUID().toString()) {
+        EventDAO.new(UUID.randomUUID().toString()) {
             this.title = request.title
             this.subtitle = request.subtitle
             this.author = UserDAO[authorId]
@@ -45,14 +45,14 @@ class LectureService {
 
             this.createDate = now
             this.updateDate = now
-        }.toLecture()
+        }.toEvent()
     }
 
-    fun updateLecture(lecture: Lecture, request: LectureRequest): Lecture = transaction {
+    fun updateEvent(event: Event, request: EventRequest): Event = transaction {
         val tags = TagDAO.find { Tags.id inList request.tags.map { it.id } }
             .toMutableList()
 
-        LectureDAO[lecture.id]
+        EventDAO[event.id]
             .apply {
                 this.title = request.title
                 this.subtitle = request.subtitle
@@ -72,59 +72,59 @@ class LectureService {
 
                 this.updateDate = Clock.System.now()
             }
-            .toLecture()
+            .toEvent()
     }
 
-    fun updateTheme(lecture: Lecture, request: LectureThemeRequest): Lecture = transaction {
-        LectureDAO[lecture.id]
+    fun updateTheme(event: Event, request: EventThemeRequest): Event = transaction {
+        EventDAO[event.id]
             .apply {
                 this.primaryColor = request.primaryColor
                 this.secondaryColor = request.secondaryColor
             }
-            .toLecture()
+            .toEvent()
     }
 
-    fun updateThemeImage(lecture: Lecture, fileResource: FileResource?): Lecture = transaction {
-        LectureDAO[lecture.id]
+    fun updateThemeImage(event: Event, fileResource: FileResource?): Event = transaction {
+        EventDAO[event.id]
             .apply {
                 this.image = fileResource?.pathWithName
             }
-            .toLecture()
+            .toEvent()
     }
 
-    fun deleteLecture(lecture: Lecture) = transaction {
-        LectureDAO[lecture.id].delete()
+    fun deleteEvent(event: Event) = transaction {
+        EventDAO[event.id].delete()
     }
 
-    fun followLecture(user: User, lecture: Lecture): LectureFollow =
+    fun followEvent(user: User, event: Event): EventFollow =
         transaction {
-            LectureFollowDAO.find { (LectureFollows.user eq user.id) and (LectureFollows.lecture eq lecture.id) }
+            EventFollowDAO.find { (EventFollows.user eq user.id) and (EventFollows.event eq event.id) }
                 .firstOrNull()
-                ?.toLectureFollow()
+                ?.toEventFollow()
                 ?.let { return@transaction it }
 
-            LectureFollowDAO.new(UUID.randomUUID().toString()) {
+            EventFollowDAO.new(UUID.randomUUID().toString()) {
                 this.user = UserDAO[user.id]
-                this.lecture = LectureDAO[lecture.id]
+                this.event = EventDAO[event.id]
 
                 this.followDate = Clock.System.now()
-            }.toLectureFollow()
+            }.toEventFollow()
         }
 
-    fun unfollowLecture(user: User, lecture: Lecture) {
+    fun unfollowEvent(user: User, event: Event) {
         transaction {
-            LectureFollowDAO.find { (LectureFollows.user eq user.id) and (LectureFollows.lecture eq lecture.id) }
+            EventFollowDAO.find { (EventFollows.user eq user.id) and (EventFollows.event eq event.id) }
                 .firstOrNull()
                 ?.delete()
         }
     }
 
-    fun getThemeImageFileResource(lecture: Lecture): LectureImageFileResource? {
-        val nameWithExtension = lecture.theme.image?.substringAfterLast('/')
+    fun getThemeImageFileResource(event: Event): EventImageFileResource? {
+        val nameWithExtension = event.theme.image?.substringAfterLast('/')
             ?: return null
 
-        return LectureImageFileResource(
-            lectureId = lecture.id,
+        return EventImageFileResource(
+            eventId = event.id,
             nameWithExtension = nameWithExtension,
         )
     }

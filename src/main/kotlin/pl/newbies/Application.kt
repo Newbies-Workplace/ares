@@ -9,8 +9,8 @@ import io.ktor.server.application.install
 import kotlinx.serialization.json.Json
 import pl.newbies.auth.authModule
 import pl.newbies.common.commonModule
-import pl.newbies.lecture.application.lectureRoutes
-import pl.newbies.lecture.lectureModule
+import pl.newbies.event.application.eventRoutes
+import pl.newbies.event.eventModule
 import pl.newbies.plugins.*
 import pl.newbies.storage.application.storageRoutes
 import pl.newbies.storage.storageModule
@@ -37,7 +37,7 @@ fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
             authModule,
             userModule,
             tagModule,
-            lectureModule,
+            eventModule,
             storageModule,
         )
     }
@@ -46,7 +46,7 @@ fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
 
     userRoutes()
     tagRoutes()
-    lectureRoutes()
+    eventRoutes()
     storageRoutes()
 }
 

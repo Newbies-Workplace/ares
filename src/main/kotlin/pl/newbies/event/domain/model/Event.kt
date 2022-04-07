@@ -1,10 +1,10 @@
-package pl.newbies.lecture.domain.model
+package pl.newbies.event.domain.model
 
 import kotlinx.datetime.Instant
 import pl.newbies.tag.domain.model.Tag
 import java.util.*
 
-data class Lecture(
+data class Event(
     val id: String = UUID.randomUUID().toString(),
     var title: String,
     var subtitle: String? = null,
