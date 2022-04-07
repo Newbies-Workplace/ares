@@ -92,7 +92,7 @@ suspend fun ApplicationTestBuilder.addEventImage(
     contentType: String,
     fileName: String,
 ): FileUrlResponse {
-    val response = httpClient.put("/api/v1/events/${eventId}/theme/image") {
+    val response = httpClient.put("/api/v1/events/$eventId/theme/image") {
         bearerAuth(authResponse.accessToken)
         setBody(
             MultiPartFormDataContent(

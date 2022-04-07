@@ -145,7 +145,7 @@ class EventSchema(
                     val users = transaction {
                         UserDAO.forIds(authorIds).map { it.toUser() }
                     }
-                    
+
                     users.map { userConverter.convert(it) }
                 }
             }
