@@ -8,7 +8,6 @@ import pl.newbies.tag.domain.model.FollowedTag
 import pl.newbies.tag.domain.model.Tag
 import pl.newbies.tag.infrastructure.repository.*
 import pl.newbies.user.infrastructure.repository.UserDAO
-import java.util.*
 
 class TagService {
 
@@ -18,7 +17,7 @@ class TagService {
             throw DuplicateException("Tag with name $name already exists")
         }
 
-        TagDAO.new(id = UUID.randomUUID().toString()) {
+        TagDAO.new {
             this.name = name
         }.toTag()
     }
@@ -28,7 +27,7 @@ class TagService {
         tags: List<Tag>,
     ): List<FollowedTag> = transaction {
         tags.map {
-            FollowedTagDAO.new(UUID.randomUUID().toString()) {
+            FollowedTagDAO.new {
                 user = UserDAO[userId]
                 tag = TagDAO[it.id]
             }.toFollowedTag()

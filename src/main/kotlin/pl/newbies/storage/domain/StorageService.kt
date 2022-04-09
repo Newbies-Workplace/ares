@@ -4,6 +4,7 @@ import io.ktor.http.content.PartData
 import io.ktor.http.content.streamProvider
 import pl.newbies.common.FileTypeNotSupportedException
 import pl.newbies.common.extension
+import pl.newbies.common.nanoId
 import pl.newbies.storage.domain.model.DirectoryResource
 import pl.newbies.storage.domain.model.FileResource
 import pl.newbies.storage.domain.model.TempDirectoryResource
@@ -11,7 +12,6 @@ import pl.newbies.storage.domain.model.TempFileResource
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
 import javax.imageio.ImageIO
 import kotlin.io.path.*
 
@@ -26,7 +26,7 @@ class StorageService(mainStoragePath: String) {
 
     fun saveTempFile(fileItem: PartData.FileItem): TempFileResource {
         val extension = fileItem.extension
-        val name = UUID.randomUUID().toString()
+        val name = nanoId()
         val fullName = "$name.$extension"
 
         val newFile = tempDir.resolve(fullName).createFile()

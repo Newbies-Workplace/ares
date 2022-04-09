@@ -2,10 +2,9 @@ package pl.newbies.user.domain.model
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import java.util.*
 
 data class User(
-    val id: String = UUID.randomUUID().toString(),
+    val id: String,
     var nickname: String,
     var description: String? = null,
     val contact: ContactDTO = ContactDTO(),

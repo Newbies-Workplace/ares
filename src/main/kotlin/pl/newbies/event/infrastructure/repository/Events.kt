@@ -4,16 +4,16 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import pl.newbies.event.domain.model.*
-import pl.newbies.plugins.StringUUIDEntity
-import pl.newbies.plugins.StringUUIDEntityClass
-import pl.newbies.plugins.StringUUIDTable
+import pl.newbies.plugins.StringNanoIdEntity
+import pl.newbies.plugins.StringNanoIdEntityClass
+import pl.newbies.plugins.StringNanoIdTable
 import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
 import pl.newbies.user.infrastructure.repository.toUser
 
-object Events : StringUUIDTable() {
+object Events : StringNanoIdTable() {
     val title = varchar("title", length = 100, collate = "utf8_general_ci")
     val subtitle = varchar("subtitle", length = 100, collate = "utf8_general_ci").nullable()
     val author = reference("author", Users)
@@ -42,7 +42,7 @@ object EventTags : Table() {
         PrimaryKey(event, tag, name = "id")
 }
 
-object EventFollows : StringUUIDTable() {
+object EventFollows : StringNanoIdTable() {
     val event = reference("event", Events)
     val user = reference("user", Users)
 
@@ -53,8 +53,8 @@ object EventFollows : StringUUIDTable() {
     }
 }
 
-class EventFollowDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object : StringUUIDEntityClass<EventFollowDAO>(EventFollows)
+class EventFollowDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
+    companion object : StringNanoIdEntityClass<EventFollowDAO>(EventFollows)
 
     var event by EventDAO referencedOn EventFollows.event
     var user by UserDAO referencedOn EventFollows.user
@@ -69,8 +69,8 @@ fun EventFollowDAO.toEventFollow() =
         followDate = followDate
     )
 
-class EventDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object : StringUUIDEntityClass<EventDAO>(Events)
+class EventDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
+    companion object : StringNanoIdEntityClass<EventDAO>(Events)
 
     var title by Events.title
     var subtitle by Events.subtitle

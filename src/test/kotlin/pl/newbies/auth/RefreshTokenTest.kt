@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import pl.newbies.auth.application.model.AuthResponse
+import pl.newbies.common.nanoId
 import pl.newbies.util.IntegrationTest
 import pl.newbies.util.TestData
 import pl.newbies.util.httpClient
 import pl.newbies.util.loginAs
-import java.util.*
 
 class RefreshTokenTest : IntegrationTest() {
 
@@ -44,7 +44,7 @@ class RefreshTokenTest : IntegrationTest() {
         @Test
         fun `should return 401 when refreshToken does not exists`() = withAres {
             // given
-            val randomRefreshToken = UUID.randomUUID().toString()
+            val randomRefreshToken = nanoId()
 
             // when
             val exception = assertThrows<ClientRequestException> {

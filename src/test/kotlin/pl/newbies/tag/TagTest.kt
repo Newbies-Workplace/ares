@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import pl.newbies.common.nanoId
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.util.*
-import java.util.*
 
 class TagTest : IntegrationTest() {
 
@@ -63,7 +63,7 @@ class TagTest : IntegrationTest() {
         @Test
         fun `should create tag when called with valid name`() = withAres {
             // given
-            val name = UUID.randomUUID().toString()
+            val name = nanoId()
             val authResponse = loginAs(TestData.testUser3)
             val body = TagCreateRequest(name)
 
@@ -104,7 +104,7 @@ class TagTest : IntegrationTest() {
         fun `should return 409 when called with existing tag name`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser3)
-            val name = UUID.randomUUID().toString()
+            val name = nanoId()
             val body = TagCreateRequest(name)
             val firstResponse = httpClient.post("api/v1/tags") {
                 setBody(body)

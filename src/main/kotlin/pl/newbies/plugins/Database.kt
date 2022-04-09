@@ -13,6 +13,7 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import pl.newbies.common.nanoId
 
 private fun Application.createHikariDataSource(): HikariDataSource {
     val config = environment.config
@@ -46,16 +47,18 @@ private fun Application.runMigrations(dataSource: HikariDataSource) {
     log.info("Flyway database migration finished")
 }
 
-open class StringUUIDTable(name: String = "", columnName: String = "id") : IdTable<String>(name) {
+open class StringNanoIdTable(name: String = "", columnName: String = "id") : IdTable<String>(name) {
     final override val id: Column<EntityID<String>> =
-        varchar(columnName, length = 36).entityId()
+        varchar(columnName, length = 36)
+            .clientDefault { nanoId() }
+            .entityId()
 
     final override val primaryKey =
         PrimaryKey(id)
 }
 
-abstract class StringUUIDEntity(id: EntityID<String>) : Entity<String>(id)
-abstract class StringUUIDEntityClass<out E : StringUUIDEntity>(table: IdTable<String>, entityType: Class<E>? = null) : EntityClass<String, E>(table, entityType)
+abstract class StringNanoIdEntity(id: EntityID<String>) : Entity<String>(id)
+abstract class StringNanoIdEntityClass<out E : StringNanoIdEntity>(table: IdTable<String>, entityType: Class<E>? = null) : EntityClass<String, E>(table, entityType)
 
 fun Application.configureDatabase() {
     val dataSource = createHikariDataSource()

@@ -11,6 +11,7 @@ import io.ktor.server.testing.ApplicationTestBuilder
 import org.junit.jupiter.api.Assertions.assertEquals
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.auth.application.model.GithubUser
+import pl.newbies.common.nanoId
 import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.EventResponse
 import pl.newbies.storage.application.model.FileUrlResponse
@@ -21,7 +22,6 @@ import pl.newbies.user.application.model.UserResponse
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
@@ -42,7 +42,7 @@ suspend fun ApplicationTestBuilder.loginAs(
 
 suspend fun ApplicationTestBuilder.createTag(
     authResponse: AuthResponse,
-    request: TagCreateRequest = TagCreateRequest(name = UUID.randomUUID().toString()),
+    request: TagCreateRequest = TagCreateRequest(name = nanoId()),
 ): TagResponse {
     val response = httpClient.post("api/v1/tags") {
         setBody(request)

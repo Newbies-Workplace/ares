@@ -65,6 +65,7 @@ dependencies {
     implementation("io.insert-koin:koin-ktor:$koinVersion")
 
     implementation("org.sejda.imageio:webp-imageio:0.1.6")
+    implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
 
     // validation
     implementation("org.valiktor:valiktor-core:$valiktorVersion")

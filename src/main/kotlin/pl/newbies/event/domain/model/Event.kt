@@ -2,10 +2,9 @@ package pl.newbies.event.domain.model
 
 import kotlinx.datetime.Instant
 import pl.newbies.tag.domain.model.Tag
-import java.util.*
 
 data class Event(
-    val id: String = UUID.randomUUID().toString(),
+    val id: String,
     var title: String,
     var subtitle: String? = null,
     val timeFrame: TimeFrameDTO,

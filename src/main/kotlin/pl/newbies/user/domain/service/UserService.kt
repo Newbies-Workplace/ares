@@ -9,7 +9,6 @@ import pl.newbies.user.domain.UserNotFoundException
 import pl.newbies.user.domain.model.User
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.toUser
-import java.util.*
 
 class UserService(
     private val userEditor: UserEditor,
@@ -26,7 +25,7 @@ class UserService(
 
         val now = Clock.System.now()
 
-        UserDAO.new(UUID.randomUUID().toString()) {
+        UserDAO.new {
             this.nickname = nickname
 
             this.githubId = githubId
