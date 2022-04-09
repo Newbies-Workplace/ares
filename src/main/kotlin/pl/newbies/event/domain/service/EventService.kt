@@ -15,7 +15,6 @@ import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.user.domain.model.User
 import pl.newbies.user.infrastructure.repository.UserDAO
-import java.util.*
 
 class EventService {
 
@@ -25,7 +24,7 @@ class EventService {
 
         val now = Clock.System.now()
 
-        EventDAO.new(UUID.randomUUID().toString()) {
+        EventDAO.new {
             this.title = request.title
             this.subtitle = request.subtitle
             this.author = UserDAO[authorId]
@@ -103,7 +102,7 @@ class EventService {
                 ?.toEventFollow()
                 ?.let { return@transaction it }
 
-            EventFollowDAO.new(UUID.randomUUID().toString()) {
+            EventFollowDAO.new {
                 this.user = UserDAO[user.id]
                 this.event = EventDAO[event.id]
 

@@ -4,19 +4,19 @@ import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import pl.newbies.auth.domain.model.RefreshToken
-import pl.newbies.plugins.StringUUIDEntity
-import pl.newbies.plugins.StringUUIDEntityClass
-import pl.newbies.plugins.StringUUIDTable
+import pl.newbies.plugins.StringNanoIdEntity
+import pl.newbies.plugins.StringNanoIdEntityClass
+import pl.newbies.plugins.StringNanoIdTable
 
-object RefreshTokens : StringUUIDTable() {
+object RefreshTokens : StringNanoIdTable() {
     val userId = varchar("userId", 36)
 
     val dateCreated = timestamp("dateCreated")
         .clientDefault { Clock.System.now() }
 }
 
-class RefreshTokenDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object : StringUUIDEntityClass<RefreshTokenDAO>(RefreshTokens)
+class RefreshTokenDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
+    companion object : StringNanoIdEntityClass<RefreshTokenDAO>(RefreshTokens)
 
     var userId by RefreshTokens.userId
     var dateCreated by RefreshTokens.dateCreated

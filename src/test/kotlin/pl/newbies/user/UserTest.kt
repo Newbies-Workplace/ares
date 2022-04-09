@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import pl.newbies.common.nanoId
 import pl.newbies.user.application.model.ContactRequest
 import pl.newbies.user.application.model.UserRequest
 import pl.newbies.user.application.model.UserResponse
@@ -19,7 +20,6 @@ import pl.newbies.util.IntegrationTest
 import pl.newbies.util.TestData
 import pl.newbies.util.httpClient
 import pl.newbies.util.loginAs
-import java.util.*
 
 class UserTest : IntegrationTest() {
 
@@ -43,7 +43,7 @@ class UserTest : IntegrationTest() {
         @Test
         fun `should return 404 when getting user that does not exists`() = withAres {
             // given
-            val randomId = UUID.randomUUID().toString()
+            val randomId = nanoId()
 
             // when
             val exception = assertThrows<ClientRequestException> {

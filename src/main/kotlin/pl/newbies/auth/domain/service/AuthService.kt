@@ -2,7 +2,10 @@ package pl.newbies.auth.domain.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.plus
+import kotlinx.datetime.toJavaInstant
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.auth.application.model.PropertiesResponse
@@ -36,7 +39,7 @@ class AuthService(
             .sign(Algorithm.HMAC256(jwtSecret))
 
         val token = refreshToken ?: transaction {
-            RefreshTokenDAO.new(UUID.randomUUID().toString()) {
+            RefreshTokenDAO.new {
                 this.userId = user.id
             }.toRefreshToken()
         }

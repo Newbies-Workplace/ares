@@ -2,32 +2,32 @@ package pl.newbies.tag.infrastructure.repository
 
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ReferenceOption
-import pl.newbies.plugins.StringUUIDEntity
-import pl.newbies.plugins.StringUUIDEntityClass
-import pl.newbies.plugins.StringUUIDTable
+import pl.newbies.plugins.StringNanoIdEntity
+import pl.newbies.plugins.StringNanoIdEntityClass
+import pl.newbies.plugins.StringNanoIdTable
 import pl.newbies.tag.domain.model.FollowedTag
 import pl.newbies.tag.domain.model.Tag
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
 import pl.newbies.user.infrastructure.repository.toUser
 
-object Tags : StringUUIDTable() {
+object Tags : StringNanoIdTable() {
     val name = varchar("name", length = 50, collate = "utf8_general_ci").uniqueIndex()
 }
 
-class TagDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object : StringUUIDEntityClass<TagDAO>(Tags)
+class TagDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
+    companion object : StringNanoIdEntityClass<TagDAO>(Tags)
 
     var name by Tags.name
 }
 
-object FollowedTags : StringUUIDTable() {
+object FollowedTags : StringNanoIdTable() {
     val user = reference("user", Users)
     val tag = reference("tag", Tags, onDelete = ReferenceOption.CASCADE)
 }
 
-class FollowedTagDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object : StringUUIDEntityClass<FollowedTagDAO>(FollowedTags)
+class FollowedTagDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
+    companion object : StringNanoIdEntityClass<FollowedTagDAO>(FollowedTags)
 
     var user by UserDAO referencedOn FollowedTags.user
     var tag by TagDAO referencedOn FollowedTags.tag

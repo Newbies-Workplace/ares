@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import pl.newbies.common.nanoId
 import pl.newbies.event.application.model.EventResponse
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.util.*
-import java.util.*
 
 class EventTest : IntegrationTest() {
 
@@ -108,7 +108,7 @@ class EventTest : IntegrationTest() {
         fun `should return 404 when there is no event with given id`() = withAres {
             // given
             clearTable("Events")
-            val randomId = UUID.randomUUID().toString()
+            val randomId = nanoId()
 
             // when
             val exception = assertThrows<ClientRequestException> {
@@ -241,7 +241,7 @@ class EventTest : IntegrationTest() {
         fun `should return 404 when called with not existing id`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val randomId = UUID.randomUUID().toString()
+            val randomId = nanoId()
 
             // when
             val exception = assertThrows<ClientRequestException> {
@@ -298,7 +298,7 @@ class EventTest : IntegrationTest() {
         fun `should return 404 when called with not existing id`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val randomId = UUID.randomUUID().toString()
+            val randomId = nanoId()
 
             // when
             val exception = assertThrows<ClientRequestException> {

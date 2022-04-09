@@ -2,14 +2,14 @@ package pl.newbies.user.infrastructure.repository
 
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
-import pl.newbies.plugins.StringUUIDEntity
-import pl.newbies.plugins.StringUUIDEntityClass
-import pl.newbies.plugins.StringUUIDTable
+import pl.newbies.plugins.StringNanoIdEntity
+import pl.newbies.plugins.StringNanoIdEntityClass
+import pl.newbies.plugins.StringNanoIdTable
 import pl.newbies.user.domain.model.AuthAccountsDTO
 import pl.newbies.user.domain.model.ContactDTO
 import pl.newbies.user.domain.model.User
 
-object Users : StringUUIDTable() {
+object Users : StringNanoIdTable() {
     val nickname = varchar("nickname", length = 50, collate = "utf8_general_ci")
     val description = varchar("description", length = 255, collate = "utf8_general_ci").nullable()
 
@@ -27,8 +27,8 @@ object Users : StringUUIDTable() {
     val updateDate = timestamp("updateDate")
 }
 
-class UserDAO(id: EntityID<String>) : StringUUIDEntity(id) {
-    companion object : StringUUIDEntityClass<UserDAO>(Users)
+class UserDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
+    companion object : StringNanoIdEntityClass<UserDAO>(Users)
 
     var nickname by Users.nickname
     var description by Users.description
