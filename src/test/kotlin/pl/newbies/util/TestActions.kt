@@ -14,6 +14,8 @@ import pl.newbies.auth.application.model.GithubUser
 import pl.newbies.common.nanoId
 import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.EventResponse
+import pl.newbies.event.application.model.EventVisibilityRequest
+import pl.newbies.event.domain.model.Event
 import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
@@ -68,10 +70,33 @@ suspend fun ApplicationTestBuilder.followTags(
 
 suspend fun ApplicationTestBuilder.createEvent(
     authResponse: AuthResponse,
-    request: EventRequest = TestData.createEventRequest()
+    request: EventRequest = TestData.createEventRequest(),
+    visibility: Event.Visibility? = Event.Visibility.PUBLIC,
 ): EventResponse {
-    val response = httpClient.post("api/v1/events") {
+    val event = httpClient.post("api/v1/events") {
         setBody(request)
+        contentType(ContentType.Application.Json)
+        bearerAuth(authResponse.accessToken)
+    }.body<EventResponse>()
+
+    visibility?.let {
+        changeVisibility(
+            authResponse = authResponse,
+            eventId = event.id,
+            visibility = visibility,
+        )
+    }
+
+    return event
+}
+
+suspend fun ApplicationTestBuilder.changeVisibility(
+    authResponse: AuthResponse,
+    eventId: String,
+    visibility: Event.Visibility
+): EventResponse {
+    val response = httpClient.put("api/v1/events/$eventId/visibility") {
+        setBody(EventVisibilityRequest(visibility))
         contentType(ContentType.Application.Json)
         bearerAuth(authResponse.accessToken)
     }
@@ -123,10 +148,12 @@ fun removeDirectory(path: String) {
 
     println("[Test] Removing directory ${storagePath.toFile().path}")
 
-    Files.walk(storagePath)
-        .sorted(Comparator.reverseOrder())
-        .map { it.toFile() }
-        .forEach { it.delete() }
+    runCatching {
+        Files.walk(storagePath)
+            .sorted(Comparator.reverseOrder())
+            .map { it.toFile() }
+            .forEach { it.delete() }
+    }
 }
 
 fun assertFileNotExists(path: String) {
