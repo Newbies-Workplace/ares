@@ -14,17 +14,18 @@ import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
-import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.ForbiddenException
 import pl.newbies.common.extension
 import pl.newbies.common.pagination
+import pl.newbies.common.query
+import pl.newbies.event.application.model.EventFilter
 import pl.newbies.event.application.model.EventRequest
+import pl.newbies.event.application.model.EventVisibilityRequest
 import pl.newbies.event.domain.EventNotFoundException
 import pl.newbies.event.domain.model.Event
 import pl.newbies.event.domain.service.EventService
 import pl.newbies.event.infrastructure.repository.EventDAO
-import pl.newbies.event.infrastructure.repository.Events
 import pl.newbies.event.infrastructure.repository.toEvent
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
@@ -41,26 +42,29 @@ fun Application.eventRoutes() {
 
     routing {
         route("/api/v1/events") {
-            get {
-                val pagination = call.pagination()
+            authenticate("jwt", optional = true) {
+                get {
+                    val pagination = call.pagination()
+                    val principal = call.principal<AresPrincipal>()
+                    val filter = call.query("filter")
+                        ?: EventFilter()
 
-                val events = transaction {
-                    EventDAO.all()
-                        .orderBy(Events.createDate to SortOrder.ASC)
-                        .limit(pagination.limit, pagination.offset)
-                        .map { it.toEvent() }
-                }.map { eventConverter.convert(it) }
+                    val events = eventService.getEvents(pagination, filter, principal?.userId)
+                        .map { eventConverter.convert(it) }
 
-                call.respond(events)
-            }
+                    call.respond(events)
+                }
 
-            get("/{id}") {
-                val id = call.parameters.getOrFail("id")
+                get("/{id}") {
+                    val id = call.parameters.getOrFail("id")
+                    val principal = call.principal<AresPrincipal>()
+                    val event = transaction { EventDAO.findById(id)?.toEvent() }
+                        ?: throw EventNotFoundException(id)
 
-                val event = transaction { EventDAO.findById(id)?.toEvent() }
-                    ?: throw EventNotFoundException(id)
+                    principal.assertEventReadAccess(event)
 
-                call.respond(eventConverter.convert(event))
+                    call.respond(eventConverter.convert(event))
+                }
             }
 
             authenticate("jwt") {
@@ -88,6 +92,23 @@ fun Application.eventRoutes() {
                     val updatedEvent = eventService.updateEvent(
                         event = event,
                         request = request,
+                    )
+
+                    call.respond(eventConverter.convert(updatedEvent))
+                }
+
+                put("/{id}/visibility") {
+                    val id = call.parameters.getOrFail("id")
+                    val principal = call.principal<AresPrincipal>()!!
+                    val request = call.receive<EventVisibilityRequest>()
+                    val event = transaction { EventDAO.findById(id)?.toEvent() }
+                        ?: throw EventNotFoundException(id)
+
+                    principal.assertEventWriteAccess(event)
+
+                    val updatedEvent = eventService.updateVisibility(
+                        event = event,
+                        visibility = request.visibility,
                     )
 
                     call.respond(eventConverter.convert(updatedEvent))
@@ -163,5 +184,11 @@ fun AresPrincipal.assertEventWriteAccess(event: Event) {
             userId = userId,
             entityId = event.id,
         )
+    }
+}
+
+fun AresPrincipal?.assertEventReadAccess(event: Event) {
+    if (event.visibility == Event.Visibility.PRIVATE && this?.userId != event.authorId) {
+        throw EventNotFoundException(event.id)
     }
 }

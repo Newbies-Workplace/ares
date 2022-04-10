@@ -15,6 +15,14 @@ data class Event(
 
     val theme: ThemeDTO = ThemeDTO(),
 
+    val visibility: Visibility,
+
     val createDate: Instant,
     var updateDate: Instant,
-)
+) {
+    enum class Visibility {
+        PUBLIC,
+        INVISIBLE,
+        PRIVATE,
+    }
+}

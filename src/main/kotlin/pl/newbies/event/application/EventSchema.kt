@@ -5,19 +5,16 @@ import com.expediagroup.graphql.server.execution.KotlinDataLoader
 import graphql.schema.DataFetchingEnvironment
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderFactory
-import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
+import pl.newbies.common.optPrincipal
 import pl.newbies.common.pagination
 import pl.newbies.common.principal
-import pl.newbies.event.application.model.EventRequest
-import pl.newbies.event.application.model.EventResponse
-import pl.newbies.event.application.model.EventThemeRequest
+import pl.newbies.event.application.model.*
 import pl.newbies.event.domain.EventNotFoundException
 import pl.newbies.event.domain.service.EventService
 import pl.newbies.event.infrastructure.repository.EventDAO
 import pl.newbies.event.infrastructure.repository.EventFollows
-import pl.newbies.event.infrastructure.repository.Events
 import pl.newbies.event.infrastructure.repository.toEvent
 import pl.newbies.user.application.UserConverter
 import pl.newbies.user.application.model.UserResponse
@@ -33,24 +30,28 @@ class EventSchema(
 ) {
     inner class Query {
         @GraphQLDescription("Get all events paged")
-        fun events(page: Int? = null, size: Int? = null): List<EventResponse> {
+        fun events(
+            page: Int? = null,
+            size: Int? = null,
+            filter: EventFilter? = null,
+            env: DataFetchingEnvironment,
+        ): List<EventResponse> {
             val pagination = (page to size).pagination()
+            val principal = env.optPrincipal()
 
-            return transaction {
-                EventDAO.all()
-                    .orderBy(Events.createDate to SortOrder.ASC)
-                    .limit(pagination.limit, pagination.offset)
-                    .map { it.toEvent() }
-            }.map { eventConverter.convert(it) }
+            return eventService.getEvents(pagination, filter ?: EventFilter(), principal?.userId)
+                .map { eventConverter.convert(it) }
         }
 
         @GraphQLDescription("Get single event by its id")
-        fun event(id: String): EventResponse? {
-            return transaction {
-                EventDAO.findById(id)?.toEvent()
-            }?.let {
-                eventConverter.convert(it)
-            }
+        fun event(id: String, env: DataFetchingEnvironment): EventResponse {
+            val principal = env.optPrincipal()
+            val event = transaction { EventDAO.findById(id)?.toEvent() }
+                ?: throw EventNotFoundException(id)
+
+            principal.assertEventReadAccess(event)
+
+            return eventConverter.convert(event)
         }
     }
 
@@ -73,6 +74,19 @@ class EventSchema(
             principal.assertEventWriteAccess(event)
 
             val replacedEvent = eventService.updateEvent(event, request)
+
+            return eventConverter.convert(replacedEvent)
+        }
+
+        @GraphQLDescription("Change event visibility")
+        fun changeVisibility(id: String, request: EventVisibilityRequest, env: DataFetchingEnvironment): EventResponse {
+            val principal = env.principal()
+            val event = transaction { EventDAO.findById(id)?.toEvent() }
+                ?: throw EventNotFoundException(id)
+
+            principal.assertEventWriteAccess(event)
+
+            val replacedEvent = eventService.updateVisibility(event, request.visibility)
 
             return eventConverter.convert(replacedEvent)
         }

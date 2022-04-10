@@ -30,6 +30,8 @@ object Events : StringNanoIdTable() {
     val secondaryColor = varchar("secondaryColor", length = 7).nullable()
     val image = varchar("image", length = 100).nullable()
 
+    val visibility = enumerationByName("visibility", 20, Event.Visibility::class)
+
     val createDate = timestamp("createDate")
     val updateDate = timestamp("updateDate")
 }
@@ -90,6 +92,8 @@ class EventDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     var secondaryColor by Events.secondaryColor
     var image by Events.image
 
+    var visibility by Events.visibility
+
     var createDate by Events.createDate
     var updateDate by Events.updateDate
 }
@@ -120,6 +124,7 @@ fun EventDAO.toEvent() = Event(
         secondaryColor = secondaryColor,
         image = image,
     ),
+    visibility = visibility,
     createDate = createDate,
     updateDate = updateDate,
 )
