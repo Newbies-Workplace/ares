@@ -192,17 +192,19 @@ class EventTest : IntegrationTest() {
         }
 
         @ParameterizedTest
-        @CsvSource(value = [
-            "200,PRIVATE,AUTHOR",
-            "404,PRIVATE,ANOTHER_USER",
-            "404,PRIVATE,UNAUTHORIZED",
-            "200,INVISIBLE,AUTHOR",
-            "200,INVISIBLE,ANOTHER_USER",
-            "200,INVISIBLE,UNAUTHORIZED",
-            "200,PUBLIC,AUTHOR",
-            "200,PUBLIC,ANOTHER_USER",
-            "200,PUBLIC,UNAUTHORIZED",
-        ])
+        @CsvSource(
+            value = [
+                "200,PRIVATE,AUTHOR",
+                "404,PRIVATE,ANOTHER_USER",
+                "404,PRIVATE,UNAUTHORIZED",
+                "200,INVISIBLE,AUTHOR",
+                "200,INVISIBLE,ANOTHER_USER",
+                "200,INVISIBLE,UNAUTHORIZED",
+                "200,PUBLIC,AUTHOR",
+                "200,PUBLIC,ANOTHER_USER",
+                "200,PUBLIC,UNAUTHORIZED",
+            ]
+        )
         fun `should return correct status when event has specific visibility and requested by specific user`(
             status: Int,
             visibility: Event.Visibility,

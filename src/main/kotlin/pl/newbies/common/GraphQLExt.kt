@@ -5,7 +5,6 @@ import org.dataloader.BatchLoaderEnvironment
 import pl.newbies.auth.domain.UnauthorizedException
 import pl.newbies.plugins.AresPrincipal
 
-
 fun DataFetchingEnvironment.optPrincipal(): AresPrincipal? =
     graphQlContext["PRINCIPAL"]
 
