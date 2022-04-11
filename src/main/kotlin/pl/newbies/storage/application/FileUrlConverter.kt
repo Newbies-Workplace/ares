@@ -1,20 +1,17 @@
 package pl.newbies.storage.application
 
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.plugins.origin
 import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.storage.domain.model.FileResource
 
-class FileUrlConverter {
+class FileUrlConverter(
+    private val storageServiceUrl: String
+) {
 
-    fun convert(call: ApplicationCall, file: FileResource): FileUrlResponse {
-        val connectionPoint = call.request.origin
+    fun convert(file: FileResource): FileUrlResponse =
+        convert(file.pathWithName)
 
-        val scheme = connectionPoint.scheme
-        val host = connectionPoint.host
-        val port = connectionPoint.port
-
-        val fullFileUrl = "$scheme://$host:$port${StorageController.DOWNLOAD_FILE_V1_PATH}${file.pathWithName}"
+    fun convert(pathWithName: String): FileUrlResponse {
+        val fullFileUrl = "$storageServiceUrl${StorageController.DOWNLOAD_FILE_V1_PATH}$pathWithName"
 
         return FileUrlResponse(fullFileUrl)
     }

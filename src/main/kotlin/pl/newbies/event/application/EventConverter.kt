@@ -2,10 +2,12 @@ package pl.newbies.event.application
 
 import pl.newbies.event.application.model.*
 import pl.newbies.event.domain.model.Event
+import pl.newbies.storage.application.FileUrlConverter
 import pl.newbies.tag.application.TagConverter
 
 class EventConverter(
     private val tagConverter: TagConverter,
+    private val fileUrlConverter: FileUrlConverter,
 ) {
 
     fun convert(event: Event): EventResponse =
@@ -39,7 +41,7 @@ class EventConverter(
                 ThemeResponse(
                     primaryColor = it.primaryColor,
                     secondaryColor = it.secondaryColor,
-                    image = it.image,
+                    image = it.image?.let { image -> fileUrlConverter.convert(image).url },
                 )
             },
             visibility = event.visibility,
