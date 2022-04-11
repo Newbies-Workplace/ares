@@ -301,7 +301,6 @@ class EventTest : IntegrationTest() {
                 bearerAuth(authResponse.accessToken)
             }
 
-
             // then
             assertEquals(HttpStatusCode.BadRequest, response.status)
         }
