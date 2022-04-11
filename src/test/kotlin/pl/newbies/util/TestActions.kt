@@ -101,6 +101,7 @@ suspend fun ApplicationTestBuilder.changeVisibility(
         bearerAuth(authResponse.accessToken)
     }
 
+    assertEquals(200, response.status.value)
     return response.body()
 }
 

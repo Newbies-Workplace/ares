@@ -25,6 +25,7 @@ import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.common.nanoId
 import pl.newbies.event.application.model.EventFilter
 import pl.newbies.event.application.model.EventResponse
+import pl.newbies.event.application.model.EventVisibilityRequest
 import pl.newbies.event.domain.model.Event
 import pl.newbies.plugins.defaultJson
 import pl.newbies.tag.application.model.TagResponse
@@ -464,6 +465,78 @@ class EventTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             assertFileNotExists("events/${event.id}")
+        }
+    }
+
+    @Nested
+    inner class PutVisibility {
+        @Test
+        fun `should return 401 when called without authentication`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("api/v1/events/${event.id}/visibility") {
+                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                    contentType(ContentType.Application.Json)
+                }
+            }
+
+            // then
+            assertEquals(401, exception.response.status.value)
+        }
+
+        @Test
+        fun `should return 404 when called with not existing id`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("api/v1/events/someRandomId/visibility") {
+                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(authResponse.accessToken)
+                }
+            }
+
+            // then
+            assertEquals(404, exception.response.status.value)
+        }
+
+        @Test
+        fun `should return 403 when called by another user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val secondAuthResponse = loginAs(TestData.testUser2)
+            val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("api/v1/events/${event.id}/visibility") {
+                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(secondAuthResponse.accessToken)
+                }
+            }
+
+            // then
+            assertEquals(403, exception.response.status.value)
+        }
+
+        @Test
+        fun `should change visibility when called by an author`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
+
+            // when
+            val response = changeVisibility(authResponse, event.id, Event.Visibility.PRIVATE)
+
+            // then
+            assertEquals(Event.Visibility.PRIVATE, response.visibility)
         }
     }
 

@@ -50,7 +50,7 @@ class EventService {
     }
 
     fun getEvents(pagination: Pagination, filter: EventFilter, requesterId: String?): List<Event> = transaction {
-        var query: Op<Boolean> = getVisibilityQuery(filter.visibilityIn, requesterId)
+        var query: Op<Boolean> = getListVisibilityQuery(filter.visibilityIn, requesterId)
 
         filter.authorId?.run { query = query and (Events.author eq filter.authorId) }
 
@@ -149,7 +149,7 @@ class EventService {
         )
     }
 
-    private fun getVisibilityQuery(visibilityIn: List<Event.Visibility>, requesterId: String?): Op<Boolean> {
+    private fun getListVisibilityQuery(visibilityIn: List<Event.Visibility>, requesterId: String?): Op<Boolean> {
         var query: Op<Boolean> = Op.FALSE
 
         if (visibilityIn.contains(Event.Visibility.PUBLIC)) {
