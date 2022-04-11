@@ -1,9 +1,11 @@
 package pl.newbies.event.domain.service
 
 import kotlinx.datetime.Clock
-import org.jetbrains.exposed.sql.SizedCollection
-import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
+import pl.newbies.common.Pagination
+import pl.newbies.event.application.model.EventFilter
 import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.EventThemeRequest
 import pl.newbies.event.domain.model.Event
@@ -41,10 +43,21 @@ class EventService {
                 }
             }
             this.tags = SizedCollection(tags)
-
+            this.visibility = Event.Visibility.PRIVATE
             this.createDate = now
             this.updateDate = now
         }.toEvent()
+    }
+
+    fun getEvents(pagination: Pagination, filter: EventFilter, requesterId: String?): List<Event> = transaction {
+        var query: Op<Boolean> = getListVisibilityQuery(filter.visibilityIn, requesterId)
+
+        filter.authorId?.run { query = query and (Events.author eq filter.authorId) }
+
+        EventDAO.find { query }
+            .orderBy(Events.createDate to SortOrder.ASC)
+            .limit(pagination.limit, pagination.offset)
+            .map { it.toEvent() }
     }
 
     fun updateEvent(event: Event, request: EventRequest): Event = transaction {
@@ -70,6 +83,14 @@ class EventService {
                 this.tags = SizedCollection(tags)
 
                 this.updateDate = Clock.System.now()
+            }
+            .toEvent()
+    }
+
+    fun updateVisibility(event: Event, visibility: Event.Visibility) = transaction {
+        EventDAO[event.id]
+            .apply {
+                this.visibility = visibility
             }
             .toEvent()
     }
@@ -126,5 +147,23 @@ class EventService {
             eventId = event.id,
             nameWithExtension = nameWithExtension,
         )
+    }
+
+    private fun getListVisibilityQuery(visibilityIn: List<Event.Visibility>, requesterId: String?): Op<Boolean> {
+        var query: Op<Boolean> = Op.FALSE
+
+        if (visibilityIn.contains(Event.Visibility.PUBLIC)) {
+            query = query or (Events.visibility eq Event.Visibility.PUBLIC)
+        }
+        if (requesterId != null) {
+            if (visibilityIn.contains(Event.Visibility.INVISIBLE)) {
+                query = query or ((Events.visibility eq Event.Visibility.INVISIBLE) and (Events.author eq requesterId))
+            }
+            if (visibilityIn.contains(Event.Visibility.PRIVATE)) {
+                query = query or ((Events.visibility eq Event.Visibility.PRIVATE) and (Events.author eq requesterId))
+            }
+        }
+
+        return query
     }
 }

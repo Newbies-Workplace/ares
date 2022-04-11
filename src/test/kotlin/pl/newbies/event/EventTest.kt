@@ -2,12 +2,15 @@ package pl.newbies.event
 
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.server.testing.ApplicationTestBuilder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -16,8 +19,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
+import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.common.nanoId
+import pl.newbies.event.application.model.EventFilter
 import pl.newbies.event.application.model.EventResponse
+import pl.newbies.event.application.model.EventVisibilityRequest
+import pl.newbies.event.domain.model.Event
+import pl.newbies.plugins.defaultJson
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.util.*
 
@@ -100,6 +110,54 @@ class EventTest : IntegrationTest() {
             val responseBody = response.body<List<EventResponse>>()
             assertEquals(emptyList<List<EventResponse>>(), responseBody)
         }
+
+        @ParameterizedTest
+        @EnumSource(value = Event.Visibility::class, mode = EnumSource.Mode.EXCLUDE, names = ["PUBLIC"])
+        fun `should not append to list when event is not public`(
+            visibility: Event.Visibility
+        ) = withAres {
+            // given
+            clearTable("Events")
+            val authResponse = loginAs(TestData.testUser1)
+            createEvent(authResponse, visibility = visibility)
+
+            // when
+            val response = httpClient.get("api/v1/events")
+
+            // then
+            assertEquals(HttpStatusCode.OK, response.status)
+            val responseBody = response.body<List<EventResponse>>()
+            assertEquals(emptyList<List<EventResponse>>(), responseBody)
+        }
+
+        @Nested
+        inner class Filtered {
+
+            @ParameterizedTest
+            @MethodSource("pl.newbies.event.EventTest#filterTestCases")
+            fun `should return expected visibilities when requested`(case: FilterTestCase) = withAres {
+                // given
+                clearTable("Events")
+                val authResponse = loginAs(TestData.testUser1)
+                prepareFilterTestEvents(authResponse)
+
+                // when
+                val response = httpClient.get("api/v1/events") {
+                    parameter("filter", defaultJson.encodeToJsonElement(case.filter))
+                    when (case.requester) {
+                        EventRequester.AUTHOR -> bearerAuth(authResponse.accessToken)
+                        EventRequester.ANOTHER_USER -> bearerAuth(loginAs(TestData.testUser2).accessToken)
+                        EventRequester.UNAUTHORIZED -> Unit
+                    }
+                }
+
+                // then
+                assertEquals(200, response.status.value)
+                val body = response.body<List<EventResponse>>()
+                assertEquals(case.expectedSize, body.size)
+                assertTrue(body.all { it.visibility in case.expectedVisibilities })
+            }
+        }
     }
 
     @Nested
@@ -132,6 +190,43 @@ class EventTest : IntegrationTest() {
             assertEquals(HttpStatusCode.OK, response.status)
             val responseBody = response.body<EventResponse>()
             assertEquals(event.id, responseBody.id)
+        }
+
+        @ParameterizedTest
+        @CsvSource(
+            value = [
+                "200,PRIVATE,AUTHOR",
+                "404,PRIVATE,ANOTHER_USER",
+                "404,PRIVATE,UNAUTHORIZED",
+                "200,INVISIBLE,AUTHOR",
+                "200,INVISIBLE,ANOTHER_USER",
+                "200,INVISIBLE,UNAUTHORIZED",
+                "200,PUBLIC,AUTHOR",
+                "200,PUBLIC,ANOTHER_USER",
+                "200,PUBLIC,UNAUTHORIZED",
+            ]
+        )
+        fun `should return correct status when event has specific visibility and requested by specific user`(
+            status: Int,
+            visibility: Event.Visibility,
+            requester: EventRequester,
+        ) = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse, visibility = visibility)
+
+            // when
+            val response = httpClient.get("api/v1/events/${event.id}") {
+                expectSuccess = false
+                when (requester) {
+                    EventRequester.AUTHOR -> bearerAuth(authResponse.accessToken)
+                    EventRequester.ANOTHER_USER -> bearerAuth(loginAs(TestData.testUser2).accessToken)
+                    EventRequester.UNAUTHORIZED -> Unit
+                }
+            }
+
+            // then
+            assertEquals(status, response.status.value)
         }
     }
 
@@ -374,6 +469,78 @@ class EventTest : IntegrationTest() {
     }
 
     @Nested
+    inner class PutVisibility {
+        @Test
+        fun `should return 401 when called without authentication`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("api/v1/events/${event.id}/visibility") {
+                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                    contentType(ContentType.Application.Json)
+                }
+            }
+
+            // then
+            assertEquals(401, exception.response.status.value)
+        }
+
+        @Test
+        fun `should return 404 when called with not existing id`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("api/v1/events/someRandomId/visibility") {
+                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(authResponse.accessToken)
+                }
+            }
+
+            // then
+            assertEquals(404, exception.response.status.value)
+        }
+
+        @Test
+        fun `should return 403 when called by another user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val secondAuthResponse = loginAs(TestData.testUser2)
+            val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
+
+            // when
+            val exception = assertThrows<ClientRequestException> {
+                httpClient.put("api/v1/events/${event.id}/visibility") {
+                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(secondAuthResponse.accessToken)
+                }
+            }
+
+            // then
+            assertEquals(403, exception.response.status.value)
+        }
+
+        @Test
+        fun `should change visibility when called by an author`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
+
+            // when
+            val response = changeVisibility(authResponse, event.id, Event.Visibility.PRIVATE)
+
+            // then
+            assertEquals(Event.Visibility.PRIVATE, response.visibility)
+        }
+    }
+
+    @Nested
     inner class PutThemeImage {
         @Test
         fun `should return 401 when called without authentication`() = withAres {
@@ -589,4 +756,77 @@ class EventTest : IntegrationTest() {
             assertEquals(HttpStatusCode.OK, response.status)
         }
     }
+
+    companion object {
+        private val ALL_VISIBILITIES = listOf(
+            Event.Visibility.PUBLIC,
+            Event.Visibility.INVISIBLE,
+            Event.Visibility.PRIVATE,
+        )
+
+        private suspend fun ApplicationTestBuilder.prepareFilterTestEvents(authResponse: AuthResponse) = buildList {
+            add(createEvent(authResponse, visibility = Event.Visibility.PUBLIC))
+            add(createEvent(authResponse, visibility = Event.Visibility.INVISIBLE))
+            add(createEvent(authResponse, visibility = Event.Visibility.PRIVATE))
+        }
+
+        @JvmStatic
+        fun filterTestCases() = listOf(
+            FilterTestCase(
+                requester = EventRequester.AUTHOR,
+                filter = EventFilter(visibilityIn = ALL_VISIBILITIES),
+                expectedSize = 3,
+                expectedVisibilities = ALL_VISIBILITIES,
+            ),
+            FilterTestCase(
+                requester = EventRequester.AUTHOR,
+                filter = EventFilter(authorId = "someRandomId", visibilityIn = ALL_VISIBILITIES),
+                expectedSize = 0,
+                expectedVisibilities = ALL_VISIBILITIES,
+            ),
+            FilterTestCase(
+                requester = EventRequester.AUTHOR,
+                filter = EventFilter(visibilityIn = listOf(Event.Visibility.PRIVATE, Event.Visibility.INVISIBLE)),
+                expectedSize = 2,
+                expectedVisibilities = listOf(Event.Visibility.PRIVATE, Event.Visibility.INVISIBLE),
+            ),
+            FilterTestCase(
+                requester = EventRequester.AUTHOR,
+                filter = EventFilter(visibilityIn = listOf(Event.Visibility.PUBLIC)),
+                expectedSize = 1,
+                expectedVisibilities = listOf(Event.Visibility.PUBLIC),
+            ),
+            FilterTestCase(
+                requester = EventRequester.ANOTHER_USER,
+                filter = EventFilter(visibilityIn = ALL_VISIBILITIES),
+                expectedSize = 1,
+                expectedVisibilities = listOf(Event.Visibility.PUBLIC),
+            ),
+            FilterTestCase(
+                requester = EventRequester.ANOTHER_USER,
+                filter = EventFilter(visibilityIn = listOf(Event.Visibility.PRIVATE)),
+                expectedSize = 0,
+                expectedVisibilities = listOf(Event.Visibility.PUBLIC),
+            ),
+            FilterTestCase(
+                requester = EventRequester.UNAUTHORIZED,
+                filter = EventFilter(visibilityIn = ALL_VISIBILITIES),
+                expectedSize = 1,
+                expectedVisibilities = listOf(Event.Visibility.PUBLIC),
+            ),
+        )
+    }
+}
+
+data class FilterTestCase(
+    val requester: EventRequester,
+    val filter: EventFilter,
+    val expectedSize: Int,
+    val expectedVisibilities: List<Event.Visibility>
+)
+
+enum class EventRequester {
+    AUTHOR,
+    ANOTHER_USER,
+    UNAUTHORIZED,
 }

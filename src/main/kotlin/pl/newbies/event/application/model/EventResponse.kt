@@ -5,6 +5,7 @@ import com.expediagroup.graphql.server.extensions.getValueFromDataLoader
 import graphql.schema.DataFetchingEnvironment
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import pl.newbies.event.domain.model.Event
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.user.application.model.UserResponse
 import java.util.concurrent.CompletableFuture
@@ -19,6 +20,7 @@ data class EventResponse(
     val address: AddressResponse?,
     val tags: List<TagResponse>,
     val theme: ThemeResponse,
+    val visibility: Event.Visibility,
     val createDate: Instant,
     val updateDate: Instant,
 ) {

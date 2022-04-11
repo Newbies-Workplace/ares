@@ -42,6 +42,7 @@ class EventConverter(
                     image = it.image,
                 )
             },
+            visibility = event.visibility,
             createDate = event.createDate,
             updateDate = event.updateDate,
         )
