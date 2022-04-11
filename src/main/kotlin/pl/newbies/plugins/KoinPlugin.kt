@@ -1,11 +1,9 @@
 package pl.newbies.plugins
 
-import io.ktor.events.EventDefinition
-import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationPlugin
 import io.ktor.server.application.ApplicationStopping
+import io.ktor.server.application.createApplicationPlugin
 import io.ktor.server.config.ApplicationConfig
-import io.ktor.util.AttributeKey
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -16,32 +14,20 @@ import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent.getKoin
 
 // workaround for https://github.com/InsertKoinIO/koin/pull/1266
-object KoinPlugin : ApplicationPlugin<Application, KoinApplication, Unit> {
+val KoinPlugin: ApplicationPlugin<KoinApplication> =
+    createApplicationPlugin("Koin", { KoinApplication.init() }) {
 
-    override val key: AttributeKey<Unit>
-        get() = AttributeKey("Koin")
+        val monitor = application.environment.monitor
 
-    override fun install(
-        pipeline: Application,
-        configure: KoinApplication.() -> Unit
-    ) {
-        val monitor = pipeline.environment.monitor
-        val koinApplication = startKoin(appDeclaration = configure)
-        monitor.raise(EventDefinition(), koinApplication)
+        startKoin(koinApplication = this.pluginConfig)
 
-        monitor.subscribe(ApplicationStopping) {
-            monitor.raise(EventDefinition(), koinApplication)
-            stopKoin()
-            monitor.raise(EventDefinition(), koinApplication)
-        }
+        monitor.subscribe(ApplicationStopping) { stopKoin() }
     }
-}
 
 inline fun <reified T : Any> inject(
     qualifier: Qualifier? = null,
     noinline parameters: ParametersDefinition? = null
 ) = lazy { get<T>(qualifier, parameters) }
-
 
 inline fun <reified T : Any> get(
     qualifier: Qualifier? = null,

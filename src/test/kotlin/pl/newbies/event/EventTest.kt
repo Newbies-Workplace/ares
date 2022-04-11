@@ -1,7 +1,6 @@
 package pl.newbies.event
 
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.EnumSource
@@ -28,6 +26,7 @@ import pl.newbies.event.application.model.EventResponse
 import pl.newbies.event.application.model.EventVisibilityRequest
 import pl.newbies.event.domain.model.Event
 import pl.newbies.plugins.defaultJson
+import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.util.*
 
@@ -152,7 +151,7 @@ class EventTest : IntegrationTest() {
                 }
 
                 // then
-                assertEquals(200, response.status.value)
+                assertEquals(HttpStatusCode.OK, response.status)
                 val body = response.body<List<EventResponse>>()
                 assertEquals(case.expectedSize, body.size)
                 assertTrue(body.all { it.visibility in case.expectedVisibilities })
@@ -169,12 +168,10 @@ class EventTest : IntegrationTest() {
             val randomId = nanoId()
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.get("api/v1/events/$randomId")
-            }
+            val response = httpClient.get("api/v1/events/$randomId")
 
             // then
-            assertEquals(HttpStatusCode.NotFound, exception.response.status)
+            assertEquals(HttpStatusCode.NotFound, response.status)
         }
 
         @Test
@@ -235,15 +232,13 @@ class EventTest : IntegrationTest() {
         @Test
         fun `should return 401 when called without authentication`() = withAres {
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/events") {
-                    setBody(TestData.createEventRequest())
-                    contentType(ContentType.Application.Json)
-                }
+            val response = httpClient.post("api/v1/events") {
+                setBody(TestData.createEventRequest())
+                contentType(ContentType.Application.Json)
             }
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Ignore
@@ -256,16 +251,14 @@ class EventTest : IntegrationTest() {
             """.trimIndent()
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/events") {
-                    setBody(Json.parseToJsonElement(body))
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(authResponse.accessToken)
-                }
+            val response = httpClient.post("api/v1/events") {
+                setBody(Json.parseToJsonElement(body))
+                contentType(ContentType.Application.Json)
+                bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
     }
 
@@ -302,16 +295,14 @@ class EventTest : IntegrationTest() {
             """.trimIndent()
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/events/${event.id}") {
-                    setBody(Json.parseToJsonElement(body))
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(authResponse.accessToken)
-                }
+            val response = httpClient.put("api/v1/events/${event.id}") {
+                setBody(Json.parseToJsonElement(body))
+                contentType(ContentType.Application.Json)
+                bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
 
         @Test
@@ -321,15 +312,13 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse = authResponse)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/events/${event.id}") {
-                    setBody(TestData.createEventRequest(title = "NewTitle"))
-                    contentType(ContentType.Application.Json)
-                }
+            val response = httpClient.put("api/v1/events/${event.id}") {
+                setBody(TestData.createEventRequest(title = "NewTitle"))
+                contentType(ContentType.Application.Json)
             }
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Test
@@ -339,16 +328,14 @@ class EventTest : IntegrationTest() {
             val randomId = nanoId()
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/events/$randomId") {
-                    setBody(TestData.createEventRequest(title = "NewTitle"))
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(authResponse.accessToken)
-                }
+            val response = httpClient.put("api/v1/events/$randomId") {
+                setBody(TestData.createEventRequest(title = "NewTitle"))
+                contentType(ContentType.Application.Json)
+                bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.NotFound, exception.response.status)
+            assertEquals(HttpStatusCode.NotFound, response.status)
         }
 
         @Test
@@ -359,16 +346,14 @@ class EventTest : IntegrationTest() {
             val secondAuthResponse = loginAs(TestData.testUser2)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/events/${event.id}") {
-                    setBody(TestData.createEventRequest(title = "NewTitle"))
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(secondAuthResponse.accessToken)
-                }
+            val response = httpClient.delete("api/v1/events/${event.id}") {
+                setBody(TestData.createEventRequest(title = "NewTitle"))
+                contentType(ContentType.Application.Json)
+                bearerAuth(secondAuthResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.Forbidden, exception.response.status)
+            assertEquals(HttpStatusCode.Forbidden, response.status)
         }
     }
 
@@ -381,12 +366,10 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse = authResponse)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/events/${event.id}")
-            }
+            val response = httpClient.delete("api/v1/events/${event.id}")
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Test
@@ -396,14 +379,12 @@ class EventTest : IntegrationTest() {
             val randomId = nanoId()
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/events/$randomId") {
-                    bearerAuth(authResponse.accessToken)
-                }
+            val response = httpClient.delete("api/v1/events/$randomId") {
+                bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.NotFound, exception.response.status)
+            assertEquals(HttpStatusCode.NotFound, response.status)
         }
 
         @Test
@@ -414,14 +395,12 @@ class EventTest : IntegrationTest() {
             val secondAuthResponse = loginAs(TestData.testUser2)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/events/${event.id}") {
-                    bearerAuth(secondAuthResponse.accessToken)
-                }
+            val response = httpClient.delete("api/v1/events/${event.id}") {
+                bearerAuth(secondAuthResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.Forbidden, exception.response.status)
+            assertEquals(HttpStatusCode.Forbidden, response.status)
         }
 
         @Test
@@ -437,10 +416,8 @@ class EventTest : IntegrationTest() {
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.get("api/v1/events/${event.id}")
-            }
-            assertEquals(HttpStatusCode.NotFound, exception.response.status)
+            val checkResponse = httpClient.get("api/v1/events/${event.id}")
+            assertEquals(HttpStatusCode.NotFound, checkResponse.status)
         }
 
         @Test
@@ -448,13 +425,14 @@ class EventTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse)
-            addEventImage(
+            val fileResponse = addEventImage(
                 authResponse = authResponse,
                 eventId = event.id,
                 imagePath = "images/newbies-logo.webp",
                 contentType = "image/webp",
                 fileName = "filename=newbies-logo.webp",
             )
+            assertEquals(HttpStatusCode.OK, fileResponse.status)
             assertFileExists("events/${event.id}")
 
             // when
@@ -477,15 +455,13 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/events/${event.id}/visibility") {
-                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
-                    contentType(ContentType.Application.Json)
-                }
+            val response = httpClient.put("api/v1/events/${event.id}/visibility") {
+                setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                contentType(ContentType.Application.Json)
             }
 
             // then
-            assertEquals(401, exception.response.status.value)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Test
@@ -494,16 +470,14 @@ class EventTest : IntegrationTest() {
             val authResponse = loginAs(TestData.testUser1)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/events/someRandomId/visibility") {
-                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(authResponse.accessToken)
-                }
+            val response = httpClient.put("api/v1/events/someRandomId/visibility") {
+                setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                contentType(ContentType.Application.Json)
+                bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertEquals(404, exception.response.status.value)
+            assertEquals(HttpStatusCode.NotFound, response.status)
         }
 
         @Test
@@ -514,16 +488,16 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
+            val response =
                 httpClient.put("api/v1/events/${event.id}/visibility") {
                     setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
                     contentType(ContentType.Application.Json)
                     bearerAuth(secondAuthResponse.accessToken)
                 }
-            }
+
 
             // then
-            assertEquals(403, exception.response.status.value)
+            assertEquals(HttpStatusCode.Forbidden, response.status)
         }
 
         @Test
@@ -549,23 +523,19 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse = authResponse)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/events/${event.id}/theme/image")
-            }
+            val response = httpClient.put("api/v1/events/${event.id}/theme/image")
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Test
         fun `should return 404 when called with not existing id`() = withAres {
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/events/randomid/theme/image")
-            }
+            val response = httpClient.put("api/v1/events/randomid/theme/image")
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Test
@@ -575,18 +545,16 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse = authResponse)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                addEventImage(
-                    authResponse = authResponse,
-                    eventId = event.id,
-                    imagePath = "images/newbies-logo.gif",
-                    contentType = "image/gif",
-                    fileName = "filename=newbies-logo.gif",
-                )
-            }
+            val response = addEventImage(
+                authResponse = authResponse,
+                eventId = event.id,
+                imagePath = "images/newbies-logo.gif",
+                contentType = "image/gif",
+                fileName = "filename=newbies-logo.gif",
+            )
 
             // then
-            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
 
         @Test
@@ -596,15 +564,13 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse = authResponse)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("/api/v1/events/${event.id}/theme/image") {
-                    bearerAuth(authResponse.accessToken)
-                    setBody(MultiPartFormDataContent(parts = listOf()))
-                }
+            val response = httpClient.put("/api/v1/events/${event.id}/theme/image") {
+                bearerAuth(authResponse.accessToken)
+                setBody(MultiPartFormDataContent(parts = listOf()))
             }
 
             // then
-            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
 
         @Test
@@ -615,18 +581,16 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse = authResponse)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                addEventImage(
-                    authResponse = secondAuthResponse,
-                    eventId = event.id,
-                    imagePath = "images/newbies-logo.png",
-                    contentType = "image/png",
-                    fileName = "filename=newbies-logo.png",
-                )
-            }
+            val response = addEventImage(
+                authResponse = secondAuthResponse,
+                eventId = event.id,
+                imagePath = "images/newbies-logo.png",
+                contentType = "image/png",
+                fileName = "filename=newbies-logo.png",
+            )
 
             // then
-            assertEquals(HttpStatusCode.Forbidden, exception.response.status)
+            assertEquals(HttpStatusCode.Forbidden, response.status)
         }
 
         @ParameterizedTest
@@ -645,7 +609,7 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse = authResponse)
 
             // when
-            val responseBody = addEventImage(
+            val response = addEventImage(
                 authResponse = authResponse,
                 eventId = event.id,
                 imagePath = imagePath,
@@ -654,6 +618,8 @@ class EventTest : IntegrationTest() {
             )
 
             // then
+            assertEquals(HttpStatusCode.OK, response.status)
+            val responseBody = response.body<FileUrlResponse>()
             assertEquals("http://localhost:80/api/v1/files/events/${event.id}/image.webp", responseBody.url)
             assertFileExists("events/${event.id}/image.webp")
         }
@@ -668,12 +634,10 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse = authResponse)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/events/${event.id}/theme/image")
-            }
+            val response = httpClient.delete("api/v1/events/${event.id}/theme/image")
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Test
@@ -682,14 +646,12 @@ class EventTest : IntegrationTest() {
             val authResponse = loginAs(TestData.testUser1)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/events/someRandomId/theme/image") {
-                    bearerAuth(authResponse.accessToken)
-                }
+            val response = httpClient.delete("api/v1/events/someRandomId/theme/image") {
+                bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.NotFound, exception.response.status)
+            assertEquals(HttpStatusCode.NotFound, response.status)
         }
 
         @Test
@@ -698,23 +660,22 @@ class EventTest : IntegrationTest() {
             val authResponse = loginAs(TestData.testUser1)
             val secondAuthResponse = loginAs(TestData.testUser2)
             val event = createEvent(authResponse)
-            addEventImage(
+            val fileResponse = addEventImage(
                 authResponse = authResponse,
                 eventId = event.id,
                 imagePath = "images/newbies-logo.png",
                 contentType = "image/png",
                 fileName = "filename=newbies-logo.png",
             )
+            assertEquals(HttpStatusCode.OK, fileResponse.status)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/events/${event.id}/theme/image") {
-                    bearerAuth(secondAuthResponse.accessToken)
-                }
+            val response = httpClient.delete("api/v1/events/${event.id}/theme/image") {
+                bearerAuth(secondAuthResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.Forbidden, exception.response.status)
+            assertEquals(HttpStatusCode.Forbidden, response.status)
         }
 
         @Test
@@ -737,13 +698,14 @@ class EventTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse)
-            addEventImage(
+            val fileResponse = addEventImage(
                 authResponse = authResponse,
                 eventId = event.id,
                 imagePath = "images/newbies-logo.png",
                 contentType = "image/png",
                 fileName = "filename=newbies-logo.png",
             )
+            assertEquals(HttpStatusCode.OK, fileResponse.status)
             assertFileExists("events/${event.id}/image.webp")
 
             // when

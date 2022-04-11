@@ -1,7 +1,6 @@
 package pl.newbies.auth
 
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.delete
 import io.ktor.client.request.post
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.common.nanoId
 import pl.newbies.util.IntegrationTest
@@ -47,14 +45,12 @@ class RefreshTokenTest : IntegrationTest() {
             val randomRefreshToken = nanoId()
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/refresh") {
-                    setBody(randomRefreshToken)
-                }
+            val response = httpClient.post("api/v1/refresh") {
+                setBody(randomRefreshToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 
@@ -65,21 +61,19 @@ class RefreshTokenTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser2)
             val refreshToken = authResponse.refreshToken
-
-            // when
-            val response = httpClient.delete("api/v1/logout") {
+            val status = httpClient.delete("api/v1/logout") {
                 setBody(refreshToken)
                 bearerAuth(authResponse.accessToken)
-            }
-            assertEquals(HttpStatusCode.OK, response.status)
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/refresh") {
-                    setBody(refreshToken)
-                }
+            }.status
+            assertEquals(HttpStatusCode.OK, status)
+
+            // when
+            val response = httpClient.post("api/v1/refresh") {
+                setBody(refreshToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Test
@@ -87,22 +81,20 @@ class RefreshTokenTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser2)
             val refreshToken = authResponse.refreshToken
+            val status = httpClient.delete("api/v1/logout") {
+                setBody(refreshToken)
+                bearerAuth(authResponse.accessToken)
+            }.status
+            assertEquals(HttpStatusCode.OK, status)
 
             // when
             val response = httpClient.delete("api/v1/logout") {
                 setBody(refreshToken)
                 bearerAuth(authResponse.accessToken)
             }
-            assertEquals(HttpStatusCode.OK, response.status)
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/logout") {
-                    setBody(refreshToken)
-                    bearerAuth(authResponse.accessToken)
-                }
-            }
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
         @Test
@@ -112,14 +104,12 @@ class RefreshTokenTest : IntegrationTest() {
             val refreshToken = authResponse.refreshToken
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.delete("api/v1/logout") {
-                    setBody(refreshToken)
-                }
+            val response = httpClient.delete("api/v1/logout") {
+                setBody(refreshToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 }

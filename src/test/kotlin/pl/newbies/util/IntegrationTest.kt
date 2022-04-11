@@ -3,7 +3,7 @@ package pl.newbies.util
 import com.auth0.jwt.JWT
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
-import io.ktor.client.plugins.ContentNegotiation
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.config.HoconApplicationConfig
 import io.ktor.server.testing.ApplicationTestBuilder
@@ -30,8 +30,10 @@ abstract class IntegrationTest {
             environment {
                 config = HoconApplicationConfig(configFactory)
                 module {
-                    module(createClient {
-                        this.install(ContentNegotiation) { json() } }
+                    module(
+                        this@testApplication.createClient {
+                            this.install(ContentNegotiation) { json() }
+                        }
                     )
                 }
             }

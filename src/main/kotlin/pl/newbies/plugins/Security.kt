@@ -29,11 +29,10 @@ fun Application.configureSecurity(oauthClient: HttpClient) {
                 AresPrincipal(credential.getClaim("id", String::class)!!)
             }
         }
-
-        githubAuthentication(oauthClient)
-        devGithubAuthentication(oauthClient)
     }
 
+    githubAuthentication(oauthClient)
+    devGithubAuthentication(oauthClient)
     authenticationRoutes()
 }
 

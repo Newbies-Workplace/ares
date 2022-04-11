@@ -1,7 +1,6 @@
 package pl.newbies.user
 
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.*
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import pl.newbies.common.nanoId
 import pl.newbies.user.application.model.ContactRequest
 import pl.newbies.user.application.model.UserRequest
@@ -46,12 +44,10 @@ class UserTest : IntegrationTest() {
             val randomId = nanoId()
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.get("api/v1/users/$randomId")
-            }
+            val response = httpClient.get("api/v1/users/$randomId")
 
             // then
-            assertEquals(HttpStatusCode.NotFound, exception.response.status)
+            assertEquals(HttpStatusCode.NotFound, response.status)
         }
     }
 
@@ -77,12 +73,10 @@ class UserTest : IntegrationTest() {
         @Test
         fun `should return 401 when called without authentication`() = withAres {
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.get("api/v1/users/@me")
-            }
+            val response = httpClient.get("api/v1/users/@me")
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 
@@ -126,27 +120,23 @@ class UserTest : IntegrationTest() {
             val body = """{"description":{"invalid":true}}"""
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.patch("api/v1/users/@me") {
-                    bearerAuth(authResponse.accessToken)
-                    setBody(Json.parseToJsonElement(body))
-                    contentType(ContentType.Application.Json)
-                }
+            val response = httpClient.patch("api/v1/users/@me") {
+                bearerAuth(authResponse.accessToken)
+                setBody(Json.parseToJsonElement(body))
+                contentType(ContentType.Application.Json)
             }
 
             // then
-            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
 
         @Test
         fun `should return 401 when called without authentication`() = withAres {
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.patch("api/v1/users/@me")
-            }
+            val response = httpClient.patch("api/v1/users/@me")
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 
@@ -192,27 +182,23 @@ class UserTest : IntegrationTest() {
             val body = Json.parseToJsonElement("{\"nickname\":\"\"}")
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/users/@me") {
-                    bearerAuth(auth.accessToken)
-                    setBody(body)
-                    contentType(ContentType.Application.Json)
-                }
+            val response = httpClient.put("api/v1/users/@me") {
+                bearerAuth(auth.accessToken)
+                setBody(body)
+                contentType(ContentType.Application.Json)
             }
 
             // then
-            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
 
         @Test
         fun `should return 401 when called without authentication`() = withAres {
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/users/@me")
-            }
+            val response = httpClient.put("api/v1/users/@me")
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 }

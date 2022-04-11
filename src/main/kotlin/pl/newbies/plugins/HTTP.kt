@@ -4,19 +4,19 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.plugins.CORS
+import io.ktor.server.plugins.cors.CORS
 
 fun Application.configureHTTP() {
     install(CORS) {
         anyHost()
         allowNonSimpleContentTypes = true
 
-        method(HttpMethod.Options)
-        method(HttpMethod.Put)
-        method(HttpMethod.Patch)
-        method(HttpMethod.Delete)
+        allowMethod(HttpMethod.Options)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Patch)
+        allowMethod(HttpMethod.Delete)
 
-        header(HttpHeaders.Authorization)
-        header(HttpHeaders.ContentLength)
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.ContentLength)
     }
 }

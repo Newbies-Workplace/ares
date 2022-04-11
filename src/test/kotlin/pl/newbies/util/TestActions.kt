@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitForm
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.*
 import io.ktor.server.testing.ApplicationTestBuilder
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -16,7 +17,6 @@ import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.EventResponse
 import pl.newbies.event.application.model.EventVisibilityRequest
 import pl.newbies.event.domain.model.Event
-import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
 import pl.newbies.tag.application.model.TagResponse
@@ -101,7 +101,7 @@ suspend fun ApplicationTestBuilder.changeVisibility(
         bearerAuth(authResponse.accessToken)
     }
 
-    assertEquals(200, response.status.value)
+    assertEquals(HttpStatusCode.OK, response.status)
     return response.body()
 }
 
@@ -117,7 +117,7 @@ suspend fun ApplicationTestBuilder.addEventImage(
     imagePath: String,
     contentType: String,
     fileName: String,
-): FileUrlResponse {
+): HttpResponse {
     val response = httpClient.put("/api/v1/events/$eventId/theme/image") {
         bearerAuth(authResponse.accessToken)
         setBody(
@@ -139,9 +139,7 @@ suspend fun ApplicationTestBuilder.addEventImage(
         }
     }
 
-    assertEquals(HttpStatusCode.OK, response.status)
-
-    return response.body()
+    return response
 }
 
 fun removeDirectory(path: String) {
