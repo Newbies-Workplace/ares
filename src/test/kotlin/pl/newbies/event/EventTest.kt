@@ -257,7 +257,6 @@ class EventTest : IntegrationTest() {
                 bearerAuth(authResponse.accessToken)
             }
 
-
             // then
             assertEquals(HttpStatusCode.BadRequest, response.status)
         }
@@ -319,7 +318,6 @@ class EventTest : IntegrationTest() {
                 contentType(ContentType.Application.Json)
             }
 
-
             // then
             assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
@@ -336,7 +334,6 @@ class EventTest : IntegrationTest() {
                 contentType(ContentType.Application.Json)
                 bearerAuth(authResponse.accessToken)
             }
-
 
             // then
             assertEquals(HttpStatusCode.NotFound, response.status)
@@ -386,7 +383,6 @@ class EventTest : IntegrationTest() {
             val response = httpClient.delete("api/v1/events/$randomId") {
                 bearerAuth(authResponse.accessToken)
             }
-
 
             // then
             assertEquals(HttpStatusCode.NotFound, response.status)

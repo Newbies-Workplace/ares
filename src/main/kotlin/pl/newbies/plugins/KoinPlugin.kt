@@ -14,7 +14,7 @@ import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent.getKoin
 
 // workaround for https://github.com/InsertKoinIO/koin/pull/1266
-val KoinPlugin : ApplicationPlugin<KoinApplication> =
+val KoinPlugin: ApplicationPlugin<KoinApplication> =
     createApplicationPlugin("Koin", { KoinApplication.init() }) {
 
         val monitor = application.environment.monitor

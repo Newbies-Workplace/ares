@@ -30,8 +30,10 @@ abstract class IntegrationTest {
             environment {
                 config = HoconApplicationConfig(configFactory)
                 module {
-                    module(this@testApplication.createClient {
-                        this.install(ContentNegotiation) { json() } }
+                    module(
+                        this@testApplication.createClient {
+                            this.install(ContentNegotiation) { json() }
+                        }
                     )
                 }
             }
