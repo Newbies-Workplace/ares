@@ -136,7 +136,7 @@ fun Application.eventRoutes() {
 
                     val tempFileResource = storageService.saveTempFile(part)
 
-                    call.respond(fileUrlConverter.convert(call, fileResource))
+                    call.respond(fileUrlConverter.convert(fileResource))
 
                     storageService.saveImage(tempFileResource, fileResource)
                     storageService.removeResource(tempFileResource)

@@ -654,7 +654,7 @@ class EventTest : IntegrationTest() {
             )
 
             // then
-            assertEquals(responseBody.url, "http://localhost:80/api/v1/files/events/${event.id}/image.webp")
+            assertEquals("http://localhost:80/api/v1/files/events/${event.id}/image.webp", responseBody.url)
             assertFileExists("events/${event.id}/image.webp")
         }
     }
