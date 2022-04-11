@@ -1,7 +1,6 @@
 package pl.newbies.tag
 
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.*
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import pl.newbies.common.nanoId
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
@@ -88,16 +86,14 @@ class TagTest : IntegrationTest() {
             val body = Json.parseToJsonElement("""{"name":" "}""")
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/tags") {
-                    setBody(body)
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(authResponse.accessToken)
-                }
+            val response = httpClient.post("api/v1/tags") {
+                setBody(body)
+                contentType(ContentType.Application.Json)
+                bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.BadRequest, exception.response.status)
+            assertEquals(HttpStatusCode.BadRequest, response.status)
         }
 
         @Test
@@ -116,16 +112,14 @@ class TagTest : IntegrationTest() {
             assertEquals(name, firstResponseBody.name)
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/tags") {
-                    setBody(body)
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(authResponse.accessToken)
-                }
+            val response = httpClient.post("api/v1/tags") {
+                setBody(body)
+                contentType(ContentType.Application.Json)
+                bearerAuth(authResponse.accessToken)
             }
 
             // then
-            assertEquals(HttpStatusCode.Conflict, exception.response.status)
+            assertEquals(HttpStatusCode.Conflict, response.status)
         }
 
         @Test
@@ -134,15 +128,13 @@ class TagTest : IntegrationTest() {
             val body = TagCreateRequest("name")
 
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.post("api/v1/tags") {
-                    setBody(body)
-                    contentType(ContentType.Application.Json)
-                }
+            val response = httpClient.post("api/v1/tags") {
+                setBody(body)
+                contentType(ContentType.Application.Json)
             }
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 
@@ -185,12 +177,10 @@ class TagTest : IntegrationTest() {
         @Test
         fun `should return 401 when called without authentication`() = withAres {
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.get("api/v1/tags/@me")
-            }
+            val response = httpClient.get("api/v1/tags/@me")
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 
@@ -292,15 +282,13 @@ class TagTest : IntegrationTest() {
         @Test
         fun `should return 401 when called without authentication`() = withAres {
             // when
-            val exception = assertThrows<ClientRequestException> {
-                httpClient.put("api/v1/tags/@me") {
-                    setBody(listOf(TagRequest("id")))
-                    contentType(ContentType.Application.Json)
-                }
+            val response = httpClient.put("api/v1/tags/@me") {
+                setBody(listOf(TagRequest("id")))
+                contentType(ContentType.Application.Json)
             }
 
             // then
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 }

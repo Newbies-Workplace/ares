@@ -1,6 +1,5 @@
 package pl.newbies.auth
 
-import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import pl.newbies.util.*
 
 class GithubAuthTest : IntegrationTest() {
@@ -66,18 +64,16 @@ class GithubAuthTest : IntegrationTest() {
         @Test
         fun `should return 401 when called with invalid data`() = withAres {
             // then
-            val exception = assertThrows<ClientRequestException> {
-                client.submitForm(
-                    url = "/oauth/callback/github",
-                    formParameters = Parameters.build {
-                        append("code", "valid")
-                        append("state", "invalid")
-                    },
-                    encodeInQuery = true,
-                )
-            }
+            val response = client.submitForm(
+                url = "/oauth/callback/github",
+                formParameters = Parameters.build {
+                    append("code", "valid")
+                    append("state", "invalid")
+                },
+                encodeInQuery = true,
+            )
 
-            assertEquals(HttpStatusCode.Unauthorized, exception.response.status)
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
     }
 }
