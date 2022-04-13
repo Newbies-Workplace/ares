@@ -12,6 +12,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -241,7 +243,6 @@ class EventTest : IntegrationTest() {
             assertEquals(HttpStatusCode.Unauthorized, response.status)
         }
 
-        @Ignore
         @Test
         fun `should return 400 when called with invalid data`() = withAres {
             // given
@@ -260,6 +261,90 @@ class EventTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.BadRequest, response.status)
         }
+
+        @Test
+        fun `should create event when called with valid request`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
+            // when
+            val event = createEvent(authResponse)
+
+            // then
+            assertNotNull(event.id)
+        }
+
+        @Nested
+        inner class VanityUrl {
+            @Test
+            fun `should generate different vanityUrl when called with same event title`() = withAres {
+                // given
+                clearTable("Events")
+                val title = "Once upon a time in lorem ipsum world"
+                val authResponse = loginAs(TestData.testUser1)
+                val firstEvent = createEvent(authResponse, TestData.createEventRequest(title = title))
+
+                // when
+                val secondEvent = createEvent(authResponse, TestData.createEventRequest(title = title))
+
+                // then
+                assertNotEquals(firstEvent.vanityUrl, secondEvent.vanityUrl)
+                assertTrue(secondEvent.vanityUrl.startsWith(firstEvent.vanityUrl))
+            }
+
+            @Test
+            fun `should not generate too long vanityUrl when called with same event title`() = withAres {
+                // given
+                clearTable("Events")
+                val title = buildString { repeat(100) { append("a") } }
+                val authResponse = loginAs(TestData.testUser1)
+                val firstEvent = createEvent(authResponse, TestData.createEventRequest(title = title))
+
+                // when
+                val secondEvent = createEvent(authResponse, TestData.createEventRequest(title = title))
+
+                // then
+                assertNotEquals(firstEvent.vanityUrl, secondEvent.vanityUrl)
+                assertTrue(secondEvent.vanityUrl.length <= 50, "vanityUrl should be shorter than 50 chars")
+            }
+
+            @Test
+            fun `should generate vanityUrl longer than 10 characters when called with almost blank title`() = withAres {
+                // given
+                clearTable("Events")
+                val title = "A        B        C"
+                val authResponse = loginAs(TestData.testUser1)
+
+                // when
+                val event = createEvent(authResponse, TestData.createEventRequest(title = title))
+
+                // then
+                assertTrue(event.vanityUrl.length >= 10, "generated vanityUrl is too short")
+            }
+
+            @ParameterizedTest
+            @MethodSource("pl.newbies.event.EventTest#vanityUrlTestCases")
+            fun `should generate valid vanityUrl when requested with specified title`(
+                case: VanityUrlTestCase
+            ) = withAres {
+                // given
+                clearTable("Events")
+                val authResponse = loginAs(TestData.testUser1)
+                val request = TestData.createEventRequest(title = case.eventTitle)
+
+                // when
+                val event = createEvent(authResponse, request)
+
+                // then
+                case.expectedVanityUrl?.let { url ->
+                    assertEquals(url, event.vanityUrl)
+                }
+                case.expectedVanityUrlLength?.let { length ->
+                    assertEquals(length, event.vanityUrl.length)
+                }
+                assertTrue(event.vanityUrl.length >= 10, "generated vanity url is too short")
+            }
+        }
     }
 
     @Nested
@@ -269,7 +354,7 @@ class EventTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse = authResponse)
-            val body = TestData.createEventRequest(title = "NewTitle")
+            val body = TestData.createEventRequest(title = "New longer Title")
 
             // when
             val response = httpClient.put("api/v1/events/${event.id}") {
@@ -313,7 +398,7 @@ class EventTest : IntegrationTest() {
 
             // when
             val response = httpClient.put("api/v1/events/${event.id}") {
-                setBody(TestData.createEventRequest(title = "NewTitle"))
+                setBody(TestData.createEventRequest(title = "New longer Title"))
                 contentType(ContentType.Application.Json)
             }
 
@@ -329,7 +414,7 @@ class EventTest : IntegrationTest() {
 
             // when
             val response = httpClient.put("api/v1/events/$randomId") {
-                setBody(TestData.createEventRequest(title = "NewTitle"))
+                setBody(TestData.createEventRequest(title = "New longer Title"))
                 contentType(ContentType.Application.Json)
                 bearerAuth(authResponse.accessToken)
             }
@@ -347,7 +432,7 @@ class EventTest : IntegrationTest() {
 
             // when
             val response = httpClient.delete("api/v1/events/${event.id}") {
-                setBody(TestData.createEventRequest(title = "NewTitle"))
+                setBody(TestData.createEventRequest(title = "New longer Title"))
                 contentType(ContentType.Application.Json)
                 bearerAuth(secondAuthResponse.accessToken)
             }
@@ -733,6 +818,20 @@ class EventTest : IntegrationTest() {
         }
 
         @JvmStatic
+        fun vanityUrlTestCases() = listOf(
+            VanityUrlTestCase("Jak skutecznie japko", "jak-skutecznie-japko"),
+            VanityUrlTestCase("spaceonlastchar   ", "spaceonlastchar"),
+            VanityUrlTestCase("123 - testowa N4zwa", "123-testowa-n4zwa"),
+            VanityUrlTestCase("345-testowa N4zwa", "345testowa-n4zwa"),
+            VanityUrlTestCase("testowe  wydarzenie", "testowe-wydarzenie"),
+            VanityUrlTestCase("somerandomwithoutspaces", "somerandomwithoutspaces"),
+            VanityUrlTestCase("/to/do k,o'm`entarz", "todo-komentarz"),
+            VanityUrlTestCase("ąąłłó óććęę", "aallo-occee"),
+            VanityUrlTestCase("<><><bruh><><>", expectedVanityUrlLength = 10),
+            VanityUrlTestCase("     bruh     ", expectedVanityUrlLength = 10),
+        )
+
+        @JvmStatic
         fun filterTestCases() = listOf(
             FilterTestCase(
                 requester = EventRequester.AUTHOR,
@@ -785,6 +884,12 @@ data class FilterTestCase(
     val filter: EventFilter,
     val expectedSize: Int,
     val expectedVisibilities: List<Event.Visibility>
+)
+
+data class VanityUrlTestCase(
+    val eventTitle: String,
+    val expectedVanityUrl: String? = null,
+    val expectedVanityUrlLength: Int? = null,
 )
 
 enum class EventRequester {

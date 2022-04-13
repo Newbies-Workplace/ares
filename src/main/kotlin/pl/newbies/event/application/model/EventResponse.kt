@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture
 data class EventResponse(
     val id: String,
     val authorId: String,
+    val vanityUrl: String,
     val title: String,
     val subtitle: String?,
     val timeFrame: TimeFrameResponse,

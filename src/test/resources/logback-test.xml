@@ -11,6 +11,8 @@
 
     <logger name="org.testcontainers" level="INFO"/>
     <logger name="com.github.dockerjava" level="WARN"/>
-    <logger name="com.zaxxer.hikari" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
     <logger name="pl.newbies" level="DEBUG"/>
+    <logger name="org.mariadb" level="INFO"/>
+    <logger name="org.flywaydb" level="WARN"/>
 </configuration>
