@@ -6,7 +6,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.Pagination
-import pl.newbies.common.nanoId
 import pl.newbies.event.application.model.EventFilter
 import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.EventThemeRequest
@@ -30,7 +29,6 @@ class EventService {
 
         EventDAO.new {
             appendRequestFields(request)
-            this.vanityUrl = getEventVanityUrl(title)
             this.author = UserDAO[authorId]
             this.tags = SizedCollection(tags)
             this.visibility = Event.Visibility.PRIVATE
@@ -130,6 +128,7 @@ class EventService {
         val title = request.title.trim()
 
         this.title = title
+        this.vanityUrl = getEventVanityUrl(title)
         this.subtitle = request.subtitle?.trim()
         request.timeFrame.let { frame ->
             this.startDate = frame.startDate
@@ -145,25 +144,14 @@ class EventService {
         }
     }
 
-    private fun getEventVanityUrl(title: String): String {
-        var normalized = StringUtils.stripAccents(title)
-            .trim()
+    private fun getEventVanityUrl(title: String): String =
+        StringUtils.stripAccents(title)
             .filter { it.isLetterOrDigit() || it in listOf(' ') }
             .replace(Regex("[ \\t]{2,}"), " ") // multiple spaces to one space
+            .trim()
             .replace(' ', '-')
             .lowercase()
-            .take(44)
-
-        if (normalized.length < VANITY_URL_MIN_SIZE) {
-            normalized += nanoId().take(VANITY_URL_MIN_SIZE - normalized.length)
-        }
-
-        if (EventDAO.count(Events.vanityUrl eq normalized) > 0) {
-            normalized += ("-" + nanoId().take(5))
-        }
-
-        return normalized
-    }
+            .take(50)
 
     private fun getListVisibilityQuery(visibilityIn: List<Event.Visibility>, requesterId: String?): Op<Boolean> {
         var query: Op<Boolean> = Op.FALSE
@@ -181,9 +169,5 @@ class EventService {
         }
 
         return query
-    }
-
-    companion object {
-        const val VANITY_URL_MIN_SIZE = 10
     }
 }
