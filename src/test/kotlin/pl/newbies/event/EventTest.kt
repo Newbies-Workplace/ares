@@ -583,7 +583,6 @@ class EventTest : IntegrationTest() {
                 bearerAuth(authResponse.accessToken)
             }
 
-
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val updatedEvent = response.body<EventResponse>()
