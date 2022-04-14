@@ -490,12 +490,11 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
 
             // when
-            val response =
-                httpClient.put("api/v1/events/${event.id}/visibility") {
-                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(secondAuthResponse.accessToken)
-                }
+            val response = httpClient.put("api/v1/events/${event.id}/visibility") {
+                setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                contentType(ContentType.Application.Json)
+                bearerAuth(secondAuthResponse.accessToken)
+            }
 
             // then
             assertEquals(HttpStatusCode.Forbidden, response.status)
