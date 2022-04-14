@@ -30,7 +30,7 @@ class EventService {
 
         EventDAO.new {
             appendRequestFields(request)
-
+            this.vanityUrl = getEventVanityUrl(title)
             this.author = UserDAO[authorId]
             this.tags = SizedCollection(tags)
             this.visibility = Event.Visibility.PRIVATE
@@ -131,7 +131,6 @@ class EventService {
 
         this.title = title
         this.subtitle = request.subtitle?.trim()
-        this.vanityUrl = getEventVanityUrl(title)
         request.timeFrame.let { frame ->
             this.startDate = frame.startDate
             this.finishDate = frame.finishDate
