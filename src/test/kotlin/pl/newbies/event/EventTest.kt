@@ -497,7 +497,6 @@ class EventTest : IntegrationTest() {
                     bearerAuth(secondAuthResponse.accessToken)
                 }
 
-
             // then
             assertEquals(HttpStatusCode.Forbidden, response.status)
         }
@@ -566,7 +565,6 @@ class EventTest : IntegrationTest() {
                 contentType(ContentType.Application.Json)
                 bearerAuth(secondAuthResponse.accessToken)
             }
-
 
             // then
             assertEquals(HttpStatusCode.Forbidden, response.status)
