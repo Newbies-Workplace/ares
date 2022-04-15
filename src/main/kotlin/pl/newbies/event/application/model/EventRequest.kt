@@ -8,7 +8,7 @@ import org.valiktor.functions.isLessThanOrEqualTo
 import org.valiktor.functions.isNotBlank
 import org.valiktor.validate
 import pl.newbies.common.validator.distinct
-import pl.newbies.common.validator.oneLine
+import pl.newbies.common.validator.maxLines
 import pl.newbies.tag.application.model.TagRequest
 
 @Serializable
@@ -25,11 +25,11 @@ data class EventRequest(
             validate(EventRequest::title)
                 .isNotBlank()
                 .hasSize(min = 3, max = 100)
-                .oneLine()
+                .maxLines(1)
             validate(EventRequest::subtitle)
                 .isNotBlank()
                 .hasSize(max = 100)
-                .oneLine()
+                .maxLines(1)
             validate(EventRequest::tags)
                 .distinct()
         }
@@ -54,11 +54,10 @@ data class AddressRequest(
             validate(AddressRequest::city)
                 .isNotBlank()
                 .hasSize(max = 50)
-                .oneLine()
+                .maxLines(5)
             validate(AddressRequest::place)
                 .isNotBlank()
-                .hasSize(max = 50)
-                .oneLine()
+                .hasSize(max = 100)
         }
     }
 }

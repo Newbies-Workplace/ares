@@ -25,7 +25,7 @@ object Events : StringNanoIdTable() {
     val finishDate = timestamp("finishDate").nullable()
 
     val city = varchar("city", length = 50, collate = "utf8_general_ci").nullable()
-    val place = varchar("place", length = 50, collate = "utf8_general_ci").nullable()
+    val place = varchar("place", length = 100, collate = "utf8_general_ci").nullable()
     val latitude = double("latitude").nullable()
     val longitude = double("longitude").nullable()
 
