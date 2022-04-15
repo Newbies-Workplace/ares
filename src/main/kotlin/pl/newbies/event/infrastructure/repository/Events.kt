@@ -19,7 +19,7 @@ object Events : StringNanoIdTable() {
     val subtitle = varchar("subtitle", length = 100, collate = "utf8_general_ci").nullable()
     val author = reference("author", Users)
 
-    val vanityUrl = varchar("vanityUrl", length = 50, collate = "utf8_general_ci").uniqueIndex()
+    val vanityUrl = varchar("vanityUrl", length = 50, collate = "utf8_general_ci")
 
     val startDate = timestamp("startDate")
     val finishDate = timestamp("finishDate").nullable()

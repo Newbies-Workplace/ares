@@ -24,7 +24,7 @@ data class EventRequest(
         validate(this) {
             validate(EventRequest::title)
                 .isNotBlank()
-                .hasSize(min = 10, max = 100)
+                .hasSize(min = 3, max = 100)
                 .oneLine()
             validate(EventRequest::subtitle)
                 .isNotBlank()

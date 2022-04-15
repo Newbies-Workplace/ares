@@ -896,7 +896,7 @@ class EventTest : IntegrationTest() {
 
         @JvmStatic
         fun vanityUrlTestCases() = listOf(
-            VanityUrlTestCase("Jak skutecznie japko", "jak-skutecznie-japko"),
+            VanityUrlTestCase("Jak skutecznie   japko", "jak-skutecznie-japko"),
             VanityUrlTestCase("spaceonlastchar   ", "spaceonlastchar"),
             VanityUrlTestCase("illegallastchar   <", "illegallastchar"),
             VanityUrlTestCase("123 - testowa N4zwa", "123-testowa-n4zwa"),
@@ -905,6 +905,7 @@ class EventTest : IntegrationTest() {
             VanityUrlTestCase("somerandomwithoutspaces", "somerandomwithoutspaces"),
             VanityUrlTestCase("/to/do k,o'm`entarz", "todo-komentarz"),
             VanityUrlTestCase("ąąłłó óććęę", "aallo-occee"),
+            VanityUrlTestCase("Ää Ãã Āā Áá Àà", "aa-aa-aa-aa-aa"),
             VanityUrlTestCase("<><><bruh><><>", "bruh"),
         )
 
