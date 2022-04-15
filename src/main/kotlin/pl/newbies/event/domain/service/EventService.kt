@@ -146,8 +146,8 @@ class EventService {
 
     private fun getEventVanityUrl(title: String): String =
         StringUtils.stripAccents(title)
-            .filter { it.isLetterOrDigit() || it in listOf(' ') }
-            .replace(Regex(" +"), "-") // multiple spaces to one space
+            .filter { it.isDigit() || " abcdefghijklmnopqrstuvwxyz".contains(it, ignoreCase = true) }
+            .replace(Regex(" +"), "-") // spaces to dash
             .trim('-')
             .lowercase()
             .take(50)

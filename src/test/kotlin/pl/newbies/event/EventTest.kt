@@ -905,7 +905,7 @@ class EventTest : IntegrationTest() {
             VanityUrlTestCase("somerandomwithoutspaces", "somerandomwithoutspaces"),
             VanityUrlTestCase("/to/do k,o'm`entarz", "todo-komentarz"),
             VanityUrlTestCase("ąąłłó óććęę", "aallo-occee"),
-            VanityUrlTestCase("Ää Ãã Āā Áá Àà", "aa-aa-aa-aa-aa"),
+            VanityUrlTestCase("Ää Ãã Āā Áá Àà ö ü ß", "aa-aa-aa-aa-aa-o-u"),
             VanityUrlTestCase("<><><bruh><><>", "bruh"),
         )
 
