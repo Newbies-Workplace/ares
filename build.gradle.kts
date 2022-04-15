@@ -10,7 +10,7 @@ val hikariVersion = "5.0.1"
 val flywayVersion = "8.5.8"
 val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
-val testContainers = "1.17.0"
+val testContainers = "1.17.1"
 val kGraphQLVersion = "0.17.14"
 val kotlinGraphQL = "5.3.2"
 
