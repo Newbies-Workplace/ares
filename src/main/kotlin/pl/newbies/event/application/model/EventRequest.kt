@@ -54,10 +54,11 @@ data class AddressRequest(
             validate(AddressRequest::city)
                 .isNotBlank()
                 .hasSize(max = 50)
-                .maxLines(5)
+                .maxLines(1)
             validate(AddressRequest::place)
                 .isNotBlank()
                 .hasSize(max = 100)
+                .maxLines(5)
         }
     }
 }
