@@ -9,6 +9,7 @@ import pl.newbies.plugins.StringNanoIdEntityClass
 import pl.newbies.plugins.StringNanoIdTable
 import pl.newbies.tag.infrastructure.repository.TagDAO
 import pl.newbies.tag.infrastructure.repository.Tags
+import pl.newbies.tag.infrastructure.repository.toTag
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
 import pl.newbies.user.infrastructure.repository.toUser
@@ -18,11 +19,13 @@ object Events : StringNanoIdTable() {
     val subtitle = varchar("subtitle", length = 100, collate = "utf8_general_ci").nullable()
     val author = reference("author", Users)
 
+    val vanityUrl = varchar("vanityUrl", length = 50, collate = "utf8_general_ci")
+
     val startDate = timestamp("startDate")
     val finishDate = timestamp("finishDate").nullable()
 
     val city = varchar("city", length = 50, collate = "utf8_general_ci").nullable()
-    val place = varchar("place", length = 50, collate = "utf8_general_ci").nullable()
+    val place = varchar("place", length = 100, collate = "utf8_general_ci").nullable()
     val latitude = double("latitude").nullable()
     val longitude = double("longitude").nullable()
 
@@ -78,6 +81,8 @@ class EventDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     var subtitle by Events.subtitle
     var author by UserDAO referencedOn Events.author
 
+    var vanityUrl by Events.vanityUrl
+
     var startDate by Events.startDate
     var finishDate by Events.finishDate
 
@@ -103,6 +108,8 @@ fun EventDAO.toEvent() = Event(
     title = title,
     subtitle = subtitle,
     authorId = author.id.value,
+    vanityUrl = vanityUrl,
+    tags = tags.map { it.toTag() }.toMutableList(),
     timeFrame = TimeFrameDTO(
         startDate = startDate,
         finishDate = finishDate,

@@ -66,6 +66,7 @@ dependencies {
 
     implementation("org.sejda.imageio:webp-imageio:0.1.6")
     implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
 
     // validation
     implementation("org.valiktor:valiktor-core:$valiktorVersion")

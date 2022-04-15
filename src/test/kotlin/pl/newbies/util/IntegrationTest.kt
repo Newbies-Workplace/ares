@@ -52,7 +52,7 @@ abstract class IntegrationTest {
     }
 
     companion object {
-        private val container = MariaDBContainer("mariadb:10.4")
+        private val container = MariaDBContainer("mariadb:10.7")
             .withUrlParam("characterEncoding", "utf-8")
             .withUrlParam("useUnicode", "true")
             .withDatabaseName("ares")

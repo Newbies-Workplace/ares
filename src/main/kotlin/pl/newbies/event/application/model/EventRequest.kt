@@ -2,10 +2,13 @@ package pl.newbies.event.application.model
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import org.valiktor.functions.hasSize
+import org.valiktor.functions.isGreaterThanOrEqualTo
+import org.valiktor.functions.isLessThanOrEqualTo
 import org.valiktor.functions.isNotBlank
-import org.valiktor.functions.isPositiveOrZero
 import org.valiktor.validate
 import pl.newbies.common.validator.distinct
+import pl.newbies.common.validator.maxLines
 import pl.newbies.tag.application.model.TagRequest
 
 @Serializable
@@ -19,8 +22,16 @@ data class EventRequest(
 
     init {
         validate(this) {
-            validate(EventRequest::title).isNotBlank()
-            validate(EventRequest::tags).distinct()
+            validate(EventRequest::title)
+                .isNotBlank()
+                .hasSize(min = 3, max = 100)
+                .maxLines(1)
+            validate(EventRequest::subtitle)
+                .isNotBlank()
+                .hasSize(max = 100)
+                .maxLines(1)
+            validate(EventRequest::tags)
+                .distinct()
         }
     }
 }
@@ -40,8 +51,14 @@ data class AddressRequest(
 
     init {
         validate(this) {
-            validate(AddressRequest::city).isNotBlank()
-            validate(AddressRequest::place).isNotBlank()
+            validate(AddressRequest::city)
+                .isNotBlank()
+                .hasSize(max = 50)
+                .maxLines(1)
+            validate(AddressRequest::place)
+                .isNotBlank()
+                .hasSize(max = 100)
+                .maxLines(5)
         }
     }
 }
@@ -54,8 +71,12 @@ data class CoordinatesRequest(
 
     init {
         validate(this) {
-            validate(CoordinatesRequest::latitude).isPositiveOrZero()
-            validate(CoordinatesRequest::longitude).isPositiveOrZero()
+            validate(CoordinatesRequest::latitude)
+                .isGreaterThanOrEqualTo(-90.0)
+                .isLessThanOrEqualTo(90.0)
+            validate(CoordinatesRequest::longitude)
+                .isGreaterThanOrEqualTo(-180.0)
+                .isLessThanOrEqualTo(180.0)
         }
     }
 }

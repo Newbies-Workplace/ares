@@ -14,6 +14,7 @@ class EventConverter(
         EventResponse(
             id = event.id,
             authorId = event.authorId,
+            vanityUrl = getVanityUrl(event.vanityUrl, event.id),
             title = event.title,
             subtitle = event.subtitle,
             timeFrame = event.timeFrame.let { timeFrame ->
@@ -48,4 +49,7 @@ class EventConverter(
             createDate = event.createDate,
             updateDate = event.updateDate,
         )
+
+    private fun getVanityUrl(vanityUrl: String, id: String): String =
+        listOfNotNull(vanityUrl.takeIf { it.isNotEmpty() }, id).joinToString("-")
 }
