@@ -79,7 +79,7 @@ class EventSchema(
         }
 
         @GraphQLDescription("Change event visibility")
-        fun changeVisibility(id: String, request: EventVisibilityRequest, env: DataFetchingEnvironment): EventResponse {
+        fun changeEventVisibility(id: String, request: EventVisibilityRequest, env: DataFetchingEnvironment): EventResponse {
             val principal = env.principal()
             val event = transaction { EventDAO.findById(id)?.toEvent() }
                 ?: throw EventNotFoundException(id)
