@@ -13,6 +13,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -596,6 +597,7 @@ class EventTest : IntegrationTest() {
 
             // then
             assertEquals(Event.Visibility.PRIVATE, response.visibility)
+            assertNotEquals(event.updateDate, response.updateDate)
         }
     }
 
@@ -671,6 +673,7 @@ class EventTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val updatedEvent = response.body<EventResponse>()
+            assertNotEquals(event.updateDate, updatedEvent.updateDate)
             assertNotEquals(event.theme.primaryColor, updatedEvent.theme.primaryColor)
             assertNotEquals(event.theme.secondaryColor, updatedEvent.theme.secondaryColor)
         }
@@ -867,6 +870,7 @@ class EventTest : IntegrationTest() {
                 contentType = "image/png",
                 fileName = "filename=newbies-logo.png",
             )
+            val eventWithImage = getEvent(event.id)
             assertEquals(HttpStatusCode.OK, fileResponse.status)
             assertFileExists("events/${event.id}/image.webp")
 
@@ -876,8 +880,11 @@ class EventTest : IntegrationTest() {
             }
 
             // then
-            assertFileNotExists("events/${event.id}/image.webp")
             assertEquals(HttpStatusCode.OK, response.status)
+            assertFileNotExists("events/${event.id}/image.webp")
+            val eventWithoutImage = getEvent(event.id)
+            assertNull(eventWithoutImage.theme.image)
+            assertNotEquals(eventWithImage.updateDate, eventWithoutImage.updateDate)
         }
     }
 
