@@ -9,6 +9,7 @@ data class Event(
     var subtitle: String? = null,
     val timeFrame: TimeFrameDTO,
     var address: AddressDTO? = null,
+    var description: String?,
 
     val authorId: String,
     var tags: MutableList<Tag> = mutableListOf(),
