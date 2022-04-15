@@ -108,6 +108,14 @@ suspend fun ApplicationTestBuilder.changeVisibility(
 suspend fun ApplicationTestBuilder.getUser(id: String): UserResponse {
     val response = httpClient.get("api/v1/users/$id")
 
+    assertEquals(HttpStatusCode.OK, response.status)
+    return response.body()
+}
+
+suspend fun ApplicationTestBuilder.getEvent(id: String): EventResponse {
+    val response = httpClient.get("api/v1/events/$id")
+
+    assertEquals(HttpStatusCode.OK, response.status)
     return response.body()
 }
 

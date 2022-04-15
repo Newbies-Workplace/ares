@@ -66,6 +66,8 @@ class EventService {
         EventDAO[event.id]
             .apply {
                 this.visibility = visibility
+
+                this.updateDate = Clock.System.now()
             }
             .toEvent()
     }
@@ -75,6 +77,8 @@ class EventService {
             .apply {
                 this.primaryColor = request.primaryColor
                 this.secondaryColor = request.secondaryColor
+
+                this.updateDate = Clock.System.now()
             }
             .toEvent()
     }
@@ -83,6 +87,8 @@ class EventService {
         EventDAO[event.id]
             .apply {
                 this.image = fileResource?.pathWithName
+
+                this.updateDate = Clock.System.now()
             }
             .toEvent()
     }
