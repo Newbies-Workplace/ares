@@ -24,6 +24,7 @@ import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.common.nanoId
 import pl.newbies.event.application.model.EventFilter
 import pl.newbies.event.application.model.EventResponse
+import pl.newbies.event.application.model.EventThemeRequest
 import pl.newbies.event.application.model.EventVisibilityRequest
 import pl.newbies.event.domain.model.Event
 import pl.newbies.plugins.defaultJson
@@ -574,13 +575,11 @@ class EventTest : IntegrationTest() {
             val event = createEvent(authResponse, visibility = Event.Visibility.PUBLIC)
 
             // when
-            val response =
-                httpClient.put("api/v1/events/${event.id}/visibility") {
-                    setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
-                    contentType(ContentType.Application.Json)
-                    bearerAuth(secondAuthResponse.accessToken)
-                }
-
+            val response = httpClient.put("api/v1/events/${event.id}/visibility") {
+                setBody(EventVisibilityRequest(Event.Visibility.PUBLIC))
+                contentType(ContentType.Application.Json)
+                bearerAuth(secondAuthResponse.accessToken)
+            }
 
             // then
             assertEquals(HttpStatusCode.Forbidden, response.status)
@@ -597,6 +596,83 @@ class EventTest : IntegrationTest() {
 
             // then
             assertEquals(Event.Visibility.PRIVATE, response.visibility)
+        }
+    }
+
+    @Nested
+    inner class PutTheme {
+        @Test
+        fun `should return 401 when called without authentication`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse)
+            val request = EventThemeRequest(primaryColor = "#58b5bf", secondaryColor = null)
+
+            // when
+            val response = httpClient.put("api/v1/events/${event.id}/theme") {
+                setBody(request)
+                contentType(ContentType.Application.Json)
+            }
+
+            // then
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
+        }
+
+        @Test
+        fun `should return 404 when called with not existing id`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val request = EventThemeRequest(primaryColor = "#58b5bf", secondaryColor = null)
+
+            // when
+            val response = httpClient.put("api/v1/events/someRandomId/theme") {
+                setBody(request)
+                contentType(ContentType.Application.Json)
+                bearerAuth(authResponse.accessToken)
+            }
+
+            // then
+            assertEquals(HttpStatusCode.NotFound, response.status)
+        }
+
+        @Test
+        fun `should return 403 when called by another user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val secondAuthResponse = loginAs(TestData.testUser2)
+            val event = createEvent(authResponse)
+            val request = EventThemeRequest(primaryColor = "#58b5bf", secondaryColor = null)
+
+            // when
+            val response = httpClient.put("api/v1/events/${event.id}/theme") {
+                setBody(request)
+                contentType(ContentType.Application.Json)
+                bearerAuth(secondAuthResponse.accessToken)
+            }
+
+            // then
+            assertEquals(HttpStatusCode.Forbidden, response.status)
+        }
+
+        @Test
+        fun `should change theme when called by an author`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse)
+            val request = EventThemeRequest(primaryColor = "#58b5bf", secondaryColor = "#58b5bf")
+
+            // when
+            val response = httpClient.put("api/v1/events/${event.id}/theme") {
+                setBody(request)
+                contentType(ContentType.Application.Json)
+                bearerAuth(authResponse.accessToken)
+            }
+
+            // then
+            assertEquals(HttpStatusCode.OK, response.status)
+            val updatedEvent = response.body<EventResponse>()
+            assertNotEquals(event.theme.primaryColor, updatedEvent.theme.primaryColor)
+            assertNotEquals(event.theme.secondaryColor, updatedEvent.theme.secondaryColor)
         }
     }
 

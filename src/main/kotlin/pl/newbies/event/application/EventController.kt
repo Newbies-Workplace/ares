@@ -21,6 +21,7 @@ import pl.newbies.common.pagination
 import pl.newbies.common.query
 import pl.newbies.event.application.model.EventFilter
 import pl.newbies.event.application.model.EventRequest
+import pl.newbies.event.application.model.EventThemeRequest
 import pl.newbies.event.application.model.EventVisibilityRequest
 import pl.newbies.event.domain.EventNotFoundException
 import pl.newbies.event.domain.model.Event
@@ -110,6 +111,20 @@ fun Application.eventRoutes() {
                         event = event,
                         visibility = request.visibility,
                     )
+
+                    call.respond(eventConverter.convert(updatedEvent))
+                }
+
+                put("/{id}/theme") {
+                    val id = call.parameters.getOrFail("id")
+                    val principal = call.principal<AresPrincipal>()!!
+                    val request = call.receive<EventThemeRequest>()
+                    val event = transaction { EventDAO.findById(id)?.toEvent() }
+                        ?: throw EventNotFoundException(id)
+
+                    principal.assertEventWriteAccess(event)
+
+                    val updatedEvent = eventService.updateTheme(event, request)
 
                     call.respond(eventConverter.convert(updatedEvent))
                 }
