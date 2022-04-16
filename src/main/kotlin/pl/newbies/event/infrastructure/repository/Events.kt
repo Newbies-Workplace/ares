@@ -19,6 +19,8 @@ object Events : StringNanoIdTable() {
     val subtitle = varchar("subtitle", length = 100, collate = "utf8_general_ci").nullable()
     val author = reference("author", Users)
 
+    val description = text("description", collate = "utf8_general_ci").nullable()
+
     val vanityUrl = varchar("vanityUrl", length = 50, collate = "utf8_general_ci")
 
     val startDate = timestamp("startDate")
@@ -81,6 +83,8 @@ class EventDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     var subtitle by Events.subtitle
     var author by UserDAO referencedOn Events.author
 
+    var description by Events.description
+
     var vanityUrl by Events.vanityUrl
 
     var startDate by Events.startDate
@@ -107,9 +111,6 @@ fun EventDAO.toEvent() = Event(
     id = id.value,
     title = title,
     subtitle = subtitle,
-    authorId = author.id.value,
-    vanityUrl = vanityUrl,
-    tags = tags.map { it.toTag() }.toMutableList(),
     timeFrame = TimeFrameDTO(
         startDate = startDate,
         finishDate = finishDate,
@@ -126,6 +127,10 @@ fun EventDAO.toEvent() = Event(
             } else null
         )
     } else null,
+    description = description,
+    authorId = author.id.value,
+    tags = tags.map { it.toTag() }.toMutableList(),
+    vanityUrl = vanityUrl,
     theme = ThemeDTO(
         primaryColor = primaryColor,
         secondaryColor = secondaryColor,

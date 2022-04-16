@@ -136,6 +136,7 @@ class EventService {
         this.title = title
         this.vanityUrl = getEventVanityUrl(title)
         this.subtitle = request.subtitle?.trim()
+        this.description = request.description?.trim()
         request.timeFrame.let { frame ->
             this.startDate = frame.startDate
             this.finishDate = frame.finishDate

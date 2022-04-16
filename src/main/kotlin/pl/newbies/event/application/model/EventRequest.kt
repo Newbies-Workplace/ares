@@ -14,9 +14,10 @@ import pl.newbies.tag.application.model.TagRequest
 @Serializable
 data class EventRequest(
     val title: String,
-    val subtitle: String?,
+    val subtitle: String? = null,
+    val description: String? = null,
     val timeFrame: TimeFrameRequest,
-    val address: AddressRequest?,
+    val address: AddressRequest? = null,
     val tags: List<TagRequest> = emptyList(),
 ) {
 
@@ -30,6 +31,9 @@ data class EventRequest(
                 .isNotBlank()
                 .hasSize(max = 100)
                 .maxLines(1)
+            validate(EventRequest::description)
+                .isNotBlank()
+                .hasSize(max = 5_000)
             validate(EventRequest::tags)
                 .distinct()
         }

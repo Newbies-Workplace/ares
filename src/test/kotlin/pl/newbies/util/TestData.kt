@@ -5,6 +5,7 @@ import pl.newbies.auth.application.model.GithubUser
 import pl.newbies.event.application.model.AddressRequest
 import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.TimeFrameRequest
+import pl.newbies.tag.application.model.TagRequest
 
 object TestData {
 
@@ -47,11 +48,14 @@ object TestData {
             place = "Kolońska 45/2",
             coordinates = null,
         ),
+        description: String = "Some random description",
+        tags: List<TagRequest> = emptyList(),
     ) = EventRequest(
         title = title,
         subtitle = subtitle,
         timeFrame = timeFrameRequest,
         address = address,
-        tags = emptyList()
+        description = description,
+        tags = tags,
     )
 }
