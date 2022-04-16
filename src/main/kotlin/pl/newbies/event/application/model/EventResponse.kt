@@ -17,6 +17,7 @@ data class EventResponse(
     val vanityUrl: String,
     val title: String,
     val subtitle: String?,
+    val description: String?,
     val timeFrame: TimeFrameResponse,
     val address: AddressResponse?,
     val tags: List<TagResponse>,

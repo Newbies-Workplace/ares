@@ -17,6 +17,7 @@ class EventConverter(
             vanityUrl = getVanityUrl(event.vanityUrl, event.id),
             title = event.title,
             subtitle = event.subtitle,
+            description = event.description,
             timeFrame = event.timeFrame.let { timeFrame ->
                 TimeFrameResponse(
                     startDate = timeFrame.startDate,
