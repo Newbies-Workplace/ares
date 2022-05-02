@@ -2,12 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion = "2.0.0"
 val koinVersion = "3.1.6"
-val kotlinVersion = "1.6.10"
 val logbackVersion = "1.2.11"
 val valiktorVersion = "0.12.0"
-val exposedVersion = "0.38.1"
+val exposedVersion = "0.38.2"
 val hikariVersion = "5.0.1"
-val flywayVersion = "8.5.8"
+val flywayVersion = "8.5.9"
 val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
 val testContainers = "1.17.1"
@@ -16,8 +15,8 @@ val kotlinGraphQL = "5.3.2"
 
 plugins {
     application
-    kotlin("jvm") version "1.6.20"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.20"
+    kotlin("jvm") version "1.6.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
 }
 
 group = "pl.newbies"
@@ -36,15 +35,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 
     // ktor
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
     implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
-    implementation("io.ktor:ktor-server-host-common:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
 
     // database
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
@@ -55,6 +51,14 @@ dependencies {
     // graphql
     implementation("com.expediagroup:graphql-kotlin-server:$kotlinGraphQL")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
+    implementation("io.ktor:ktor-server-core-jvm:2.0.1")
+    implementation("io.ktor:ktor-server-host-common-jvm:2.0.1")
+    implementation("io.ktor:ktor-server-netty-jvm:2.0.1")
+    implementation("io.ktor:ktor-client-core-jvm:2.0.1")
+    implementation("io.ktor:ktor-client-core-jvm:2.0.1")
+    implementation("io.ktor:ktor-client-apache-jvm:2.0.1")
+    implementation("io.ktor:ktor-client-serialization-jvm:2.0.1")
+    testImplementation("io.ktor:ktor-server-tests-jvm:2.0.1")
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.4")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
@@ -73,10 +77,6 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-core-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-client-apache:$ktorVersion")
-    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
     // tests
@@ -85,7 +85,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.testcontainers:mariadb:$testContainers")
     testImplementation("org.testcontainers:junit-jupiter:$testContainers")
-    testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
 }
 
 java {

@@ -58,7 +58,10 @@ open class StringNanoIdTable(name: String = "", columnName: String = "id") : IdT
 }
 
 abstract class StringNanoIdEntity(id: EntityID<String>) : Entity<String>(id)
-abstract class StringNanoIdEntityClass<out E : StringNanoIdEntity>(table: IdTable<String>, entityType: Class<E>? = null) : EntityClass<String, E>(table, entityType)
+abstract class StringNanoIdEntityClass<out E : StringNanoIdEntity>(
+    table: IdTable<String>,
+    entityType: Class<E>? = null
+) : EntityClass<String, E>(table, entityType)
 
 fun Application.configureDatabase() {
     val dataSource = createHikariDataSource()

@@ -66,7 +66,7 @@ fun Application.githubAuthentication(oauthClient: HttpClient) {
                     githubId = githubUser.id,
                 )
 
-                val response = authService.generateResponse(user, refreshToken = null)
+                val response = authService.generateResponse(user, previousToken = null)
 
                 call.respond(response)
             }

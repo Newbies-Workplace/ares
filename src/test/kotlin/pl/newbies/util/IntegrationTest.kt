@@ -63,7 +63,11 @@ abstract class IntegrationTest {
         fun clearTable(tableName: String) {
             println("[Test] Removing table $tableName")
 
-            container.execInContainer("mysql", "-u", "root", "-p", "-D", "ares", "-e DELETE FROM $tableName;")
+            executeSQL("DELETE FROM $tableName;")
+        }
+
+        fun executeSQL(query: String) {
+            container.execInContainer("mysql", "-u", "root", "-p", "-D", "ares", "-e $query")
         }
 
         init {
