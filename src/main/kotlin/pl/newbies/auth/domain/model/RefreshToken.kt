@@ -4,6 +4,9 @@ import kotlinx.datetime.Instant
 
 data class RefreshToken(
     var token: String,
+    var family: String,
     var userId: String,
-    var dateCreated: Instant? = null,
+    var isUsed: Boolean,
+    var dateExpired: Instant,
+    var dateCreated: Instant,
 )

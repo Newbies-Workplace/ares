@@ -10,6 +10,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.auth.domain.UnauthorizedException
 import pl.newbies.auth.domain.service.AuthService
@@ -32,6 +33,16 @@ fun Application.authenticationRoutes() {
                 RefreshTokenDAO.findById(refreshToken)?.toRefreshToken()
             } ?: throw UnauthorizedException("Refresh token not found")
 
+            if (token.isUsed) {
+                authService.deleteTokenFamily(token)
+
+                throw UnauthorizedException("Toked has been used already")
+            }
+
+            if (token.dateExpired < Clock.System.now()) {
+                throw UnauthorizedException("Token has expired")
+            }
+
             val user = transaction {
                 UserDAO.findById(token.userId)?.toUser()
             } ?: throw UserNotFoundException(token.userId)
@@ -49,11 +60,17 @@ fun Application.authenticationRoutes() {
                     RefreshTokenDAO.findById(refreshToken)?.toRefreshToken()
                 } ?: throw UnauthorizedException("Refresh token not found")
 
+                if (token.isUsed) {
+                    authService.deleteTokenFamily(token)
+
+                    throw UnauthorizedException("Toked has been used already")
+                }
+
                 if (token.userId != principal.userId) {
                     throw ForbiddenException(userId = token.userId, entityId = refreshToken)
                 }
 
-                authService.deleteRefreshToken(token)
+                authService.deleteTokenFamily(token)
 
                 call.respond(HttpStatusCode.OK)
             }

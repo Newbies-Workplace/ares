@@ -704,7 +704,7 @@ class EventTest : IntegrationTest() {
         }
 
         @Test
-        fun `should 400 return when called with unsupported file`() = withAres {
+        fun `should return 400 when called with unsupported file`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse = authResponse)
@@ -723,7 +723,7 @@ class EventTest : IntegrationTest() {
         }
 
         @Test
-        fun `should 400 return when called without file`() = withAres {
+        fun `should return 400 when called without file`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse = authResponse)
