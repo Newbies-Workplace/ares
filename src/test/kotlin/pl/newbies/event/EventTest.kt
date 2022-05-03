@@ -264,6 +264,22 @@ class EventTest : IntegrationTest() {
         }
 
         @Test
+        fun `should create event when request contains emoji`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val title =  "Some title with emojis \uD83C\uDF55"
+            val request = TestData.createEventRequest(title = title)
+
+            // when
+            val event = createEvent(authResponse, request)
+
+            // then
+            assertNotNull(event.id)
+            assertEquals(title, event.title)
+            assertTrue(event.title.contains("🍕"))
+        }
+
+        @Test
         fun `should create event when called with valid request`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
@@ -914,6 +930,7 @@ class EventTest : IntegrationTest() {
             VanityUrlTestCase("ąąłłó óććęę", "aallo-occee"),
             VanityUrlTestCase("Ää Ãã Āā Áá Àà ö ü ß", "aa-aa-aa-aa-aa-o-u"),
             VanityUrlTestCase("<><><bruh><><>", "bruh"),
+            VanityUrlTestCase("emoji test \uD83C\uDF55", "emoji-test"),
         )
 
         @JvmStatic
