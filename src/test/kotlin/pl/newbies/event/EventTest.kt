@@ -267,7 +267,7 @@ class EventTest : IntegrationTest() {
         fun `should create event when request contains emoji`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val title =  "Some title with emojis \uD83C\uDF55"
+            val title = "Some title with emojis \uD83C\uDF55"
             val request = TestData.createEventRequest(title = title)
 
             // when
