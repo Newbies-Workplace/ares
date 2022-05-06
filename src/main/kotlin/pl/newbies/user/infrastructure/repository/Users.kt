@@ -10,8 +10,8 @@ import pl.newbies.user.domain.model.ContactDTO
 import pl.newbies.user.domain.model.User
 
 object Users : StringNanoIdTable() {
-    val nickname = varchar("nickname", length = 50, collate = "utf8_general_ci")
-    val description = varchar("description", length = 255, collate = "utf8_general_ci").nullable()
+    val nickname = varchar("nickname", length = 50, collate = "utf8mb4_unicode_ci")
+    val description = varchar("description", length = 255, collate = "utf8mb4_unicode_ci").nullable()
 
     //accounts
     val githubId = varchar("githubId", length = 30).nullable()

@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.0.0"
+val ktorVersion = "2.0.1"
 val koinVersion = "3.1.6"
 val logbackVersion = "1.2.11"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.38.2"
 val hikariVersion = "5.0.1"
-val flywayVersion = "8.5.9"
+val flywayVersion = "8.5.10"
 val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
 val testContainers = "1.17.1"

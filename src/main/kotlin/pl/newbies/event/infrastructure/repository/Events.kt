@@ -15,11 +15,11 @@ import pl.newbies.user.infrastructure.repository.Users
 import pl.newbies.user.infrastructure.repository.toUser
 
 object Events : StringNanoIdTable() {
-    val title = varchar("title", length = 100, collate = "utf8_general_ci")
-    val subtitle = varchar("subtitle", length = 100, collate = "utf8_general_ci").nullable()
+    val title = varchar("title", length = 100, collate = "utf8mb4_unicode_ci")
+    val subtitle = varchar("subtitle", length = 100, collate = "utf8mb4_unicode_ci").nullable()
     val author = reference("author", Users)
 
-    val description = text("description", collate = "utf8_general_ci").nullable()
+    val description = text("description", collate = "utf8mb4_unicode_ci").nullable()
 
     val vanityUrl = varchar("vanityUrl", length = 50, collate = "utf8_general_ci")
 
