@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion = "2.0.1"
-val koinVersion = "3.1.6"
+val koinVersion = "3.2.0"
 val logbackVersion = "1.2.11"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.38.2"
@@ -11,7 +11,7 @@ val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
 val testContainers = "1.17.1"
 val kGraphQLVersion = "0.17.14"
-val kotlinGraphQL = "5.3.2"
+val kotlinGraphQL = "5.4.1"
 
 plugins {
     application
@@ -42,11 +42,16 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
     implementation("io.ktor:ktor-client-apache-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-serialization-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     // database
+    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.4")
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
+    implementation("org.flywaydb:flyway-mysql:$flywayVersion")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
@@ -54,11 +59,7 @@ dependencies {
 
     // graphql
     implementation("com.expediagroup:graphql-kotlin-server:$kotlinGraphQL")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.2")
-
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.4")
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("org.flywaydb:flyway-mysql:$flywayVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.3")
 
     // di
     implementation("io.insert-koin:koin-core:$koinVersion")
@@ -67,13 +68,13 @@ dependencies {
     implementation("org.sejda.imageio:webp-imageio:0.1.6")
     implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
     implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     // validation
     implementation("org.valiktor:valiktor-core:$valiktorVersion")
 
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    // metrics
+    implementation("io.micrometer:micrometer-registry-prometheus:1.9.0")
 
     // tests
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
