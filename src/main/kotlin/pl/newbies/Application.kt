@@ -24,6 +24,7 @@ fun main(args: Array<String>): Unit =
 
 @Suppress("unused")
 fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
+    configureMetrics()
     configureSecurity(oauthClient)
     configureHTTP()
     configureSerialization()
