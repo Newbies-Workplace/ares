@@ -49,7 +49,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     // database
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.4")
+    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.5")
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-mysql:$flywayVersion")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
