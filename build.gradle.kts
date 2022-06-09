@@ -15,7 +15,7 @@ val kotlinGraphQL = "5.4.1"
 
 plugins {
     application
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.7.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.6.21"
 }
 
