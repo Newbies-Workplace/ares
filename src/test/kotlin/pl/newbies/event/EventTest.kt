@@ -1,7 +1,6 @@
 package pl.newbies.event
 
 import io.ktor.client.call.body
-import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.http.ContentType
@@ -217,7 +216,6 @@ class EventTest : IntegrationTest() {
 
             // when
             val response = httpClient.get("api/v1/events/${event.id}") {
-                expectSuccess = false
                 when (requester) {
                     EventRequester.AUTHOR -> bearerAuth(authResponse.accessToken)
                     EventRequester.ANOTHER_USER -> bearerAuth(loginAs(TestData.testUser2).accessToken)

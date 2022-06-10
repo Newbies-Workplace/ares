@@ -12,7 +12,6 @@ import pl.newbies.tag.infrastructure.repository.Tags
 import pl.newbies.tag.infrastructure.repository.toTag
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
-import pl.newbies.user.infrastructure.repository.toUser
 
 object Events : StringNanoIdTable() {
     val title = varchar("title", length = 100, collate = "utf8mb4_unicode_ci")
@@ -48,33 +47,6 @@ object EventTags : Table() {
     override val primaryKey: PrimaryKey =
         PrimaryKey(event, tag, name = "id")
 }
-
-object EventFollows : StringNanoIdTable() {
-    val event = reference("event", Events)
-    val user = reference("user", Users)
-
-    val followDate = timestamp("followDate")
-
-    init {
-        uniqueIndex(event, user)
-    }
-}
-
-class EventFollowDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
-    companion object : StringNanoIdEntityClass<EventFollowDAO>(EventFollows)
-
-    var event by EventDAO referencedOn EventFollows.event
-    var user by UserDAO referencedOn EventFollows.user
-
-    var followDate by EventFollows.followDate
-}
-
-fun EventFollowDAO.toEventFollow() =
-    EventFollow(
-        user = user.toUser(),
-        event = event.toEvent(),
-        followDate = followDate
-    )
 
 class EventDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     companion object : StringNanoIdEntityClass<EventDAO>(Events)

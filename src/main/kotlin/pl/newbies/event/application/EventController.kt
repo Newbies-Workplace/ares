@@ -78,7 +78,7 @@ fun Application.eventRoutes() {
                         authorId = principal.userId,
                     )
 
-                    call.respond(eventConverter.convert(createdEvent))
+                    call.respond(HttpStatusCode.Created, eventConverter.convert(createdEvent))
                 }
 
                 put("/{id}") {

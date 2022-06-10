@@ -13,10 +13,9 @@ data class Event(
 
     val authorId: String,
     var tags: MutableList<Tag> = mutableListOf(),
+
     val vanityUrl: String,
-
     val theme: ThemeDTO = ThemeDTO(),
-
     val visibility: Visibility,
 
     val createDate: Instant,
