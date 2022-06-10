@@ -1,6 +1,9 @@
 name: Feature CI
 
-on: push
+on:
+  push:
+    branches:
+      - '**'
 
 jobs:
   unit-test:
