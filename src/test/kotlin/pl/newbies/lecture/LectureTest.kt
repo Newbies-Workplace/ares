@@ -40,9 +40,12 @@ class LectureTest : IntegrationTest() {
 
             // when
             val response = httpClient.get("api/v1/lectures") {
-                parameter("filter", defaultJson.encodeToJsonElement(LectureFilter(
-                    eventId = eventId
-                )))
+                parameter(
+                    "filter",
+                    defaultJson.encodeToJsonElement(
+                        LectureFilter(eventId = eventId)
+                    )
+                )
             }
 
             // then
@@ -59,9 +62,12 @@ class LectureTest : IntegrationTest() {
 
             // when
             val response = httpClient.get("api/v1/lectures") {
-                parameter("filter", defaultJson.encodeToJsonElement(LectureFilter(
-                    eventId = event.id
-                )))
+                parameter(
+                    "filter",
+                    defaultJson.encodeToJsonElement(
+                        LectureFilter(eventId = event.id)
+                    )
+                )
             }
 
             // then
@@ -76,14 +82,17 @@ class LectureTest : IntegrationTest() {
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse)
             val lectures = buildList {
-                repeat(3) { add( createLecture(authResponse, event.id)) }
+                repeat(3) { add(createLecture(authResponse, event.id)) }
             }
 
             // when
             val response = httpClient.get("api/v1/lectures") {
-                parameter("filter", defaultJson.encodeToJsonElement(LectureFilter(
-                    eventId = event.id
-                )))
+                parameter(
+                    "filter",
+                    defaultJson.encodeToJsonElement(
+                        LectureFilter(eventId = event.id)
+                    )
+                )
             }
 
             // then
@@ -346,9 +355,11 @@ class LectureTest : IntegrationTest() {
 
             // when
             val response = httpClient.put("api/v1/lectures/${lecture.id}") {
-                setBody(TestData.createLectureRequest(
-                    speakerIds = listOf(secondAuthResponse.user.id)
-                ))
+                setBody(
+                    TestData.createLectureRequest(
+                        speakerIds = listOf(secondAuthResponse.user.id)
+                    )
+                )
                 contentType(ContentType.Application.Json)
                 bearerAuth(firstAuthResponse.accessToken)
             }
