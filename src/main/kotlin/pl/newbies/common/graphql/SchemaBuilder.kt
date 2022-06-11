@@ -7,6 +7,7 @@ import com.expediagroup.graphql.generator.toSchema
 import com.fasterxml.jackson.databind.ObjectMapper
 import graphql.GraphQL
 import pl.newbies.event.application.EventSchema
+import pl.newbies.lecture.application.LectureSchema
 import pl.newbies.tag.application.TagSchema
 import pl.newbies.user.application.UserSchema
 
@@ -15,6 +16,7 @@ class SchemaBuilder(
     tagSchema: TagSchema,
     eventSchema: EventSchema,
     userSchema: UserSchema,
+    lectureSchema: LectureSchema,
 ) {
     private val config = SchemaGeneratorConfig(
         supportedPackages = listOf("pl.newbies"),
@@ -27,12 +29,14 @@ class SchemaBuilder(
     private val queries = listOf(
         TopLevelObject(tagSchema.Query()),
         TopLevelObject(eventSchema.Query()),
-        TopLevelObject(userSchema.Query())
+        TopLevelObject(userSchema.Query()),
+        TopLevelObject(lectureSchema.Query()),
     )
     private val mutations = listOf(
         TopLevelObject(tagSchema.Mutation()),
         TopLevelObject(eventSchema.Mutation()),
         TopLevelObject(userSchema.Mutation()),
+        TopLevelObject(lectureSchema.Mutation()),
     )
 
     val graphQLSchema = toSchema(config, queries, mutations)

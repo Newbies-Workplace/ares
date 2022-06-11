@@ -12,7 +12,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.ForbiddenException
-import pl.newbies.common.NotFoundException
 import pl.newbies.common.query
 import pl.newbies.event.application.assertEventWriteAccess
 import pl.newbies.event.domain.EventNotFoundException
@@ -24,7 +23,6 @@ import pl.newbies.lecture.domain.LectureNotFoundException
 import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
-import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
@@ -56,13 +54,10 @@ fun Application.lectureRoutes() {
                     val principal = call.principal<AresPrincipal>()!!
                     val lecture = transaction { LectureDAO.findById(id)?.toLecture() }
                         ?: throw LectureNotFoundException(id)
-                    val event = transaction {
-                        EventDAO.findById(lecture.eventId)?.toEvent()
-                    } ?: throw NotFoundException("Event with lectureId=${lecture.id} not found.")
 
                     principal.assertLectureWriteAccess(lecture)
 
-                    val updatedLecture = lectureService.updateLecture(lecture, event, request)
+                    val updatedLecture = lectureService.updateLecture(lecture, request)
 
                     call.respond(lectureConverter.convert(updatedLecture))
                 }
@@ -85,10 +80,7 @@ fun Application.lectureRoutes() {
                 val filter: LectureFilter = call.query("filter")
                     ?: throw BadRequestException("No 'filter' provided")
 
-                val lectures = transaction {
-                    LectureDAO.find { Lectures.event eq filter.eventId }
-                        .map { it.toLecture() }
-                }
+                val lectures = lectureService.getLectures(filter)
 
                 call.respond(lectures.map { lectureConverter.convert(it) })
             }

@@ -5,12 +5,16 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.jetbrains.exposed.dao.load
 import org.jetbrains.exposed.sql.transactions.transaction
+import pl.newbies.common.NotFoundException
 import pl.newbies.common.nanoId
 import pl.newbies.event.domain.model.Event
 import pl.newbies.event.infrastructure.repository.EventDAO
+import pl.newbies.event.infrastructure.repository.toEvent
+import pl.newbies.lecture.application.model.LectureFilter
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
+import pl.newbies.lecture.infrastructure.repository.Lectures
 import pl.newbies.lecture.infrastructure.repository.toLecture
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
@@ -44,11 +48,18 @@ class LectureService {
         lecture.toLecture()
     }
 
+    fun getLectures(filter: LectureFilter): List<Lecture> = transaction {
+        LectureDAO.find { Lectures.event eq filter.eventId }
+            .map { it.toLecture() }
+    }
+
     fun updateLecture(
         lecture: Lecture,
-        event: Event,
         request: LectureRequest,
     ): Lecture = transaction {
+        val event = EventDAO.findById(lecture.eventId)?.toEvent()
+            ?: throw NotFoundException("Event with lectureId=${lecture.id} not found.")
+
         assertLectureTimeFrameFitsEvent(
             lectureStartDate = request.timeFrame.startDate,
             lectureFinishDate = request.timeFrame.finishDate,
