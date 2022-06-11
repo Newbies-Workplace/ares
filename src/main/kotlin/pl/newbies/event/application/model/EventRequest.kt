@@ -1,6 +1,5 @@
 package pl.newbies.event.application.model
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import org.valiktor.functions.hasSize
 import org.valiktor.functions.isGreaterThanOrEqualTo
@@ -41,16 +40,10 @@ data class EventRequest(
 }
 
 @Serializable
-data class TimeFrameRequest(
-    val startDate: Instant,
-    val finishDate: Instant?,
-)
-
-@Serializable
 data class AddressRequest(
     val city: String,
     val place: String,
-    val coordinates: CoordinatesRequest?,
+    val coordinates: CoordinatesRequest? = null,
 ) {
 
     init {

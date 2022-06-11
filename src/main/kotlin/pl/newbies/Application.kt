@@ -11,6 +11,8 @@ import pl.newbies.auth.authModule
 import pl.newbies.common.commonModule
 import pl.newbies.event.application.eventRoutes
 import pl.newbies.event.eventModule
+import pl.newbies.lecture.application.lectureRoutes
+import pl.newbies.lecture.lectureModule
 import pl.newbies.plugins.*
 import pl.newbies.storage.application.storageRoutes
 import pl.newbies.storage.storageModule
@@ -39,6 +41,7 @@ fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
             userModule,
             tagModule,
             eventModule,
+            lectureModule,
             storageModule,
         )
     }
@@ -48,6 +51,7 @@ fun Application.module(oauthClient: HttpClient = oauthHttpClient) {
     userRoutes()
     tagRoutes()
     eventRoutes()
+    lectureRoutes()
     storageRoutes()
 }
 

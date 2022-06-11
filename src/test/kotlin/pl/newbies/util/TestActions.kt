@@ -17,10 +17,13 @@ import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.EventResponse
 import pl.newbies.event.application.model.EventVisibilityRequest
 import pl.newbies.event.domain.model.Event
+import pl.newbies.lecture.application.model.LectureRequest
+import pl.newbies.lecture.application.model.LectureResponse
 import pl.newbies.tag.application.model.TagCreateRequest
 import pl.newbies.tag.application.model.TagRequest
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.user.application.model.UserResponse
+import pl.newbies.util.TestData.createLectureRequest
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -73,11 +76,14 @@ suspend fun ApplicationTestBuilder.createEvent(
     request: EventRequest = TestData.createEventRequest(),
     visibility: Event.Visibility? = Event.Visibility.PUBLIC,
 ): EventResponse {
-    val event = httpClient.post("api/v1/events") {
+    val eventResponse = httpClient.post("api/v1/events") {
         setBody(request)
         contentType(ContentType.Application.Json)
         bearerAuth(authResponse.accessToken)
-    }.body<EventResponse>()
+    }
+    assertEquals(HttpStatusCode.Created, eventResponse.status)
+
+    val event = eventResponse.body<EventResponse>()
 
     visibility?.let {
         changeVisibility(
@@ -88,6 +94,21 @@ suspend fun ApplicationTestBuilder.createEvent(
     }
 
     return event
+}
+
+suspend fun ApplicationTestBuilder.createLecture(
+    authResponse: AuthResponse,
+    eventId: String,
+    request: LectureRequest = createLectureRequest(),
+): LectureResponse {
+    val lectureResponse = httpClient.post("api/v1/events/$eventId/lectures") {
+        setBody(request)
+        contentType(ContentType.Application.Json)
+        bearerAuth(authResponse.accessToken)
+    }
+    assertEquals(HttpStatusCode.Created, lectureResponse.status)
+
+    return lectureResponse.body()
 }
 
 suspend fun ApplicationTestBuilder.changeVisibility(

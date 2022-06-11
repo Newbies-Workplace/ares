@@ -24,7 +24,7 @@ val commonModule = module {
             )
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     }
-    single { SchemaBuilder(get(), get(), get(), get()) }
+    single { SchemaBuilder(get(), get(), get(), get(), get()) }
     single { GraphQLHandler(get(), get()) }
     single { KtorDataLoaderRegistryFactory(get()) }
     single { KtorGraphQLRequestParser(get()) }

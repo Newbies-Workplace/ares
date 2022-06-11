@@ -1,8 +1,8 @@
 package pl.newbies.auth
 
+import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import kotlinx.coroutines.delay
@@ -23,7 +23,7 @@ class GithubAuthTest : IntegrationTest() {
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            assertEquals("ok", response.bodyAsText())
+            assertEquals("ok", response.body<String>())
         }
     }
 

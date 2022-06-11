@@ -5,6 +5,7 @@ import pl.newbies.auth.application.model.GithubUser
 import pl.newbies.event.application.model.AddressRequest
 import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.TimeFrameRequest
+import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.tag.application.model.TagRequest
 
 object TestData {
@@ -57,5 +58,20 @@ object TestData {
         address = address,
         description = description,
         tags = tags,
+    )
+
+    fun createLectureRequest(
+        title: String = "Lecture name",
+        description: String? = null,
+        timeFrameRequest: TimeFrameRequest = TimeFrameRequest(
+            startDate = Instant.fromEpochMilliseconds(1_000L),
+            finishDate = Instant.fromEpochMilliseconds(4_000L),
+        ),
+        speakerIds: List<String> = listOf()
+    ) = LectureRequest(
+        title = title,
+        description = description,
+        timeFrame = timeFrameRequest,
+        speakerIds = speakerIds,
     )
 }
