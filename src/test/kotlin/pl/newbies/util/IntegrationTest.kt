@@ -27,15 +27,16 @@ abstract class IntegrationTest {
             val configFactory = ConfigFactory.load()
                 .withValue("database.jdbcUrl", ConfigValueFactory.fromAnyRef(container.jdbcUrl))
 
+            application {
+                module(
+                    oauthClient = this@testApplication.createClient {
+                        this.install(ContentNegotiation) { json() }
+                    }
+                )
+            }
+
             environment {
                 config = HoconApplicationConfig(configFactory)
-                module {
-                    module(
-                        this@testApplication.createClient {
-                            this.install(ContentNegotiation) { json() }
-                        }
-                    )
-                }
             }
 
             externalServices {

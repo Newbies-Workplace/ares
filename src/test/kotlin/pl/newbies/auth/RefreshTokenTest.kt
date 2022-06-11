@@ -5,7 +5,6 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.delete
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
@@ -115,7 +114,7 @@ class RefreshTokenTest : IntegrationTest() {
 
             // then
             assertEquals(HttpStatusCode.Unauthorized, response.status)
-            val body = response.bodyAsText()
+            val body = response.body<String>()
             assertEquals("Token has expired", body)
         }
     }
