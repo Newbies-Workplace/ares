@@ -4,7 +4,8 @@ import com.expediagroup.graphql.server.execution.GraphQLRequestParser
 import com.expediagroup.graphql.server.types.GraphQLServerRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ktor.server.request.ApplicationRequest
-import io.ktor.server.request.receiveText
+import io.ktor.server.request.receive
+import kotlinx.serialization.json.JsonElement
 import java.io.IOException
 
 class KtorGraphQLRequestParser(
@@ -14,9 +15,10 @@ class KtorGraphQLRequestParser(
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun parseRequest(request: ApplicationRequest): GraphQLServerRequest =
         try {
-            val rawRequest = request.call.receiveText()
-            mapper.readValue(rawRequest, GraphQLServerRequest::class.java)
-        } catch (e: IOException) {
-            throw IOException("Unable to parse GraphQL payload.")
+            val rawRequest: JsonElement = request.call.receive()
+
+            mapper.readValue(rawRequest.toString(), GraphQLServerRequest::class.java)
+        } catch (e: Exception) {
+            throw IOException("Unable to parse GraphQL payload.", e)
         }
 }

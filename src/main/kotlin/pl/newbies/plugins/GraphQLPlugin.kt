@@ -4,11 +4,8 @@ import com.expediagroup.graphql.generator.extensions.print
 import io.ktor.http.ContentType
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
-import io.ktor.server.application.install
-import io.ktor.server.application.pluginOrNull
 import io.ktor.server.auth.authenticate
 import io.ktor.server.response.respondText
-import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
@@ -23,8 +20,6 @@ fun Application.graphQLModule(
     val schemaBuilder: SchemaBuilder by inject()
     val graphQLHandler: GraphQLHandler by inject()
 
-    pluginOrNull(Routing) ?: install(Routing)
-
     routing {
         authenticate("jwt", optional = true) {
             post(graphQLEndpoint) {
@@ -33,7 +28,10 @@ fun Application.graphQLModule(
         }
 
         get("sdl") {
-            call.respondText(schemaBuilder.graphQLSchema.print())
+            call.respondText(
+                schemaBuilder.graphQLSchema.print(),
+                ContentType.Text.Plain,
+            )
         }
 
         if (playgroundEnabled) {
