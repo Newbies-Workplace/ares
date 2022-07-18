@@ -17,7 +17,7 @@ val jacksonJsr310Version = "2.13.3"
 val webpImageIoVersion = "0.1.6"
 val jNanoIdVersion = "2.0.0"
 val apacheCommonsLang3Version = "3.12.0"
-val micrometerPrometheusVersion = "1.9.0"
+val micrometerPrometheusVersion = "1.9.2"
 
 plugins {
     application
