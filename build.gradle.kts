@@ -1,23 +1,23 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.0.3"
+val ktorVersion = "2.1.0"
 val koinVersion = "3.2.0"
 val logbackVersion = "1.2.11"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.39.2"
 val hikariVersion = "5.0.1"
-val flywayVersion = "8.5.12"
+val flywayVersion = "9.1.5"
 val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
-val testContainersVersion = "1.17.2"
+val testContainersVersion = "1.17.3"
 val kotlinGraphQLVersion = "5.5.0"
 val kotlinDateTimeVersion = "0.4.0"
-val mariadbClientVersion = "3.0.5"
+val mariadbClientVersion = "3.0.7"
 val jacksonJsr310Version = "2.13.3"
 val webpImageIoVersion = "0.1.6"
 val jNanoIdVersion = "2.0.0"
 val apacheCommonsLang3Version = "3.12.0"
-val micrometerPrometheusVersion = "1.9.0"
+val micrometerPrometheusVersion = "1.9.3"
 
 plugins {
     application
