@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.0.2"
+val ktorVersion = "2.1.0"
 val koinVersion = "3.2.0"
 val logbackVersion = "1.2.11"
 val valiktorVersion = "0.12.0"
@@ -11,7 +11,7 @@ val h2Version = "2.1.210"
 val junitVersion = "5.8.2"
 val testContainersVersion = "1.17.2"
 val kotlinGraphQLVersion = "5.5.0"
-val kotlinDateTimeVersion = "0.3.3"
+val kotlinDateTimeVersion = "0.4.0"
 val mariadbClientVersion = "3.0.5"
 val jacksonJsr310Version = "2.13.3"
 val webpImageIoVersion = "0.1.6"
