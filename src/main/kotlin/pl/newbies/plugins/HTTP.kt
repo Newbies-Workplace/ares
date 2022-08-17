@@ -10,6 +10,7 @@ fun Application.configureHTTP() {
     install(CORS) {
         anyHost()
         allowNonSimpleContentTypes = true
+        allowCredentials = true
 
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Put)
