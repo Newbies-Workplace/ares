@@ -1,7 +1,7 @@
 package pl.newbies.event.application
 
+import com.expediagroup.graphql.dataloader.KotlinDataLoader
 import com.expediagroup.graphql.generator.annotations.GraphQLDescription
-import com.expediagroup.graphql.server.execution.KotlinDataLoader
 import graphql.schema.DataFetchingEnvironment
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderFactory
