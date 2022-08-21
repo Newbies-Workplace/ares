@@ -1,6 +1,7 @@
 package pl.newbies.util
 
 import com.auth0.jwt.JWT
+import com.expediagroup.graphql.client.ktor.GraphQLKtorClient
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -15,6 +16,7 @@ import org.koin.core.context.stopKoin
 import org.testcontainers.containers.MariaDBContainer
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.module
+import java.net.URL
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 abstract class IntegrationTest {
@@ -89,3 +91,6 @@ val ApplicationTestBuilder.httpClient
             json()
         }
     }
+
+val ApplicationTestBuilder.graphQLClient
+    get() = GraphQLKtorClient(URL("http://localhost:80/graphql"), httpClient)

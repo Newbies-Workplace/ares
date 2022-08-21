@@ -109,7 +109,7 @@ class EventTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val responseBody = response.body<List<EventResponse>>()
-            assertEquals(emptyList<List<EventResponse>>(), responseBody)
+            assertEquals(emptyList<EventResponse>(), responseBody)
         }
 
         @ParameterizedTest
@@ -128,7 +128,7 @@ class EventTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val responseBody = response.body<List<EventResponse>>()
-            assertEquals(emptyList<List<EventResponse>>(), responseBody)
+            assertEquals(emptyList<EventResponse>(), responseBody)
         }
 
         @Nested

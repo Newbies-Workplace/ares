@@ -22,13 +22,15 @@ import pl.newbies.user.domain.UserNotFoundException
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.toUser
 import java.util.concurrent.CompletableFuture
+import com.expediagroup.graphql.server.operations.Mutation as GraphQLMutation
+import com.expediagroup.graphql.server.operations.Query as GraphQLQuery
 
 class EventSchema(
     private val eventConverter: EventConverter,
     private val eventService: EventService,
     private val userConverter: UserConverter,
 ) {
-    inner class Query {
+    inner class Query : GraphQLQuery {
         @GraphQLDescription("Get all events paged")
         fun events(
             page: Int? = null,
@@ -55,7 +57,7 @@ class EventSchema(
         }
     }
 
-    inner class Mutation {
+    inner class Mutation : GraphQLMutation {
         @GraphQLDescription("Create event with request")
         fun createEvent(request: EventRequest, env: DataFetchingEnvironment): EventResponse {
             val principal = env.principal()

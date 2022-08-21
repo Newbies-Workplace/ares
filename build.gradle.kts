@@ -1,3 +1,6 @@
+import com.expediagroup.graphql.plugin.gradle.config.GraphQLSerializer
+import com.expediagroup.graphql.plugin.gradle.graphql
+import com.expediagroup.graphql.plugin.gradle.tasks.GraphQLGenerateTestClientTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion = "2.1.0"
@@ -10,7 +13,7 @@ val flywayVersion = "9.1.5"
 val h2Version = "2.1.210"
 val junitVersion = "5.9.0"
 val testContainersVersion = "1.17.3"
-val kotlinGraphQLVersion = "6.2.0"
+val kotlinGraphQLVersion = "6.2.1"
 val kotlinDateTimeVersion = "0.4.0"
 val mariadbClientVersion = "3.0.7"
 val jacksonJsr310Version = "2.13.3"
@@ -23,6 +26,7 @@ plugins {
     application
     kotlin("jvm") version "1.7.10"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.7.10"
+    id("com.expediagroup.graphql") version "6.2.1"
 }
 
 group = "pl.newbies"
@@ -65,6 +69,7 @@ dependencies {
 
     // graphql
     implementation("com.expediagroup:graphql-kotlin-server:$kotlinGraphQLVersion")
+    implementation("com.expediagroup:graphql-kotlin-hooks-provider:$kotlinGraphQLVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonJsr310Version")
 
     // di
@@ -85,6 +90,7 @@ dependencies {
     // tests
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
+    testImplementation("com.expediagroup:graphql-kotlin-ktor-client:$kotlinGraphQLVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.testcontainers:mariadb:$testContainersVersion")
@@ -103,4 +109,19 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+// generates classes needed for graphql tests
+tasks.withType<GraphQLGenerateTestClientTask> {
+    dependsOn("graphqlGenerateSDL")
+    schemaFile.set(file("${project.buildDir}/schema.graphql"))
+    packageName.set("pl.newbies.generated")
+    serializer.set(GraphQLSerializer.KOTLINX)
+}
+
+// generates schema.graphql needed for graphql tests
+graphql {
+    schema {
+        packages = listOf("pl.newbies")
+    }
 }

@@ -11,12 +11,14 @@ import pl.newbies.tag.application.model.TagRequest
 import pl.newbies.tag.application.model.TagResponse
 import pl.newbies.tag.domain.service.TagService
 import pl.newbies.tag.infrastructure.repository.*
+import com.expediagroup.graphql.server.operations.Mutation as GraphQLMutation
+import com.expediagroup.graphql.server.operations.Query as GraphQLQuery
 
 class TagSchema(
     private val tagConverter: TagConverter,
     private val tagService: TagService,
 ) {
-    inner class Query {
+    inner class Query : GraphQLQuery {
         @GraphQLDescription("Get all tags paged")
         fun tags(page: Int? = null, size: Int? = null): List<TagResponse> {
             val pagination = (page to size).pagination()
@@ -51,7 +53,7 @@ class TagSchema(
         }
     }
 
-    inner class Mutation {
+    inner class Mutation : GraphQLMutation {
         @GraphQLDescription("Appends new tags to followed list")
         fun followTags(request: List<TagRequest>, env: DataFetchingEnvironment): List<TagResponse> {
             val principal = env.principal()

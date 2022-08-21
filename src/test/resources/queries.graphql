@@ -1,0 +1,5 @@
+query EventsList($page: Int, $size: Int, $filter: EventFilterInput) {
+    events(page: $page, size: $size, filter: $filter) {
+        id
+    }
+}
