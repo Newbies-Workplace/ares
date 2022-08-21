@@ -1,0 +1,10 @@
+query TagListQuery($page: Int, $size: Int) {
+    tags(page: $page, size: $size) {
+        ...CoreTagResponse
+    }
+}
+
+fragment CoreTagResponse on TagResponse {
+    id
+    name
+}

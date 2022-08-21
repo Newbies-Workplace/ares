@@ -115,6 +115,7 @@ tasks.withType<Test> {
 tasks.withType<GraphQLGenerateTestClientTask> {
     dependsOn("graphqlGenerateSDL")
     schemaFile.set(file("${project.buildDir}/schema.graphql"))
+    queryFileDirectory.set(file("src/test/resources/graphql"))
     packageName.set("pl.newbies.generated")
     serializer.set(GraphQLSerializer.KOTLINX)
 }

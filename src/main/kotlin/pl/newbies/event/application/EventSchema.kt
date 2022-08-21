@@ -16,6 +16,8 @@ import pl.newbies.event.domain.service.EventService
 import pl.newbies.event.infrastructure.repository.EventDAO
 import pl.newbies.event.infrastructure.repository.EventFollows
 import pl.newbies.event.infrastructure.repository.toEvent
+import pl.newbies.storage.domain.StorageService
+import pl.newbies.storage.domain.model.EventDirectoryResource
 import pl.newbies.user.application.UserConverter
 import pl.newbies.user.application.model.UserResponse
 import pl.newbies.user.domain.UserNotFoundException
@@ -29,6 +31,7 @@ class EventSchema(
     private val eventConverter: EventConverter,
     private val eventService: EventService,
     private val userConverter: UserConverter,
+    private val storageService: StorageService,
 ) {
     inner class Query : GraphQLQuery {
         @GraphQLDescription("Get all events paged")
@@ -119,6 +122,8 @@ class EventSchema(
             principal.assertEventWriteAccess(event)
 
             eventService.deleteEvent(event)
+
+            storageService.removeDirectory(EventDirectoryResource(event.id))
 
             return true
         }

@@ -30,10 +30,15 @@ val commonModule = module {
     single { GraphQLHandler(get(), get()) }
     single { KtorGraphQLRequestParser(get()) }
     single { KtorGraphQLContextFactory() }
-    single { GraphQLRequestHandler(get<SchemaBuilder>().getGraphQLObject(), KotlinDataLoaderRegistryFactory(
-        get<EventSchema>().AuthorDataLoader(),
-        get<EventSchema>().IsFollowedDataLoader(),
-    )) }
+    single {
+        GraphQLRequestHandler(
+            get<SchemaBuilder>().getGraphQLObject(),
+            KotlinDataLoaderRegistryFactory(
+                get<EventSchema>().AuthorDataLoader(),
+                get<EventSchema>().IsFollowedDataLoader(),
+            ),
+        )
+    }
     single { KtorGraphQLServer(get(), get(), get()) }
 }
 
