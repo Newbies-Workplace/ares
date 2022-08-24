@@ -114,6 +114,7 @@ tasks.withType<Test> {
 // generates classes needed for graphql tests
 tasks.withType<GraphQLGenerateTestClientTask> {
     dependsOn("graphqlGenerateSDL")
+
     schemaFile.set(file("${project.buildDir}/schema.graphql"))
     queryFileDirectory.set(file("src/test/resources/graphql"))
     packageName.set("pl.newbies.generated")

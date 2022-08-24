@@ -30,21 +30,47 @@ class EventGraphQLTest : IntegrationTest() {
 
     @Nested
     inner class DataLoaders {
-        //todo tests
         @Nested
         inner class Author {
             @Test
             fun `should return author for single event`() = withAres {
                 // given
+                val authResponse = loginAs(TestData.testUser1)
+                val event = createEvent(authResponse)
+
                 // when
+                val response = graphQLClient.execute(
+                    EventByIdQuery(
+                        EventByIdQuery.Variables(
+                            id = event.id,
+                        )
+                    )
+                )
+
                 // then
+                assertNotNull(response.data?.event?.author)
+                assertEquals(authResponse.user.nickname, response.data?.event?.author?.nickname)
             }
 
             @Test
             fun `should return author for event list`() = withAres {
                 // given
+                clearTable("Events")
+                val authResponse = loginAs(TestData.testUser1)
+                createEvent(authResponse)
+                createEvent(authResponse)
+
                 // when
+                val response = graphQLClient.execute(
+                    EventListQuery(
+                        EventListQuery.Variables()
+                    )
+                )
+
                 // then
+                val event = response.data?.events?.firstOrNull()
+                assertNotNull(event?.author)
+                assertEquals(authResponse.user.nickname, event?.author?.nickname)
             }
         }
 
@@ -53,22 +79,84 @@ class EventGraphQLTest : IntegrationTest() {
             @Test
             fun `should return isFollowed for single event when user is authorized`() = withAres {
                 // given
+                val authResponse = loginAs(TestData.testUser1)
+                val event = createEvent(authResponse)
+
                 // when
+                val response = graphQLClient.execute(
+                    EventWithFollowedByIdQuery(
+                        EventWithFollowedByIdQuery.Variables(
+                            id = event.id,
+                        )
+                    )
+                ) {
+                    bearerAuth(authResponse.accessToken)
+                }
+
                 // then
+                assertNotNull(response.data?.event?.isFollowed)
             }
 
             @Test
             fun `should return null for single event when user is unauthorized`() = withAres {
                 // given
+                val authResponse = loginAs(TestData.testUser1)
+                val event = createEvent(authResponse)
+
                 // when
+                val response = graphQLClient.execute(
+                    EventWithFollowedByIdQuery(
+                        EventWithFollowedByIdQuery.Variables(
+                            id = event.id,
+                        )
+                    )
+                )
+
                 // then
+                assertNull(response.data?.event?.isFollowed)
+                assertNull(response.data)
+                assertNotNull(response.errorAt("event"))
             }
 
             @Test
-            fun `should return isFollowed for event list`() = withAres {
+            fun `should return isFollowed for event list when user is authorized`() = withAres {
                 // given
+                clearTable("Events")
+                val authResponse = loginAs(TestData.testUser1)
+                createEvent(authResponse)
+                createEvent(authResponse)
+
                 // when
+                val response = graphQLClient.execute(
+                    EventListWithFollowedQuery(
+                        EventListWithFollowedQuery.Variables()
+                    )
+                ) {
+                    bearerAuth(authResponse.accessToken)
+                }
+
                 // then
+                assertNotNull(response.data?.events?.firstOrNull()?.isFollowed)
+            }
+
+            @Test
+            fun `should return null for event list when user is unauthorized`() = withAres {
+                // given
+                clearTable("Events")
+                val authResponse = loginAs(TestData.testUser1)
+                createEvent(authResponse)
+
+                // when
+                val response = graphQLClient.execute(
+                    EventListWithFollowedQuery(
+                        EventListWithFollowedQuery.Variables()
+                    )
+                )
+
+                // then
+                assertNull(response.data?.events?.firstOrNull()?.isFollowed)
+                assertNull(response.data)
+                assertNotNull(response.errorAt("events"))
             }
         }
     }
@@ -933,6 +1021,51 @@ class EventGraphQLTest : IntegrationTest() {
             assertNotEquals(event.updateDate.toString(), updatedEvent.updateDate)
             assertNotEquals(event.theme.primaryColor, updatedEvent.theme.primaryColor)
             assertNotEquals(event.theme.secondaryColor, updatedEvent.theme.secondaryColor)
+        }
+    }
+
+    @Nested
+    inner class FollowEvent {
+        @Test
+        fun `should return null when called by unauthorized user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse)
+
+            // when
+            val response = graphQLClient.execute(
+                FollowEventMutation(
+                    FollowEventMutation.Variables(
+                        id = event.id,
+                    )
+                )
+            )
+
+            // then
+            assertNull(response.data?.followEvent)
+            assertNull(response.data)
+            assertNotNull(response.errorAt("followEvent"))
+        }
+
+        @Test
+        fun `should follow when called by authorized user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse)
+
+            // when
+            val response = graphQLClient.execute(
+                FollowEventMutation(
+                    FollowEventMutation.Variables(
+                        id = event.id,
+                    )
+                )
+            ) {
+                bearerAuth(authResponse.accessToken)
+            }
+
+            // when
+            assertTrue(response.data?.followEvent!!)
         }
     }
 }

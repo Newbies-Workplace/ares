@@ -16,6 +16,4 @@ class KtorGraphQLContextFactory : GraphQLContextFactory<GraphQLContext, Applicat
 
         return map
     }
-
-    override suspend fun generateContext(request: ApplicationRequest): GraphQLContext? = null
 }

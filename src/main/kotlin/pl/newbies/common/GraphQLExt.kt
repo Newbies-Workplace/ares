@@ -1,5 +1,6 @@
 package pl.newbies.common
 
+import graphql.GraphQLContext
 import graphql.schema.DataFetchingEnvironment
 import org.dataloader.BatchLoaderEnvironment
 import pl.newbies.auth.domain.UnauthorizedException
@@ -11,5 +12,8 @@ fun DataFetchingEnvironment.optPrincipal(): AresPrincipal? =
 fun DataFetchingEnvironment.principal(): AresPrincipal =
     optPrincipal() ?: throw UnauthorizedException("No auth principal in context")
 
+fun BatchLoaderEnvironment.optPrincipal(): AresPrincipal? =
+    (keyContextsList.firstOrNull() as GraphQLContext).get("PRINCIPAL") as? AresPrincipal
+
 fun BatchLoaderEnvironment.principal(): AresPrincipal =
-    keyContexts["PRINCIPAL"] as? AresPrincipal ?: throw UnauthorizedException("No auth principal in context")
+    optPrincipal() ?: throw UnauthorizedException("No auth principal in context")

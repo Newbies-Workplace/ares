@@ -1,0 +1,3 @@
+mutation FollowEventMutation($id: String!) {
+    followEvent(id: $id)
+}

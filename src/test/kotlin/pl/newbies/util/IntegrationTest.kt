@@ -11,6 +11,7 @@ import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.koin.core.context.stopKoin
 import org.testcontainers.containers.MariaDBContainer
@@ -70,7 +71,9 @@ abstract class IntegrationTest {
         }
 
         fun executeSQL(query: String) {
-            container.execInContainer("mysql", "-u", "root", "-p", "-D", "ares", "-e $query")
+            val result = container.execInContainer("mysql", "-u", "root", "-D", "ares", "-e $query")
+
+            assertEquals("", result.stderr, "executeSQL Failed with an error: ")
         }
 
         init {
