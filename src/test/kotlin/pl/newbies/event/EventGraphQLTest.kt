@@ -27,7 +27,6 @@ import pl.newbies.generated.inputs.EventVisibilityRequestInput
 import pl.newbies.util.*
 
 class EventGraphQLTest : IntegrationTest() {
-
     @Nested
     inner class DataLoaders {
         @Nested
@@ -125,6 +124,8 @@ class EventGraphQLTest : IntegrationTest() {
                 val authResponse = loginAs(TestData.testUser1)
                 createEvent(authResponse)
                 createEvent(authResponse)
+                createEvent(authResponse).also { followEvent(authResponse, it.id) }
+                createEvent(authResponse).also { followEvent(authResponse, it.id) }
 
                 // when
                 val response = graphQLClient.execute(
@@ -137,6 +138,7 @@ class EventGraphQLTest : IntegrationTest() {
 
                 // then
                 assertNotNull(response.data?.events?.firstOrNull()?.isFollowed)
+                assertEquals(listOf(false, false, true, true), response.data?.events?.map { it.isFollowed })
             }
 
             @Test
@@ -163,7 +165,6 @@ class EventGraphQLTest : IntegrationTest() {
 
     @Nested
     inner class EventList {
-
         @Test
         fun `should return empty list when there are no events`() = withAres {
             // given
@@ -1054,18 +1055,67 @@ class EventGraphQLTest : IntegrationTest() {
             val event = createEvent(authResponse)
 
             // when
-            val response = graphQLClient.execute(
-                FollowEventMutation(
-                    FollowEventMutation.Variables(
-                        id = event.id,
+            followEvent(authResponse, event.id)
+
+            // when
+            val assertionResponse = graphQLClient.execute(
+                EventWithFollowedByIdQuery(
+                    EventWithFollowedByIdQuery.Variables(
+                        id = event.id
                     )
                 )
             ) {
                 bearerAuth(authResponse.accessToken)
             }
 
+            assertEquals(true, assertionResponse.data?.event?.isFollowed)
+        }
+    }
+    @Nested
+    inner class UnfollowEvent {
+        @Test
+        fun `should return null when called by unauthorized user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse)
+
             // when
-            assertTrue(response.data?.followEvent!!)
+            val response = graphQLClient.execute(
+                UnfollowEventMutation(
+                    UnfollowEventMutation.Variables(
+                        id = event.id,
+                    )
+                )
+            )
+
+            // then
+            assertNull(response.data?.unfollowEvent)
+            assertNull(response.data)
+            assertNotNull(response.errorAt("unfollowEvent"))
+        }
+
+        @Test
+        fun `should follow when called by authorized user`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse)
+            followEvent(authResponse, event.id)
+
+            // when
+            unfollowEvent(authResponse, event.id)
+
+            // when
+            val assertionResponse = graphQLClient.execute(
+                EventWithFollowedByIdQuery(
+                    EventWithFollowedByIdQuery.Variables(
+                        id = event.id
+                    )
+                )
+            ) {
+                bearerAuth(authResponse.accessToken)
+            }
+
+            assertEquals(false, assertionResponse.data?.event?.isFollowed)
         }
     }
 }

@@ -1,0 +1,15 @@
+mutation ReplaceMyUserMutation($request: UserRequestInput!) {
+    replaceMyUser(request: $request) {
+        id
+        nickname
+        description
+        contact {
+            github
+            linkedin
+            mail
+            twitter
+        }
+        createDate
+        updateDate
+    }
+}
