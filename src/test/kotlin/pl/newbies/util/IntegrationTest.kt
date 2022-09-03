@@ -5,6 +5,7 @@ import com.expediagroup.graphql.client.ktor.GraphQLKtorClient
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigValueFactory
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.config.HoconApplicationConfig
 import io.ktor.server.testing.ApplicationTestBuilder
@@ -45,6 +46,10 @@ abstract class IntegrationTest {
             externalServices {
                 hosts("https://github.com", "https://api.github.com") { githubModule() }
             }
+
+
+            // executed to initialize application (early execution of container.execInContainer fix)
+            client.get("")
 
             block()
         }
