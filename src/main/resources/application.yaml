@@ -1,0 +1,27 @@
+ktor:
+  development: false
+  deployment:
+    port: ${PORT:8080}
+  application:
+    modules: [ pl.newbies.ApplicationKt.module ]
+jwt:
+  realm: "Jeteo Ares"
+  issuer: "Jeteo Ares"
+  secret: ${JWT_GENERATOR_SIGNATURE_SECRET:secret}
+oauth:
+  github:
+    userUrl: "https://api.github.com/user"
+    clientId: ${OAUTH_GITHUB_CLIENT_ID}
+    secret: ${OAUTH_GITHUB_SECRET}
+  devgithub:
+    userUrl: "https://api.github.com/user"
+    clientId: ${OAUTH_DEVGITHUB_CLIENT_ID}
+    secret: ${OAUTH_DEVGITHUB_SECRET}
+database:
+  driverClassName: "org.mariadb.jdbc.Driver"
+  jdbcUrl: ${ARES_DB_URL:"jdbc:mariadb://localhost:3306/ares?characterEncoding=utf8&useUnicode=true"}
+  username: ${ARES_DB_USERNAME:"root"}
+  password: ${ARES_DB_PASSWORD:"ares"}
+storage:
+  url: ${ARES_STORAGE_URL:"http://127.0.0.1:8080"}
+  path: ${ARES_STORAGE_PATH:"ares-storage"}

@@ -5,11 +5,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion = "2.1.0"
 val koinVersion = "3.2.0"
-val logbackVersion = "1.2.11"
+val logbackVersion = "1.4.0"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.39.2"
 val hikariVersion = "5.0.1"
-val flywayVersion = "9.1.5"
+val flywayVersion = "9.2.2"
 val h2Version = "2.1.210"
 val junitVersion = "5.9.0"
 val testContainersVersion = "1.17.3"
@@ -53,6 +53,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
+    implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
     implementation("io.ktor:ktor-client-apache-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-serialization-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
