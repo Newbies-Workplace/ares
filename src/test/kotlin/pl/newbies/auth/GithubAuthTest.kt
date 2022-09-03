@@ -31,6 +31,7 @@ class GithubAuthTest : IntegrationTest() {
         @Test
         fun `should create account when called with new user`() = withAres {
             // given
+            clearTable("Events")
             clearTable("Users")
             val user = TestData.testUser1
 
@@ -45,6 +46,7 @@ class GithubAuthTest : IntegrationTest() {
         @Test
         fun `should return existing account when called with existing github user`() = withAres {
             // given
+            clearTable("Events")
             clearTable("Users")
             val user = TestData.testUser1
             val authResponse = loginAs(user)
