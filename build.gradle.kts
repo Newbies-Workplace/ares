@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion = "2.1.0"
 val koinVersion = "3.2.0"
-val logbackVersion = "1.2.11"
+val logbackVersion = "1.4.0"
 val valiktorVersion = "0.12.0"
 val exposedVersion = "0.39.2"
 val hikariVersion = "5.0.1"
