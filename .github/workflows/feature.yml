@@ -30,3 +30,9 @@ jobs:
 
       - name: Gradle test
         run: bash ./gradlew test
+
+      - name: Tests results
+          uses: actions/upload-artifact@v3
+          with:
+            name: reports
+            path: ares/build/reports
