@@ -47,7 +47,6 @@ abstract class IntegrationTest {
                 hosts("https://github.com", "https://api.github.com") { githubModule() }
             }
 
-
             // executed to initialize application (early execution of container.execInContainer fix)
             client.get("")
 

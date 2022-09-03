@@ -22,10 +22,12 @@ class TaskGraphQLTest : IntegrationTest() {
     @Nested
     inner class CreateTag {
         @ParameterizedTest
-        @ValueSource(strings = [
-            "",
-            "a",
-        ])
+        @ValueSource(
+            strings = [
+                "",
+                "a",
+            ]
+        )
         fun `should return null when called with invalid name`(name: String) = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
