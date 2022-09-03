@@ -1,5 +1,6 @@
 package pl.newbies.common
 
+import com.expediagroup.graphql.dataloader.KotlinDataLoaderRegistryFactory
 import com.expediagroup.graphql.server.execution.GraphQLRequestHandler
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.datetime.Instant
 import org.koin.dsl.module
 import pl.newbies.common.graphql.*
+import pl.newbies.event.application.EventSchema
 
 val commonModule = module {
     single {
@@ -24,12 +26,19 @@ val commonModule = module {
             )
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     }
-    single { SchemaBuilder(get(), get(), get(), get(), get()) }
+    single { SchemaBuilder(get(), get(), get(), get()) }
     single { GraphQLHandler(get(), get()) }
-    single { KtorDataLoaderRegistryFactory(get()) }
     single { KtorGraphQLRequestParser(get()) }
     single { KtorGraphQLContextFactory() }
-    single { GraphQLRequestHandler(get<SchemaBuilder>().getGraphQLObject(), get<KtorDataLoaderRegistryFactory>()) }
+    single {
+        GraphQLRequestHandler(
+            get<SchemaBuilder>().getGraphQLObject(),
+            KotlinDataLoaderRegistryFactory(
+                get<EventSchema>().AuthorDataLoader(),
+                get<EventSchema>().IsFollowedDataLoader(),
+            ),
+        )
+    }
     single { KtorGraphQLServer(get(), get(), get()) }
 }
 

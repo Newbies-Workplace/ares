@@ -1,0 +1,6 @@
+mutation CreateTagMutation($request: TagCreateRequestInput!) {
+    createTag(request: $request) {
+        id
+        name
+    }
+}

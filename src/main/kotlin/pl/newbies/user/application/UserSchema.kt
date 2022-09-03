@@ -10,12 +10,14 @@ import pl.newbies.user.application.model.UserResponse
 import pl.newbies.user.domain.service.UserService
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.toUser
+import com.expediagroup.graphql.server.operations.Mutation as GraphQLMutation
+import com.expediagroup.graphql.server.operations.Query as GraphQLQuery
 
 class UserSchema(
     private val userConverter: UserConverter,
     private val userService: UserService,
 ) {
-    inner class Query {
+    inner class Query : GraphQLQuery {
         @GraphQLDescription("Get all users paged")
         fun users(page: Int? = null, size: Int? = null): List<UserResponse> {
             val pagination = (page to size).pagination()
@@ -37,7 +39,7 @@ class UserSchema(
         }
     }
 
-    inner class Mutation {
+    inner class Mutation : GraphQLMutation {
         @GraphQLDescription("Replace user data with new data (PUT equivalent)")
         fun replaceMyUser(request: UserRequest, env: DataFetchingEnvironment): UserResponse {
             val principal = env.principal()

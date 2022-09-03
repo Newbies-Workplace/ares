@@ -109,7 +109,7 @@ class EventTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val responseBody = response.body<List<EventResponse>>()
-            assertEquals(emptyList<List<EventResponse>>(), responseBody)
+            assertEquals(emptyList<EventResponse>(), responseBody)
         }
 
         @ParameterizedTest
@@ -128,7 +128,7 @@ class EventTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val responseBody = response.body<List<EventResponse>>()
-            assertEquals(emptyList<List<EventResponse>>(), responseBody)
+            assertEquals(emptyList<EventResponse>(), responseBody)
         }
 
         @Nested
@@ -448,7 +448,7 @@ class EventTest : IntegrationTest() {
             val secondAuthResponse = loginAs(TestData.testUser2)
 
             // when
-            val response = httpClient.delete("api/v1/events/${event.id}") {
+            val response = httpClient.put("api/v1/events/${event.id}") {
                 setBody(TestData.createEventRequest(title = "New longer Title"))
                 contentType(ContentType.Application.Json)
                 bearerAuth(secondAuthResponse.accessToken)
@@ -909,7 +909,7 @@ class EventTest : IntegrationTest() {
             Event.Visibility.PRIVATE,
         )
 
-        private suspend fun ApplicationTestBuilder.prepareFilterTestEvents(authResponse: AuthResponse) = buildList {
+        suspend fun ApplicationTestBuilder.prepareFilterTestEvents(authResponse: AuthResponse) = buildList {
             add(createEvent(authResponse, visibility = Event.Visibility.PUBLIC))
             add(createEvent(authResponse, visibility = Event.Visibility.INVISIBLE))
             add(createEvent(authResponse, visibility = Event.Visibility.PRIVATE))

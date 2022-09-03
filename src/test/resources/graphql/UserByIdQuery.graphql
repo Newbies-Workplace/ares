@@ -1,0 +1,15 @@
+query UserByIdQuery($id: String!) {
+    user(id: $id) {
+        id
+        nickname
+        description
+        contact {
+            github
+            linkedin
+            mail
+            twitter
+        }
+        createDate
+        updateDate
+    }
+}

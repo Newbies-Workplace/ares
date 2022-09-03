@@ -4,7 +4,6 @@ import com.expediagroup.graphql.generator.SchemaGeneratorConfig
 import com.expediagroup.graphql.generator.TopLevelObject
 import com.expediagroup.graphql.generator.execution.SimpleKotlinDataFetcherFactoryProvider
 import com.expediagroup.graphql.generator.toSchema
-import com.fasterxml.jackson.databind.ObjectMapper
 import graphql.GraphQL
 import pl.newbies.event.application.EventSchema
 import pl.newbies.lecture.application.LectureSchema
@@ -12,7 +11,6 @@ import pl.newbies.tag.application.TagSchema
 import pl.newbies.user.application.UserSchema
 
 class SchemaBuilder(
-    objectMapper: ObjectMapper,
     tagSchema: TagSchema,
     eventSchema: EventSchema,
     userSchema: UserSchema,
@@ -21,9 +19,7 @@ class SchemaBuilder(
     private val config = SchemaGeneratorConfig(
         supportedPackages = listOf("pl.newbies"),
         hooks = CustomSchemaGeneratorHooks(),
-        dataFetcherFactoryProvider = SimpleKotlinDataFetcherFactoryProvider(
-            objectMapper = objectMapper,
-        )
+        dataFetcherFactoryProvider = SimpleKotlinDataFetcherFactoryProvider()
     )
 
     private val queries = listOf(

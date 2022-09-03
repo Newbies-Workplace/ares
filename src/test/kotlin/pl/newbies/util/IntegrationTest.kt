@@ -1,7 +1,9 @@
 package pl.newbies.util
 
 import com.auth0.jwt.JWT
+import com.expediagroup.graphql.client.ktor.GraphQLKtorClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.config.MapApplicationConfig
 import io.ktor.server.config.merge
@@ -10,11 +12,13 @@ import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.koin.core.context.stopKoin
 import org.testcontainers.containers.MariaDBContainer
 import pl.newbies.auth.application.model.AuthResponse
 import pl.newbies.module
+import java.net.URL
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 abstract class IntegrationTest {
@@ -43,6 +47,9 @@ abstract class IntegrationTest {
                 hosts("https://github.com", "https://api.github.com") { githubModule() }
             }
 
+            // executed to initialize application (early execution of container.execInContainer fix)
+            client.get("")
+
             block()
         }
     }
@@ -68,7 +75,9 @@ abstract class IntegrationTest {
         }
 
         fun executeSQL(query: String) {
-            container.execInContainer("mysql", "-u", "root", "-p", "-D", "ares", "-e $query")
+            val result = container.execInContainer("mysql", "-u", "root", "-D", "ares", "-e $query")
+
+            assertEquals("", result.stderr, "executeSQL Failed with an error: ")
         }
 
         init {
@@ -89,3 +98,6 @@ val ApplicationTestBuilder.httpClient
             json()
         }
     }
+
+val ApplicationTestBuilder.graphQLClient
+    get() = GraphQLKtorClient(URL("http://localhost:80/graphql"), httpClient)

@@ -1,7 +1,7 @@
 package pl.newbies.event.application
 
+import com.expediagroup.graphql.dataloader.KotlinDataLoader
 import com.expediagroup.graphql.generator.annotations.GraphQLDescription
-import com.expediagroup.graphql.server.execution.KotlinDataLoader
 import graphql.schema.DataFetchingEnvironment
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderFactory
@@ -13,22 +13,25 @@ import pl.newbies.common.principal
 import pl.newbies.event.application.model.*
 import pl.newbies.event.domain.EventNotFoundException
 import pl.newbies.event.domain.service.EventService
-import pl.newbies.event.infrastructure.repository.EventDAO
-import pl.newbies.event.infrastructure.repository.EventFollows
-import pl.newbies.event.infrastructure.repository.toEvent
+import pl.newbies.event.infrastructure.repository.*
+import pl.newbies.storage.domain.StorageService
+import pl.newbies.storage.domain.model.EventDirectoryResource
 import pl.newbies.user.application.UserConverter
 import pl.newbies.user.application.model.UserResponse
 import pl.newbies.user.domain.UserNotFoundException
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.toUser
 import java.util.concurrent.CompletableFuture
+import com.expediagroup.graphql.server.operations.Mutation as GraphQLMutation
+import com.expediagroup.graphql.server.operations.Query as GraphQLQuery
 
 class EventSchema(
     private val eventConverter: EventConverter,
     private val eventService: EventService,
     private val userConverter: UserConverter,
+    private val storageService: StorageService,
 ) {
-    inner class Query {
+    inner class Query : GraphQLQuery {
         @GraphQLDescription("Get all events paged")
         fun events(
             page: Int? = null,
@@ -55,7 +58,7 @@ class EventSchema(
         }
     }
 
-    inner class Mutation {
+    inner class Mutation : GraphQLMutation {
         @GraphQLDescription("Create event with request")
         fun createEvent(request: EventRequest, env: DataFetchingEnvironment): EventResponse {
             val principal = env.principal()
@@ -118,6 +121,8 @@ class EventSchema(
 
             eventService.deleteEvent(event)
 
+            storageService.removeDirectory(EventDirectoryResource(event.id))
+
             return true
         }
 
@@ -172,19 +177,21 @@ class EventSchema(
             DataLoaderFactory.newDataLoader { eventIds, env ->
                 CompletableFuture.supplyAsync {
                     val principal = env.principal()
-                    val followedMap = mutableMapOf<String, Boolean>()
 
-                    transaction {
-                        eventIds.forEach { eventId ->
-                            val follow = EventDAO.find {
-                                (EventFollows.user eq principal.userId) and (EventFollows.event eq eventId)
-                            }.firstOrNull()
-
-                            followedMap[eventId] = follow != null
-                        }
+                    val follows = transaction {
+                        EventFollowDAO.find {
+                            (EventFollows.user eq principal.userId) and (EventFollows.event inList eventIds)
+                        }.map { it.toEventFollow() }
                     }
 
-                    followedMap.values.toList()
+                    val followedMap = mutableMapOf<String, Boolean>()
+                    follows.forEach {
+                        followedMap[it.event.id] = true
+                    }
+
+                    eventIds.map {
+                        followedMap.getOrDefault(it, false)
+                    }
                 }
             }
     }

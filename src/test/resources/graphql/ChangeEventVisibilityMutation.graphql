@@ -1,0 +1,35 @@
+mutation ChangeEventVisibilityMutation($id: String!, $request: EventVisibilityRequestInput!) {
+    changeEventVisibility(id: $id, request: $request) {
+        ...CoreEventResponse
+    }
+}
+
+fragment CoreEventResponse on EventResponse {
+    id
+    title
+    subtitle
+    description
+    vanityUrl
+    author {
+        nickname
+    }
+    timeFrame {
+        startDate
+        finishDate
+    }
+    address {
+        place
+        city
+    }
+    theme {
+        primaryColor
+        secondaryColor
+        image
+    }
+    visibility
+    tags {
+        id
+        name
+    }
+    updateDate
+}

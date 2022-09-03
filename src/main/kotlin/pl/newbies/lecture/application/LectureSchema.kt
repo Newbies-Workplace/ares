@@ -15,12 +15,14 @@ import pl.newbies.lecture.domain.LectureNotFoundException
 import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.LectureDAO
 import pl.newbies.lecture.infrastructure.repository.toLecture
+import com.expediagroup.graphql.server.operations.Mutation as GraphQLMutation
+import com.expediagroup.graphql.server.operations.Query as GraphQLQuery
 
 class LectureSchema(
     private val lectureConverter: LectureConverter,
     private val lectureService: LectureService,
 ) {
-    inner class Query {
+    inner class Query : GraphQLQuery {
         @GraphQLDescription("Get all event lectures")
         fun lectures(
             filter: LectureFilter,
@@ -40,7 +42,7 @@ class LectureSchema(
         }
     }
 
-    inner class Mutation {
+    inner class Mutation : GraphQLMutation {
         @GraphQLDescription("Create lecture with request")
         fun createLecture(eventId: String, request: LectureRequest, env: DataFetchingEnvironment): LectureResponse {
             val principal = env.principal()
