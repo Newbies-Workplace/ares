@@ -5,7 +5,6 @@ import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
-import kotlinx.coroutines.delay
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -50,7 +49,6 @@ class GithubAuthTest : IntegrationTest() {
             val user = TestData.testUser1
             val authResponse = loginAs(user)
             val createdUser = getUser(authResponse.getUserId())
-            delay(1_000)
 
             // when
             val response = loginAs(user)
