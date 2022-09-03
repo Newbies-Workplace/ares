@@ -1071,6 +1071,7 @@ class EventGraphQLTest : IntegrationTest() {
             assertEquals(true, assertionResponse.data?.event?.isFollowed)
         }
     }
+
     @Nested
     inner class UnfollowEvent {
         @Test
