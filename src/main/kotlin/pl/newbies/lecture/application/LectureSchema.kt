@@ -44,7 +44,7 @@ class LectureSchema(
         @GraphQLDescription("Create lecture with request")
         fun createLecture(eventId: String, request: LectureRequest, env: DataFetchingEnvironment): LectureResponse {
             val principal = env.principal()
-            val event = transaction { EventDAO.findById(id)?.toEvent() }
+            val event = transaction { EventDAO.findById(eventId)?.toEvent() }
                 ?: throw EventNotFoundException(eventId)
 
             principal.assertEventWriteAccess(event)
