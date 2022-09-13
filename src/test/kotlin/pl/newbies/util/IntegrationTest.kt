@@ -1,11 +1,11 @@
 package pl.newbies.util
 
 import com.auth0.jwt.JWT
+import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigValueFactory
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.config.MapApplicationConfig
-import io.ktor.server.config.merge
-import io.ktor.server.config.yaml.YamlConfig
+import io.ktor.server.config.HoconApplicationConfig
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import org.junit.jupiter.api.AfterAll
@@ -24,6 +24,9 @@ abstract class IntegrationTest {
 
     fun withAres(block: suspend ApplicationTestBuilder.() -> Unit) {
         testApplication {
+            val configFactory = ConfigFactory.load()
+                .withValue("database.jdbcUrl", ConfigValueFactory.fromAnyRef(container.jdbcUrl))
+
             application {
                 module(
                     oauthClient = this@testApplication.createClient {
@@ -33,10 +36,7 @@ abstract class IntegrationTest {
             }
 
             environment {
-                config = listOf(
-                    MapApplicationConfig("database.jdbcUrl" to container.jdbcUrl),
-                    YamlConfig(null)!!,
-                ).merge()
+                config = HoconApplicationConfig(configFactory)
             }
 
             externalServices {
