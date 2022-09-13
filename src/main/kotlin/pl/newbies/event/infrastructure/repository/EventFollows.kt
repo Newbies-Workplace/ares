@@ -1,6 +1,7 @@
 package pl.newbies.event.infrastructure.repository
 
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import pl.newbies.event.domain.model.EventFollow
 import pl.newbies.plugins.StringNanoIdEntity
@@ -11,8 +12,8 @@ import pl.newbies.user.infrastructure.repository.Users
 import pl.newbies.user.infrastructure.repository.toUser
 
 object EventFollows : StringNanoIdTable() {
-    val event = reference("event", Events)
-    val user = reference("user", Users)
+    val event = reference("event", Events, onDelete = ReferenceOption.CASCADE)
+    val user = reference("user", Users, onDelete = ReferenceOption.CASCADE)
 
     val followDate = timestamp("followDate")
 

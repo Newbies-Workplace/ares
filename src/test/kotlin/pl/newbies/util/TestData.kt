@@ -5,6 +5,10 @@ import pl.newbies.auth.application.model.GithubUser
 import pl.newbies.event.application.model.AddressRequest
 import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.TimeFrameRequest
+import pl.newbies.generated.inputs.AddressRequestInput
+import pl.newbies.generated.inputs.EventRequestInput
+import pl.newbies.generated.inputs.TagRequestInput
+import pl.newbies.generated.inputs.TimeFrameRequestInput
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.tag.application.model.TagRequest
 
@@ -52,6 +56,29 @@ object TestData {
         description: String = "Some random description",
         tags: List<TagRequest> = emptyList(),
     ) = EventRequest(
+        title = title,
+        subtitle = subtitle,
+        timeFrame = timeFrameRequest,
+        address = address,
+        description = description,
+        tags = tags,
+    )
+
+    fun createEventRequestInput(
+        title: String = "Event with name",
+        subtitle: String? = null,
+        timeFrameRequest: TimeFrameRequestInput = TimeFrameRequestInput(
+            startDate = Instant.fromEpochMilliseconds(1_000L).toString(),
+            finishDate = Instant.fromEpochMilliseconds(4_000L).toString(),
+        ),
+        address: AddressRequestInput? = AddressRequestInput(
+            city = "Warszawa",
+            place = "Kolońska 45/2",
+            coordinates = null,
+        ),
+        description: String = "Some random description",
+        tags: List<TagRequestInput> = emptyList(),
+    ) = EventRequestInput(
         title = title,
         subtitle = subtitle,
         timeFrame = timeFrameRequest,

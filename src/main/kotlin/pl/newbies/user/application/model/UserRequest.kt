@@ -7,7 +7,7 @@ import org.valiktor.validate
 @Serializable
 class UserRequest(
     val nickname: String,
-    val description: String?,
+    val description: String? = null,
     val contact: ContactRequest,
 ) {
 
@@ -20,8 +20,8 @@ class UserRequest(
 
 @Serializable
 data class ContactRequest(
-    val github: String?,
-    val linkedin: String?,
-    val mail: String?,
-    val twitter: String?,
+    val github: String? = null,
+    val linkedin: String? = null,
+    val mail: String? = null,
+    val twitter: String? = null,
 )

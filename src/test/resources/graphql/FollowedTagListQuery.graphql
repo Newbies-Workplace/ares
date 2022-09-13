@@ -1,0 +1,10 @@
+query FollowedTagListQuery($page: Int, $size: Int) {
+    followedTags(page: $page, size: $size) {
+        ...CoreTagResponse
+    }
+}
+
+fragment CoreTagResponse on TagResponse {
+    id
+    name
+}

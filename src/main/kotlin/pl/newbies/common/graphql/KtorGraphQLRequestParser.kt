@@ -12,7 +12,6 @@ class KtorGraphQLRequestParser(
     private val mapper: ObjectMapper
 ) : GraphQLRequestParser<ApplicationRequest> {
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun parseRequest(request: ApplicationRequest): GraphQLServerRequest =
         try {
             val rawRequest: JsonElement = request.call.receive()

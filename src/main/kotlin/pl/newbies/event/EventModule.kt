@@ -11,5 +11,5 @@ val eventModule = module {
     single { EventService() }
     single { EventConverter(get(), get()) }
     single { FileUrlConverter(prop("storage.url").getString()) }
-    single { EventSchema(get(), get(), get()) }
+    single { EventSchema(get(), get(), get(), get()) }
 }

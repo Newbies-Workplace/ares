@@ -1,0 +1,8 @@
+query EventWithFollowedByIdQuery($id: String!) {
+    event(id: $id) {
+        id
+        title
+        subtitle
+        isFollowed
+    }
+}

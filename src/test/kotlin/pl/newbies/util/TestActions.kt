@@ -186,14 +186,14 @@ fun removeDirectory(path: String) {
 
 fun assertFileNotExists(path: String) {
     val storagePath = Path.of("ares-test-storage").resolve(path)
-    print("[Test] asserting directory NOT exists (${storagePath.toFile().path})")
+    println("[Test] asserting directory NOT exists (${storagePath.toFile().path})")
 
     assert(!storagePath.exists()) { "Expected file not to exist (${storagePath.toFile().path})" }
 }
 
 fun assertFileExists(path: String) {
     val storagePath = Path.of("ares-test-storage").resolve(path)
-    print("[Test] asserting directory exists (${storagePath.toFile().path})")
+    println("[Test] asserting directory exists (${storagePath.toFile().path})")
 
     assert(storagePath.exists()) { "Expected file to exist (${storagePath.toFile().path})" }
 }
