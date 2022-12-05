@@ -3,7 +3,7 @@ import com.expediagroup.graphql.plugin.gradle.graphql
 import com.expediagroup.graphql.plugin.gradle.tasks.GraphQLGenerateTestClientTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.1.0"
+val ktorVersion = "2.1.3"
 val koinVersion = "3.2.0"
 val logbackVersion = "1.4.0"
 val valiktorVersion = "0.12.0"
