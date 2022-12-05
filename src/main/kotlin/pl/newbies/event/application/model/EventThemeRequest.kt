@@ -6,8 +6,8 @@ import pl.newbies.common.validator.isHexColor
 
 @Serializable
 data class EventThemeRequest(
-    val primaryColor: String?,
-    val secondaryColor: String?,
+    val primaryColor: String? = null,
+    val secondaryColor: String? = null,
 ) {
 
     init {

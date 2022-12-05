@@ -1,0 +1,19 @@
+query LectureByEventIdQuery($filter: LectureFilterInput!) {
+    lectures(filter: $filter) {
+        id
+        title
+        description
+        rates {
+            id
+            topicRate
+            presentationRate
+            opinion
+            createDate
+        }
+        rateSummary {
+            votesCount
+            topicAvg
+            presentationAvg
+        }
+    }
+}
