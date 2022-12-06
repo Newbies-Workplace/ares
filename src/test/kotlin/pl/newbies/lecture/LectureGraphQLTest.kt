@@ -181,7 +181,7 @@ class LectureGraphQLTest : IntegrationTest() {
 
             val data = response.data?.lecture!!
             assertAll(
-                { assertEquals(3, data.rates.size) },
+                { assertEquals(2, data.rates.size) },
                 { assertEquals(2, data.rateSummary.votesCount) },
                 { assertEquals(3.5, data.rateSummary.topicAvg) },
                 { assertEquals(3.5, data.rateSummary.presentationAvg) },

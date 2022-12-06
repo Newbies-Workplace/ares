@@ -1,3 +1,15 @@
+alter table Lectures
+    drop constraint fk_Lectures_author__id,
+    drop constraint fk_Lectures_event__id;
+
+alter table Lectures
+    add constraint fk_Lectures_author__id
+        foreign key (author) references Users (id)
+            on delete cascade,
+    add constraint fk_Lectures_event__id
+        foreign key (event) references Events (id)
+            on delete cascade;
+
 create table LectureRates
 (
     id varchar(36) not null primary key,

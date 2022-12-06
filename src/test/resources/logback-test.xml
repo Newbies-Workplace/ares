@@ -5,18 +5,14 @@
         </encoder>
     </appender>
 
-    <root level="trace">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
 
-<!--    <root level="DEBUG">-->
-<!--        <appender-ref ref="STDOUT"/>-->
-<!--    </root>-->
-
-<!--    <logger name="org.testcontainers" level="INFO"/>-->
-<!--    <logger name="com.github.dockerjava" level="WARN"/>-->
-<!--    <logger name="com.zaxxer.hikari" level="WARN"/>-->
-<!--    <logger name="pl.newbies" level="DEBUG"/>-->
+    <logger name="org.testcontainers" level="INFO"/>
+    <logger name="com.github.dockerjava" level="WARN"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="pl.newbies" level="DEBUG"/>
     <logger name="org.mariadb" level="INFO"/>
-<!--    <logger name="org.flywaydb" level="WARN"/>-->
+    <logger name="org.flywaydb" level="WARN"/>
 </configuration>

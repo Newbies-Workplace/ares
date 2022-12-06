@@ -1,6 +1,8 @@
 import com.expediagroup.graphql.plugin.gradle.config.GraphQLSerializer
 import com.expediagroup.graphql.plugin.gradle.graphql
 import com.expediagroup.graphql.plugin.gradle.tasks.GraphQLGenerateTestClientTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion = "2.1.3"
@@ -13,7 +15,7 @@ val flywayVersion = "9.8.3"
 val h2Version = "2.1.210"
 val junitVersion = "5.9.1"
 val testContainersVersion = "1.17.6"
-val kotlinGraphQLVersion = "6.3.1"
+val kotlinGraphQLVersion = "6.3.0"
 val kotlinDateTimeVersion = "0.4.0"
 val mariadbClientVersion = "3.1.0"
 val jacksonJsr310Version = "2.14.1"
@@ -109,12 +111,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    //todo remove
+
     testLogging {
-        events = mutableSetOf(
-            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED, org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED, org.gradle.api.tasks.testing.logging.TestLogEvent
-            .SKIPPED)
-        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        events = mutableSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
+        exceptionFormat = TestExceptionFormat.FULL
 
         showExceptions = true
         showCauses = true
