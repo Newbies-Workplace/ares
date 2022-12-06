@@ -203,7 +203,10 @@ class TaskGraphQLTest : IntegrationTest() {
             }
 
             // then
-            assertEquals(emptyList<pl.newbies.generated.followedtaglistquery.TagResponse>(), response.data?.followedTags)
+            assertEquals(
+                emptyList<pl.newbies.generated.followedtaglistquery.TagResponse>(),
+                response.data?.followedTags
+            )
         }
     }
 }

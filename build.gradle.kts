@@ -3,29 +3,29 @@ import com.expediagroup.graphql.plugin.gradle.graphql
 import com.expediagroup.graphql.plugin.gradle.tasks.GraphQLGenerateTestClientTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.1.0"
-val koinVersion = "3.2.0"
-val logbackVersion = "1.4.0"
+val ktorVersion = "2.1.3"
+val koinVersion = "3.2.2"
+val logbackVersion = "1.4.5"
 val valiktorVersion = "0.12.0"
-val exposedVersion = "0.39.2"
+val exposedVersion = "0.40.1"
 val hikariVersion = "5.0.1"
 val flywayVersion = "9.8.3"
 val h2Version = "2.1.210"
-val junitVersion = "5.9.0"
-val testContainersVersion = "1.17.3"
-val kotlinGraphQLVersion = "6.2.2"
+val junitVersion = "5.9.1"
+val testContainersVersion = "1.17.6"
+val kotlinGraphQLVersion = "6.3.0"
 val kotlinDateTimeVersion = "0.4.0"
-val mariadbClientVersion = "3.0.7"
+val mariadbClientVersion = "3.1.0"
 val jacksonJsr310Version = "2.14.1"
 val webpImageIoVersion = "0.1.6"
 val jNanoIdVersion = "2.0.0"
 val apacheCommonsLang3Version = "3.12.0"
-val micrometerPrometheusVersion = "1.9.3"
+val micrometerPrometheusVersion = "1.10.2"
 
 plugins {
     application
-    kotlin("jvm") version "1.7.10"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.10"
+    kotlin("jvm") version "1.7.22"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.22"
     id("com.expediagroup.graphql") version "6.3.0"
 }
 
@@ -54,9 +54,9 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktorVersion")
     implementation("io.ktor:ktor-client-apache-jvm:$ktorVersion")
-    implementation("io.ktor:ktor-client-serialization-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-serialization-jvm:$ktorVersion")
 
     // database
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:$mariadbClientVersion")

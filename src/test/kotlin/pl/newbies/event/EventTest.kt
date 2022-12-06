@@ -773,11 +773,13 @@ class EventTest : IntegrationTest() {
         }
 
         @ParameterizedTest
-        @CsvSource(value = [
-            "images/newbies-logo.jpg,image/jpg,newbies-logo.jpg",
-            "images/newbies-logo.png,image/png,newbies-logo.png",
-            "images/newbies-logo.webp,image/webp,newbies-logo.webp",
-        ])
+        @CsvSource(
+            value = [
+                "images/newbies-logo.jpg,image/jpg,newbies-logo.jpg",
+                "images/newbies-logo.png,image/png,newbies-logo.png",
+                "images/newbies-logo.webp,image/webp,newbies-logo.webp",
+            ]
+        )
         fun `should create image on valid request`(
             imagePath: String,
             contentType: String,

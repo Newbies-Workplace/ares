@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import kotlinx.datetime.*
 import kotlinx.datetime.TimeZone
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.auth.application.model.AuthResponse
@@ -71,7 +72,7 @@ class AuthService(
 
     fun deleteTokenFamily(token: RefreshToken) {
         transaction {
-            RefreshTokens.deleteWhere { RefreshTokens.family eq token.family }
+            RefreshTokens.deleteWhere { family eq token.family }
         }
     }
 
