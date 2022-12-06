@@ -29,7 +29,7 @@ jobs:
           java-version: 11
 
       - name: Gradle test
-        run: bash ./gradlew test --stacktrace
+        run: bash ./gradlew test
 
       - name: Tests results
         if: failure()
