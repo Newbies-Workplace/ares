@@ -5,14 +5,14 @@
         </encoder>
     </appender>
 
-    <root level="VERBOSE">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="org.testcontainers" level="VERBOSE"/>
-    <logger name="com.github.dockerjava" level="VERBOSE"/>
-    <logger name="com.zaxxer.hikari" level="VERBOSE"/>
-    <logger name="pl.newbies" level="VERBOSE"/>
-    <logger name="org.mariadb" level="VERBOSE"/>
-    <logger name="org.flywaydb" level="VERBOSE"/>
+    <logger name="org.testcontainers" level="INFO"/>
+    <logger name="com.github.dockerjava" level="WARN"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="pl.newbies" level="DEBUG"/>
+    <logger name="org.mariadb" level="INFO"/>
+    <logger name="org.flywaydb" level="WARN"/>
 </configuration>
