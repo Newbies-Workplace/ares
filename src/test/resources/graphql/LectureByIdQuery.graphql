@@ -1,0 +1,19 @@
+query LectureByIdQuery($id: String!) {
+    lecture(id: $id) {
+        id
+        title
+        description
+        rates {
+            id
+            topicRate
+            presentationRate
+            opinion
+            createDate
+        }
+        rateSummary {
+            votesCount
+            topicAvg
+            presentationAvg
+        }
+    }
+}

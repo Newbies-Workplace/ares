@@ -11,11 +11,11 @@ import pl.newbies.event.domain.model.Event
 import pl.newbies.event.infrastructure.repository.EventDAO
 import pl.newbies.event.infrastructure.repository.toEvent
 import pl.newbies.lecture.application.model.LectureFilter
+import pl.newbies.lecture.application.model.LectureRateRequest
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.lecture.domain.model.Lecture
-import pl.newbies.lecture.infrastructure.repository.LectureDAO
-import pl.newbies.lecture.infrastructure.repository.Lectures
-import pl.newbies.lecture.infrastructure.repository.toLecture
+import pl.newbies.lecture.domain.model.LectureRate
+import pl.newbies.lecture.infrastructure.repository.*
 import pl.newbies.user.infrastructure.repository.UserDAO
 import pl.newbies.user.infrastructure.repository.Users
 
@@ -77,6 +77,20 @@ class LectureService {
 
     fun deleteLecture(lecture: Lecture) = transaction {
         LectureDAO[lecture.id].delete()
+    }
+
+    fun rateLecture(lecture: Lecture, rateRequest: LectureRateRequest): LectureRate = transaction {
+        val rate = LectureRateDAO.new(nanoId()) {
+            this.lecture = LectureDAO[lecture.id]
+
+            this.topicRate = rateRequest.topicRate
+            this.presentationRate = rateRequest.presentationRate
+            this.opinion = rateRequest.opinion
+
+            this.createDate = Clock.System.now()
+        }
+
+        rate.toLectureRate()
     }
 
     private fun LectureDAO.appendRequestFields(request: LectureRequest) {

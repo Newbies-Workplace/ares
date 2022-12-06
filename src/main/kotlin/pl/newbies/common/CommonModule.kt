@@ -14,6 +14,7 @@ import kotlinx.datetime.Instant
 import org.koin.dsl.module
 import pl.newbies.common.graphql.*
 import pl.newbies.event.application.EventSchema
+import pl.newbies.lecture.application.LectureSchema
 
 val commonModule = module {
     single {
@@ -34,6 +35,8 @@ val commonModule = module {
         GraphQLRequestHandler(
             get<SchemaBuilder>().getGraphQLObject(),
             KotlinDataLoaderRegistryFactory(
+                get<LectureSchema>().LectureRatesDataLoader(),
+                get<LectureSchema>().LectureRateSummaryDataLoader(),
                 get<EventSchema>().AuthorDataLoader(),
                 get<EventSchema>().IsFollowedDataLoader(),
             ),

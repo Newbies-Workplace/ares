@@ -1,0 +1,10 @@
+mutation RateLectureMutation($id: String!, $request: LectureRateRequestInput!) {
+    rateLecture(id: $id, request: $request) {
+        id
+        lectureId
+        topicRate
+        presentationRate
+        opinion
+        createDate
+    }
+}
