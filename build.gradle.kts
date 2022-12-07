@@ -1,6 +1,8 @@
 import com.expediagroup.graphql.plugin.gradle.config.GraphQLSerializer
 import com.expediagroup.graphql.plugin.gradle.graphql
 import com.expediagroup.graphql.plugin.gradle.tasks.GraphQLGenerateTestClientTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktorVersion = "2.1.3"
@@ -109,6 +111,16 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+
+    testLogging {
+        events = mutableSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
+        exceptionFormat = TestExceptionFormat.FULL
+
+        showExceptions = true
+        showCauses = true
+        showStackTraces = false
+        showStandardStreams = false
+    }
 }
 
 // generates classes needed for graphql tests
