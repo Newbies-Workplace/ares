@@ -20,4 +20,5 @@ create table LectureRates
     createDate datetime(6) not null,
     constraint fk_LectureRates_lecture__id
         foreign key (lecture) references Lectures (id)
+            on delete cascade
 );
