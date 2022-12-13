@@ -10,6 +10,7 @@ import pl.newbies.user.domain.model.ContactDTO
 import pl.newbies.user.domain.model.User
 
 object Users : StringNanoIdTable() {
+    val avatar = varchar("avatar", length = 255, collate = "utf8_general_ci").nullable()
     val nickname = varchar("nickname", length = 50, collate = "utf8mb4_unicode_ci")
     val description = varchar("description", length = 255, collate = "utf8mb4_unicode_ci").nullable()
 
@@ -30,6 +31,7 @@ object Users : StringNanoIdTable() {
 class UserDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     companion object : StringNanoIdEntityClass<UserDAO>(Users)
 
+    var avatar by Users.avatar
     var nickname by Users.nickname
     var description by Users.description
 
@@ -47,6 +49,7 @@ class UserDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
 
 fun UserDAO.toUser() = User(
     id = id.value,
+    avatar = avatar,
     nickname = nickname,
     accounts = AuthAccountsDTO(
         githubId = githubId,

@@ -17,3 +17,8 @@ class EventImageFileResource(
     eventId: String,
     nameWithExtension: String,
 ) : FileResource("events/$eventId/", nameWithExtension)
+
+class UserAvatarImageFileResource(
+    userId: String,
+    nameWithExtension: String,
+) : FileResource("users/$userId/", nameWithExtension)

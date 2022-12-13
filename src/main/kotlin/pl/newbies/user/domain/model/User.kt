@@ -5,6 +5,7 @@ import kotlinx.datetime.Instant
 
 data class User(
     val id: String,
+    var avatar: String?,
     var nickname: String,
     var description: String? = null,
     val contact: ContactDTO = ContactDTO(),
