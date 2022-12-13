@@ -5,7 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion = "2.1.3"
+val ktorVersion = "2.2.1"
 val koinVersion = "3.2.2"
 val logbackVersion = "1.4.5"
 val valiktorVersion = "0.12.0"

@@ -2,6 +2,7 @@ package pl.newbies.user
 
 import io.ktor.client.call.body
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -10,14 +11,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import pl.newbies.common.nanoId
+import pl.newbies.storage.application.model.FileUrlResponse
 import pl.newbies.user.application.model.ContactRequest
 import pl.newbies.user.application.model.UserRequest
 import pl.newbies.user.application.model.UserResponse
-import pl.newbies.util.IntegrationTest
-import pl.newbies.util.TestData
-import pl.newbies.util.httpClient
-import pl.newbies.util.loginAs
+import pl.newbies.util.*
 
 class UserTest : IntegrationTest() {
 
@@ -196,6 +197,99 @@ class UserTest : IntegrationTest() {
         fun `should return 401 when called without authentication`() = withAres {
             // when
             val response = httpClient.put("api/v1/users/@me")
+
+            // then
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
+        }
+    }
+
+    @Nested
+    inner class PutAvatar {
+        @Test
+        fun `should return 401 when called without authentication`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
+            // when
+            val response = httpClient.put("api/v1/users/@me/avatar")
+
+            // then
+            assertEquals(HttpStatusCode.Unauthorized, response.status)
+        }
+
+        @Test
+        fun `should return 400 when called with unsupported file`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
+            // when
+            val response = addUserAvatar(
+                authResponse = authResponse,
+                imagePath = "images/newbies-logo.gif",
+                contentType = "image/gif",
+                fileName = "filename=newbies-logo.gif",
+            )
+
+            // then
+            assertEquals(HttpStatusCode.BadRequest, response.status)
+        }
+
+        @Test
+        fun `should return 400 when called without file`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
+            // when
+            val response = httpClient.put("api/v1/users/@me/avatar") {
+                bearerAuth(authResponse.accessToken)
+                setBody(MultiPartFormDataContent(parts = listOf()))
+            }
+
+            // then
+            assertEquals(HttpStatusCode.BadRequest, response.status)
+        }
+
+        @ParameterizedTest
+        @CsvSource(
+            value = [
+                "images/newbies-logo.jpg,image/jpg,newbies-logo.jpg",
+                "images/newbies-logo.png,image/png,newbies-logo.png",
+                "images/newbies-logo.webp,image/webp,newbies-logo.webp",
+            ]
+        )
+        fun `should create image on valid request`(
+            imagePath: String,
+            contentType: String,
+            fileName: String,
+        ) = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
+            // when
+            val response = addUserAvatar(
+                authResponse = authResponse,
+                imagePath = imagePath,
+                contentType = contentType,
+                fileName = fileName,
+            )
+
+            // then
+            assertEquals(HttpStatusCode.OK, response.status)
+            val responseBody = response.body<FileUrlResponse>()
+            assertEquals("http://localhost:80/api/v1/files/users/${authResponse.getUserId()}/avatar.webp", responseBody.url)
+            assertFileExists("users/${authResponse.getUserId()}/avatar.webp")
+        }
+    }
+
+    @Nested
+    inner class DeleteAvatar {
+        @Test
+        fun `should return 401 when called without authentication`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+
+            // when
+            val response = httpClient.delete("api/v1/users/@me/avatar")
 
             // then
             assertEquals(HttpStatusCode.Unauthorized, response.status)

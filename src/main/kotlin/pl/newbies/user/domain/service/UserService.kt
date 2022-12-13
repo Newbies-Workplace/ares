@@ -4,6 +4,8 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonElement
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.logger
+import pl.newbies.storage.domain.model.FileResource
+import pl.newbies.storage.domain.model.UserAvatarImageFileResource
 import pl.newbies.user.application.model.UserRequest
 import pl.newbies.user.domain.UserNotFoundException
 import pl.newbies.user.domain.model.User
@@ -78,5 +80,25 @@ class UserService(
             }
             ?.toUser()
             ?: throw UserNotFoundException(userId)
+    }
+
+    fun getAvatarFileResource(user: User): UserAvatarImageFileResource? {
+        val nameWithExtension = user.avatar?.substringAfterLast('/')
+            ?: return null
+
+        return UserAvatarImageFileResource(
+            userId = user.id,
+            nameWithExtension = nameWithExtension,
+        )
+    }
+
+    fun updateUserAvatar(user: User, fileResource: FileResource?): User = transaction {
+        UserDAO[user.id]
+            .apply {
+                this.avatar = fileResource?.pathWithName
+
+                this.updateDate = Clock.System.now()
+            }
+            .toUser()
     }
 }

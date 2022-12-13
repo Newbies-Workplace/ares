@@ -170,6 +170,35 @@ suspend fun ApplicationTestBuilder.addEventImage(
 
     return response
 }
+suspend fun ApplicationTestBuilder.addUserAvatar(
+    authResponse: AuthResponse,
+    imagePath: String,
+    contentType: String,
+    fileName: String,
+): HttpResponse {
+    val response = httpClient.put("api/v1/users/@me/avatar") {
+        bearerAuth(authResponse.accessToken)
+        setBody(
+            MultiPartFormDataContent(
+                parts = formData {
+                    append(
+                        key = "image",
+                        value = getResourceFile(imagePath).readBytes(),
+                        headers = Headers.build {
+                            append(HttpHeaders.ContentType, contentType)
+                            append(HttpHeaders.ContentDisposition, "filename=$fileName")
+                        },
+                    )
+                },
+            )
+        )
+        onUpload { bytesSentTotal, contentLength ->
+            println("Sent $bytesSentTotal bytes from $contentLength")
+        }
+    }
+
+    return response
+}
 
 fun removeDirectory(path: String) {
     val storagePath = Path.of("ares-test-storage").resolve(path)
