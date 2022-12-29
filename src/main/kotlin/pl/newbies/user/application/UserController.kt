@@ -17,6 +17,7 @@ import io.ktor.server.util.getOrFail
 import kotlinx.serialization.json.JsonElement
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.extension
+import pl.newbies.common.nanoId
 import pl.newbies.plugins.AresPrincipal
 import pl.newbies.plugins.inject
 import pl.newbies.storage.application.FileUrlConverter
@@ -89,7 +90,7 @@ fun Application.userRoutes() {
 
                         val fileResource = userService.getAvatarFileResource(user)
                             ?.also { res -> storageService.removeResource(res) }
-                            ?: UserAvatarImageFileResource(user.id, "avatar.webp")
+                            ?: UserAvatarImageFileResource(user.id, "${nanoId()}.webp")
 
                         val tempFileResource = storageService.saveTempFile(part)
 

@@ -276,8 +276,9 @@ class UserTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val responseBody = response.body<FileUrlResponse>()
-            assertEquals("http://localhost:80/api/v1/files/users/${authResponse.getUserId()}/avatar.webp", responseBody.url)
-            assertFileExists("users/${authResponse.getUserId()}/avatar.webp")
+
+            val filePath = responseBody.url.split("files/")[1]
+            assertFileExists(filePath)
         }
     }
 

@@ -801,8 +801,8 @@ class EventTest : IntegrationTest() {
             // then
             assertEquals(HttpStatusCode.OK, response.status)
             val responseBody = response.body<FileUrlResponse>()
-            assertEquals("http://localhost:80/api/v1/files/events/${event.id}/image.webp", responseBody.url)
-            assertFileExists("events/${event.id}/image.webp")
+            val filePath = responseBody.url.split("files/")[1]
+            assertFileExists(filePath)
         }
     }
 
@@ -888,7 +888,8 @@ class EventTest : IntegrationTest() {
             )
             val eventWithImage = getEvent(event.id)
             assertEquals(HttpStatusCode.OK, fileResponse.status)
-            assertFileExists("events/${event.id}/image.webp")
+            val filePath = eventWithImage.theme.image!!.split("files/")[1]
+            assertFileExists(filePath)
 
             // when
             val response = httpClient.delete("api/v1/events/${event.id}/theme/image") {
@@ -897,7 +898,7 @@ class EventTest : IntegrationTest() {
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
-            assertFileNotExists("events/${event.id}/image.webp")
+            assertFileNotExists(filePath)
             val eventWithoutImage = getEvent(event.id)
             assertNull(eventWithoutImage.theme.image)
             assertNotEquals(eventWithImage.updateDate, eventWithoutImage.updateDate)
