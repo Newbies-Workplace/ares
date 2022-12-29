@@ -15,10 +15,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.*
 import io.ktor.server.util.getOrFail
 import org.jetbrains.exposed.sql.transactions.transaction
-import pl.newbies.common.ForbiddenException
-import pl.newbies.common.extension
-import pl.newbies.common.pagination
-import pl.newbies.common.query
+import pl.newbies.common.*
 import pl.newbies.event.application.model.EventFilter
 import pl.newbies.event.application.model.EventRequest
 import pl.newbies.event.application.model.EventThemeRequest
@@ -147,7 +144,7 @@ fun Application.eventRoutes() {
 
                     val fileResource = eventService.getThemeImageFileResource(event)
                         ?.also { res -> storageService.removeResource(res) }
-                        ?: EventImageFileResource(event.id, "image.webp")
+                        ?: EventImageFileResource(event.id, "${nanoId()}.webp")
 
                     val tempFileResource = storageService.saveTempFile(part)
 
