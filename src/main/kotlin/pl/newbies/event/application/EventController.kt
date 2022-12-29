@@ -142,9 +142,10 @@ fun Application.eventRoutes() {
                     storageService.assertFileSize(contentLength)
                     storageService.assertSupportedImageType(part.extension)
 
-                    val fileResource = eventService.getThemeImageFileResource(event)
+                    eventService.getThemeImageFileResource(event)
                         ?.also { res -> storageService.removeResource(res) }
-                        ?: EventImageFileResource(event.id, "${nanoId()}.webp")
+
+                    val fileResource = EventImageFileResource(event.id, "${nanoId()}.webp")
 
                     val tempFileResource = storageService.saveTempFile(part)
 

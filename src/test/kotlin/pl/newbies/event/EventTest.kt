@@ -804,6 +804,36 @@ class EventTest : IntegrationTest() {
             val filePath = responseBody.url.split("files/")[1]
             assertFileExists(filePath)
         }
+
+        @Test
+        fun `should update image url with new one`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse = authResponse)
+            val firstResponse = addEventImage(
+                authResponse = authResponse,
+                eventId = event.id,
+                imagePath = "images/newbies-logo.png",
+                contentType = "image/png",
+                fileName = "filename=newbies-logo.png",
+            )
+            assertEquals(HttpStatusCode.OK, firstResponse.status)
+            val firstUrl = firstResponse.body<FileUrlResponse>()
+
+            // when
+            val secondResponse = addEventImage(
+                authResponse = authResponse,
+                eventId = event.id,
+                imagePath = "images/newbies-logo.png",
+                contentType = "image/png",
+                fileName = "filename=newbies-logo.png",
+            )
+            assertEquals(HttpStatusCode.OK, secondResponse.status)
+            val secondUrl = secondResponse.body<FileUrlResponse>()
+
+            // then
+            assertNotEquals(firstUrl.url, secondUrl.url)
+        }
     }
 
     @Nested

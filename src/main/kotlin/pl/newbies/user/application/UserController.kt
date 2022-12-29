@@ -88,9 +88,10 @@ fun Application.userRoutes() {
                         storageService.assertFileSize(contentLength)
                         storageService.assertSupportedImageType(part.extension)
 
-                        val fileResource = userService.getAvatarFileResource(user)
+                        userService.getAvatarFileResource(user)
                             ?.also { res -> storageService.removeResource(res) }
-                            ?: UserAvatarImageFileResource(user.id, "${nanoId()}.webp")
+
+                        val fileResource = UserAvatarImageFileResource(user.id, "${nanoId()}.webp")
 
                         val tempFileResource = storageService.saveTempFile(part)
 
