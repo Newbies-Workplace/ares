@@ -8,6 +8,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -279,6 +280,33 @@ class UserTest : IntegrationTest() {
 
             val filePath = responseBody.url.split("files/")[1]
             assertFileExists(filePath)
+        }
+
+        @Test
+        fun `should update avatar url with new one`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val firstResponse = addUserAvatar(
+                authResponse = authResponse,
+                imagePath = "images/newbies-logo.png",
+                contentType = "image/png",
+                fileName = "filename=newbies-logo.png",
+            )
+            assertEquals(HttpStatusCode.OK, firstResponse.status)
+            val firstUrl = firstResponse.body<FileUrlResponse>()
+
+            // when
+            val secondResponse = addUserAvatar(
+                authResponse = authResponse,
+                imagePath = "images/newbies-logo.png",
+                contentType = "image/png",
+                fileName = "filename=newbies-logo.png",
+            )
+            assertEquals(HttpStatusCode.OK, secondResponse.status)
+            val secondUrl = secondResponse.body<FileUrlResponse>()
+
+            // then
+            assertNotEquals(firstUrl.url, secondUrl.url)
         }
     }
 
