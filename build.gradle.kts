@@ -28,7 +28,7 @@ plugins {
     application
     kotlin("jvm") version "1.7.22"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.7.22"
-    id("com.expediagroup.graphql") version "6.3.0"
+    id("com.expediagroup.graphql") version "6.3.5"
 }
 
 group = "pl.newbies"
