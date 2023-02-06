@@ -3,7 +3,6 @@ package pl.newbies.auth.application
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -13,7 +12,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.auth.application.model.GoogleUser
 import pl.newbies.auth.domain.UnauthorizedException
 import pl.newbies.auth.domain.service.AuthService
-import pl.newbies.common.logger
 import pl.newbies.plugins.inject
 import pl.newbies.user.domain.service.UserService
 import pl.newbies.user.infrastructure.repository.UserDAO
