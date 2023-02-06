@@ -10,6 +10,7 @@ import io.ktor.server.auth.jwt.jwt
 import pl.newbies.auth.application.authenticationRoutes
 import pl.newbies.auth.application.devGithubAuthentication
 import pl.newbies.auth.application.githubAuthentication
+import pl.newbies.auth.application.googleAuthentication
 
 fun Application.configureSecurity(oauthClient: HttpClient) {
     val config = environment.config
@@ -33,6 +34,7 @@ fun Application.configureSecurity(oauthClient: HttpClient) {
 
     githubAuthentication(oauthClient)
     devGithubAuthentication(oauthClient)
+    googleAuthentication(oauthClient)
     authenticationRoutes()
 }
 
