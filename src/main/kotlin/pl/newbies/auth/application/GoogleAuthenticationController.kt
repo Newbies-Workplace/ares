@@ -27,7 +27,7 @@ fun Application.googleAuthentication(oauthClient: HttpClient) {
 
     authentication {
         oauth("google") {
-            urlProvider = { "http://localhost:8081/auth/callback/google" }
+            urlProvider = { "http://jeteo.newbies.pl/auth/callback/google" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "google",
