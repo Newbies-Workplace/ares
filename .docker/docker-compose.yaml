@@ -12,7 +12,7 @@ services:
       MYSQL_ROOT_PASSWORD: ares
       MYSQL_DATABASE: ares
     ports:
-      - "3307:3306"
+      - "3306:3306"
   ares-service:
     image: ghcr.io/newbies-workplace/ares:latest
     restart: unless-stopped
@@ -20,7 +20,7 @@ services:
     volumes:
       - ares-storage:/ares-storage
     environment:
-      - ARES_DB_URL=jdbc:mariadb://ares-db:3307/ares?characterEncoding=utf8&useUnicode=true
+      - ARES_DB_URL=jdbc:mariadb://ares-db:3306/ares?characterEncoding=utf8&useUnicode=true
       - ARES_DB_USERNAME=root
       - ARES_DB_PASSWORD=ares
       - OAUTH_GITHUB_CLIENT_ID
