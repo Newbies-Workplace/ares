@@ -22,8 +22,9 @@ class UserService(
         nickname: String,
         githubId: String? = null,
         devgithubId: String? = null,
+        googleId: String? = null,
     ): User = transaction {
-        logger.info("Creating user (githubId = $githubId, devgithubId = $devgithubId)")
+        logger.info("Creating user (githubId = $githubId, devgithubId = $devgithubId, googleId = $googleId)")
 
         val now = Clock.System.now()
 
@@ -32,6 +33,7 @@ class UserService(
 
             this.githubId = githubId
             this.devGithubId = devgithubId
+            this.googleId = googleId
 
             this.createDate = now
             this.updateDate = now

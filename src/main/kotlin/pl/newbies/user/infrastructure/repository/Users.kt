@@ -17,6 +17,7 @@ object Users : StringNanoIdTable() {
     //accounts
     val githubId = varchar("githubId", length = 30).nullable()
     val devGithubId = varchar("devGithubId", length = 30).nullable()
+    val googleId = varchar("googleId", length = 50).nullable()
 
     //contact
     val github = varchar("contactGithub", length = 50, collate = "utf8_general_ci").nullable()
@@ -37,6 +38,7 @@ class UserDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
 
     var githubId by Users.githubId
     var devGithubId by Users.devGithubId
+    var googleId by Users.googleId
 
     var github by Users.github
     var linkedin by Users.linkedin
@@ -54,6 +56,7 @@ fun UserDAO.toUser() = User(
     accounts = AuthAccountsDTO(
         githubId = githubId,
         devGithubId = devGithubId,
+        googleId = googleId,
     ),
     contact = ContactDTO(
         github = github,
