@@ -23,15 +23,13 @@ object Events : StringNanoIdTable() {
     val vanityUrl = varchar("vanityUrl", length = 50, collate = "utf8_general_ci")
 
     val startDate = timestamp("startDate")
-    val finishDate = timestamp("finishDate").nullable()
+    val finishDate = timestamp("finishDate")
 
-    val city = varchar("city", length = 50, collate = "utf8_general_ci").nullable()
     val place = varchar("place", length = 100, collate = "utf8_general_ci").nullable()
     val latitude = double("latitude").nullable()
     val longitude = double("longitude").nullable()
 
     val primaryColor = varchar("primaryColor", length = 7).nullable()
-    val secondaryColor = varchar("secondaryColor", length = 7).nullable()
     val image = varchar("image", length = 100).nullable()
 
     val visibility = enumerationByName("visibility", 20, Event.Visibility::class)
@@ -62,7 +60,6 @@ class EventDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     var startDate by Events.startDate
     var finishDate by Events.finishDate
 
-    var city by Events.city
     var place by Events.place
     var latitude by Events.latitude
     var longitude by Events.longitude
@@ -70,7 +67,6 @@ class EventDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     var tags by TagDAO via EventTags
 
     var primaryColor by Events.primaryColor
-    var secondaryColor by Events.secondaryColor
     var image by Events.image
 
     var visibility by Events.visibility
@@ -87,9 +83,8 @@ fun EventDAO.toEvent() = Event(
         startDate = startDate,
         finishDate = finishDate,
     ),
-    address = if (city != null && place != null) {
+    address = if (place != null) {
         AddressDTO(
-            city = city!!,
             place = place!!,
             coordinates = if (latitude != null && longitude != null) {
                 CoordinatesDTO(
@@ -105,7 +100,6 @@ fun EventDAO.toEvent() = Event(
     vanityUrl = vanityUrl,
     theme = ThemeDTO(
         primaryColor = primaryColor,
-        secondaryColor = secondaryColor,
         image = image,
     ),
     visibility = visibility,

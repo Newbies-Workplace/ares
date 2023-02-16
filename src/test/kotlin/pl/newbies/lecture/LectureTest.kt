@@ -140,33 +140,29 @@ class LectureTest : IntegrationTest() {
         @CsvSource(
             value = [
                 "400,10,20,9,20",
-                "400,10,,9,",
                 "400,10,11,10,12",
-                "201,10,,10,12",
                 "201,10,12,10,12",
-                "201,10,12,10,",
-                "201,10,,10,",
             ]
         )
         fun `should return 400 when event time frame out of bounds`(
             status: Int,
             eventStart: Long,
-            eventFinish: Long? = null,
+            eventFinish: Long,
             lectureStart: Long,
-            lectureFinish: Long? = null,
+            lectureFinish: Long,
         ) = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val eventRequest = TestData.createEventRequest(
                 timeFrameRequest = TimeFrameRequest(
                     startDate = Instant.fromEpochMilliseconds(eventStart),
-                    finishDate = eventFinish?.let { Instant.fromEpochMilliseconds(it) }
+                    finishDate = Instant.fromEpochMilliseconds(eventFinish)
                 )
             )
             val lectureRequest = TestData.createLectureRequest(
                 timeFrameRequest = TimeFrameRequest(
                     startDate = Instant.fromEpochMilliseconds(lectureStart),
-                    finishDate = lectureFinish?.let { Instant.fromEpochMilliseconds(it) }
+                    finishDate = Instant.fromEpochMilliseconds(lectureFinish)
                 )
             )
             val event = createEvent(authResponse, eventRequest)

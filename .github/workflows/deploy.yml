@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Gradle cache
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3.2.5
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
@@ -76,7 +76,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
@@ -91,7 +91,7 @@ jobs:
 
     steps:
       - name: Deploy package to production
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}

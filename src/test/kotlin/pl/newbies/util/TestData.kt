@@ -50,7 +50,6 @@ object TestData {
             finishDate = Instant.fromEpochMilliseconds(4_000L),
         ),
         address: AddressRequest? = AddressRequest(
-            city = "Warszawa",
             place = "Kolońska 45/2",
             coordinates = null,
         ),
@@ -73,7 +72,6 @@ object TestData {
             finishDate = Instant.fromEpochMilliseconds(4_000L).toString(),
         ),
         address: AddressRequestInput? = AddressRequestInput(
-            city = "Warszawa",
             place = "Kolońska 45/2",
             coordinates = null,
         ),
