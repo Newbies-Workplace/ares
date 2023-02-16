@@ -23,7 +23,7 @@ class GraphQLTest : IntegrationTest() {
             request = TestData.createEventRequest(
                 timeFrameRequest = TimeFrameRequest(
                     startDate = Instant.parse(startDateString),
-                    finishDate = Instant.parse(finishDateString)
+                    finishDate = Instant.parse(finishDateString),
                 )
             ),
             visibility = Event.Visibility.PUBLIC,

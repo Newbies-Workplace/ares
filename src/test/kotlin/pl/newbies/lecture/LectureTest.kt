@@ -156,13 +156,13 @@ class LectureTest : IntegrationTest() {
             val eventRequest = TestData.createEventRequest(
                 timeFrameRequest = TimeFrameRequest(
                     startDate = Instant.fromEpochMilliseconds(eventStart),
-                    finishDate = Instant.fromEpochMilliseconds(eventFinish)
+                    finishDate = Instant.fromEpochMilliseconds(eventFinish),
                 )
             )
             val lectureRequest = TestData.createLectureRequest(
                 timeFrameRequest = TimeFrameRequest(
                     startDate = Instant.fromEpochMilliseconds(lectureStart),
-                    finishDate = Instant.fromEpochMilliseconds(lectureFinish)
+                    finishDate = Instant.fromEpochMilliseconds(lectureFinish),
                 )
             )
             val event = createEvent(authResponse, eventRequest)
