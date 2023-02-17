@@ -932,7 +932,7 @@ class EventGraphQLTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse)
-            val request = EventThemeRequestInput(primaryColor = "#58b5bf", secondaryColor = null)
+            val request = EventThemeRequestInput(primaryColor = "#58b5bf")
 
             // when
             val response = graphQLClient.execute(
@@ -953,7 +953,7 @@ class EventGraphQLTest : IntegrationTest() {
         fun `should return null when called with not existing id`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val request = EventThemeRequestInput(primaryColor = "#58b5bf", secondaryColor = null)
+            val request = EventThemeRequestInput(primaryColor = "#58b5bf")
             val randomId = nanoId()
 
             // when
@@ -979,7 +979,7 @@ class EventGraphQLTest : IntegrationTest() {
             val authResponse = loginAs(TestData.testUser1)
             val secondAuthResponse = loginAs(TestData.testUser2)
             val event = createEvent(authResponse)
-            val request = EventThemeRequestInput(primaryColor = "#58b5bf", secondaryColor = null)
+            val request = EventThemeRequestInput(primaryColor = "#58b5bf")
 
             // when
             val response = graphQLClient.execute(
@@ -1003,7 +1003,7 @@ class EventGraphQLTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse)
-            val request = EventThemeRequestInput(primaryColor = "#58b5bf", secondaryColor = "#58b5bf")
+            val request = EventThemeRequestInput(primaryColor = "#58b5bf")
 
             // when
             val response = graphQLClient.execute(
@@ -1021,7 +1021,6 @@ class EventGraphQLTest : IntegrationTest() {
             val updatedEvent = response.data?.replaceEventTheme!!
             assertNotEquals(event.updateDate.toString(), updatedEvent.updateDate)
             assertNotEquals(event.theme.primaryColor, updatedEvent.theme.primaryColor)
-            assertNotEquals(event.theme.secondaryColor, updatedEvent.theme.secondaryColor)
         }
     }
 

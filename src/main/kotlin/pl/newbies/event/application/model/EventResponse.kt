@@ -44,7 +44,6 @@ data class TimeFrameResponse(
 
 @Serializable
 data class AddressResponse(
-    val city: String,
     val place: String,
     val coordinates: CoordinatesResponse?,
 )
@@ -58,6 +57,5 @@ data class CoordinatesResponse(
 @Serializable
 data class ThemeResponse(
     val primaryColor: String?,
-    val secondaryColor: String?,
     val image: String?,
 )

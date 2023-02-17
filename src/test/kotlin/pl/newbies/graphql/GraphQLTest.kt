@@ -17,11 +17,13 @@ class GraphQLTest : IntegrationTest() {
         // given
         val authResponse = loginAs(TestData.testUser1)
         val startDateString = "2023-04-01T12:00:00Z"
+        val finishDateString = "2023-04-01T13:00:00Z"
         val event = createEvent(
             authResponse = authResponse,
             request = TestData.createEventRequest(
                 timeFrameRequest = TimeFrameRequest(
-                    startDate = Instant.parse(startDateString)
+                    startDate = Instant.parse(startDateString),
+                    finishDate = Instant.parse(finishDateString),
                 )
             ),
             visibility = Event.Visibility.PUBLIC,

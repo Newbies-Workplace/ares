@@ -19,11 +19,9 @@ fragment CoreEventResponse on EventResponse {
     }
     address {
         place
-        city
     }
     theme {
         primaryColor
-        secondaryColor
         image
     }
     visibility

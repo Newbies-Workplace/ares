@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TimeFrameRequest(
     val startDate: Instant,
-    val finishDate: Instant? = null,
+    val finishDate: Instant,
 )

@@ -26,7 +26,6 @@ class EventConverter(
             },
             address = event.address?.let { address ->
                 AddressResponse(
-                    city = address.city,
                     place = address.place,
                     coordinates = address.coordinates?.let { coordinates ->
                         CoordinatesResponse(
@@ -42,7 +41,6 @@ class EventConverter(
             theme = event.theme.let {
                 ThemeResponse(
                     primaryColor = it.primaryColor,
-                    secondaryColor = it.secondaryColor,
                     image = it.image?.let { image -> fileUrlConverter.convert(image).url },
                 )
             },

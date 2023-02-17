@@ -76,7 +76,6 @@ class EventService {
         EventDAO[event.id]
             .apply {
                 this.primaryColor = request.primaryColor
-                this.secondaryColor = request.secondaryColor
 
                 this.updateDate = Clock.System.now()
             }
@@ -142,7 +141,6 @@ class EventService {
             this.finishDate = frame.finishDate
         }
         request.address.let { address ->
-            this.city = address?.city?.trim()
             this.place = address?.place?.trim()
             address?.coordinates.let { coordinates ->
                 this.latitude = coordinates?.latitude

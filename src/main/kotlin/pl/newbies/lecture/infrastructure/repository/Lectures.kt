@@ -23,7 +23,7 @@ object Lectures : StringNanoIdTable() {
     val author = reference("author", Users)
 
     val startDate = timestamp("startDate")
-    val finishDate = timestamp("finishDate").nullable()
+    val finishDate = timestamp("finishDate")
 
     val createDate = timestamp("createDate")
     val updateDate = timestamp("updateDate")

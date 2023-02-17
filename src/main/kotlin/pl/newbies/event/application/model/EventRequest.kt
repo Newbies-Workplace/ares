@@ -41,17 +41,12 @@ data class EventRequest(
 
 @Serializable
 data class AddressRequest(
-    val city: String,
     val place: String,
     val coordinates: CoordinatesRequest? = null,
 ) {
 
     init {
         validate(this) {
-            validate(AddressRequest::city)
-                .isNotBlank()
-                .hasSize(max = 50)
-                .maxLines(1)
             validate(AddressRequest::place)
                 .isNotBlank()
                 .hasSize(max = 100)

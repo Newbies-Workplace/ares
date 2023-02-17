@@ -622,7 +622,7 @@ class EventTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse)
-            val request = EventThemeRequest(primaryColor = "#58b5bf", secondaryColor = null)
+            val request = EventThemeRequest(primaryColor = "#58b5bf")
 
             // when
             val response = httpClient.put("api/v1/events/${event.id}/theme") {
@@ -638,7 +638,7 @@ class EventTest : IntegrationTest() {
         fun `should return 404 when called with not existing id`() = withAres {
             // given
             val authResponse = loginAs(TestData.testUser1)
-            val request = EventThemeRequest(primaryColor = "#58b5bf", secondaryColor = null)
+            val request = EventThemeRequest(primaryColor = "#58b5bf")
 
             // when
             val response = httpClient.put("api/v1/events/someRandomId/theme") {
@@ -657,7 +657,7 @@ class EventTest : IntegrationTest() {
             val authResponse = loginAs(TestData.testUser1)
             val secondAuthResponse = loginAs(TestData.testUser2)
             val event = createEvent(authResponse)
-            val request = EventThemeRequest(primaryColor = "#58b5bf", secondaryColor = null)
+            val request = EventThemeRequest(primaryColor = "#58b5bf")
 
             // when
             val response = httpClient.put("api/v1/events/${event.id}/theme") {
@@ -675,7 +675,7 @@ class EventTest : IntegrationTest() {
             // given
             val authResponse = loginAs(TestData.testUser1)
             val event = createEvent(authResponse)
-            val request = EventThemeRequest(primaryColor = "#58b5bf", secondaryColor = "#58b5bf")
+            val request = EventThemeRequest(primaryColor = "#58b5bf")
 
             // when
             val response = httpClient.put("api/v1/events/${event.id}/theme") {
@@ -689,7 +689,6 @@ class EventTest : IntegrationTest() {
             val updatedEvent = response.body<EventResponse>()
             assertNotEquals(event.updateDate, updatedEvent.updateDate)
             assertNotEquals(event.theme.primaryColor, updatedEvent.theme.primaryColor)
-            assertNotEquals(event.theme.secondaryColor, updatedEvent.theme.secondaryColor)
         }
     }
 
