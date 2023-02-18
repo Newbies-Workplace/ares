@@ -5,6 +5,7 @@ import com.expediagroup.graphql.generator.annotations.GraphQLDescription
 import graphql.schema.DataFetchingEnvironment
 import org.dataloader.DataLoader
 import org.dataloader.DataLoaderFactory
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.transactions.transaction
 import pl.newbies.common.principal
 import pl.newbies.event.application.assertEventWriteAccess
@@ -104,7 +105,9 @@ class LectureSchema(
                     val rates = transaction {
                         LectureRateDAO.find {
                             LectureRates.lecture inList lectureIds
-                        }.map { it.toLectureRate() }
+                        }
+                            .orderBy(LectureRates.createDate to SortOrder.DESC)
+                            .map { it.toLectureRate() }
                     }
 
                     val ratesMap = rates.map { lectureRateConverter.convert(it) }
