@@ -1,6 +1,7 @@
 package pl.newbies.event.infrastructure.repository
 
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import pl.newbies.event.domain.model.*
@@ -39,8 +40,8 @@ object Events : StringNanoIdTable() {
 }
 
 object EventTags : Table() {
-    val event = reference("event", Events)
-    val tag = reference("tag", Tags)
+    val event = reference("event", Events, onDelete = ReferenceOption.CASCADE)
+    val tag = reference("tag", Tags, onDelete = ReferenceOption.CASCADE)
 
     override val primaryKey: PrimaryKey =
         PrimaryKey(event, tag, name = "id")
