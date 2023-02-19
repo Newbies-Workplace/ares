@@ -1,0 +1,6 @@
+mutation CreateLectureInviteMutation($lectureId: String!, $request: LectureInviteRequestInput!) {
+    createLectureInvite(lectureId: $lectureId, request: $request) {
+        id
+        name
+    }
+}
