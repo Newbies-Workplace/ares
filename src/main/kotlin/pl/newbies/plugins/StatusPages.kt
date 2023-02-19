@@ -12,6 +12,8 @@ import pl.newbies.common.DuplicateException
 import pl.newbies.common.FileTypeNotSupportedException
 import pl.newbies.common.ForbiddenException
 import pl.newbies.common.NotFoundException
+import pl.newbies.lecture.domain.SpeakerAlreadyInLectureException
+import pl.newbies.lecture.domain.TooManyLectureInvitesException
 
 fun Application.configureStatusPages() {
     install(StatusPages) {
@@ -19,6 +21,12 @@ fun Application.configureStatusPages() {
             call.respond(HttpStatusCode.BadRequest, cause.message.orEmpty())
         }
         exception<DuplicateException> { call, cause ->
+            call.respond(HttpStatusCode.Conflict, cause.message.orEmpty())
+        }
+        exception<TooManyLectureInvitesException> { call, cause ->
+            call.respond(HttpStatusCode.Conflict, cause.message.orEmpty())
+        }
+        exception<SpeakerAlreadyInLectureException> { call, cause ->
             call.respond(HttpStatusCode.Conflict, cause.message.orEmpty())
         }
         exception<ConstraintViolationException> { call, cause ->

@@ -98,8 +98,11 @@ fun Application.lectureRoutes() {
     }
 }
 
+fun AresPrincipal.hasLectureWriteAccess(lecture: Lecture): Boolean =
+    lecture.author.id == userId || lecture.speakers.map { it.id }.contains(userId)
+
 fun AresPrincipal.assertLectureWriteAccess(lecture: Lecture) {
-    if (lecture.author.id != userId && !lecture.speakers.map { it.id }.contains(userId)) {
+    if (!hasLectureWriteAccess(lecture)) {
         throw ForbiddenException(
             userId = userId,
             entityId = lecture.id,

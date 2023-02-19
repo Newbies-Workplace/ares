@@ -8,6 +8,7 @@ import pl.newbies.event.domain.model.TimeFrameDTO
 import pl.newbies.event.infrastructure.repository.EventDAO
 import pl.newbies.event.infrastructure.repository.Events
 import pl.newbies.lecture.domain.model.Lecture
+import pl.newbies.lecture.domain.model.LectureInvite
 import pl.newbies.plugins.StringNanoIdEntity
 import pl.newbies.plugins.StringNanoIdEntityClass
 import pl.newbies.plugins.StringNanoIdTable
@@ -37,6 +38,14 @@ object LectureSpeakers : Table() {
         PrimaryKey(lecture, user, name = "id")
 }
 
+object LectureInvites : StringNanoIdTable() {
+    val lecture = reference("lecture", Lectures, onDelete = ReferenceOption.CASCADE)
+
+    val name = varchar("name", length = 50, collate = "utf8mb4_unicode_ci")
+
+    val createDate = timestamp("createDate")
+}
+
 class LectureDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     companion object : StringNanoIdEntityClass<LectureDAO>(Lectures)
 
@@ -47,12 +56,23 @@ class LectureDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
 
     var author by UserDAO referencedOn Lectures.author
     var speakers by UserDAO via LectureSpeakers
+    var invites by LectureInviteDAO via LectureInvites
 
     var startDate by Lectures.startDate
     var finishDate by Lectures.finishDate
 
     var createDate by Lectures.createDate
     var updateDate by Lectures.updateDate
+}
+
+class LectureInviteDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
+    companion object : StringNanoIdEntityClass<LectureInviteDAO>(LectureInvites)
+
+    var lecture by LectureDAO referencedOn LectureSpeakers.lecture
+
+    var name by LectureInvites.name
+
+    var createDate by LectureInvites.createDate
 }
 
 fun LectureDAO.toLecture() = Lecture(
@@ -68,4 +88,11 @@ fun LectureDAO.toLecture() = Lecture(
     ),
     createDate = createDate,
     updateDate = updateDate,
+)
+
+fun LectureInviteDAO.toInvite() = LectureInvite(
+    id = id.value,
+    lectureId = lecture.id.value,
+    name = name,
+    createDate = createDate,
 )
