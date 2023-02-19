@@ -48,8 +48,8 @@ suspend fun ApplicationTestBuilder.createLectureInvite(
                 request = LectureInviteRequestInput(
                     name = request.name,
                 ),
-            )
-        )
+            ),
+        ),
     ) {
         bearerAuth(authResponse.accessToken)
     }

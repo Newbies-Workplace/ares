@@ -113,8 +113,8 @@ object TestData {
     )
 
     fun createLectureInviteRequest(
-        name: String = "Default lecture invite name"
+        name: String = "Default lecture invite name",
     ) = LectureInviteRequest(
-        name = name
+        name = name,
     )
 }

@@ -1,7 +1,6 @@
 package pl.newbies.lecture
 
 import io.ktor.client.request.*
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -134,8 +133,8 @@ class LectureGraphQLTest : IntegrationTest() {
                 lectureId = lecture.id,
                 authResponse = authResponse,
                 request = TestData.createLectureInviteRequest(
-                    name = "Test"
-                )
+                    name = "Test",
+                ),
             )
 
             // then
@@ -166,8 +165,8 @@ class LectureGraphQLTest : IntegrationTest() {
                         request = LectureInviteRequestInput(
                             name = "Test",
                         ),
-                    )
-                )
+                    ),
+                ),
             ) {
                 bearerAuth(authResponse.accessToken)
             }
