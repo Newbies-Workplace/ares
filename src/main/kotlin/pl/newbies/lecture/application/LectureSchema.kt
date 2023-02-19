@@ -13,7 +13,9 @@ import pl.newbies.event.domain.EventNotFoundException
 import pl.newbies.event.infrastructure.repository.EventDAO
 import pl.newbies.event.infrastructure.repository.toEvent
 import pl.newbies.lecture.application.model.*
+import pl.newbies.lecture.domain.LectureInviteNotFoundException
 import pl.newbies.lecture.domain.LectureNotFoundException
+import pl.newbies.lecture.domain.model.Lecture
 import pl.newbies.lecture.domain.service.LectureService
 import pl.newbies.lecture.infrastructure.repository.*
 import java.util.concurrent.CompletableFuture
@@ -57,6 +59,55 @@ class LectureSchema(
             val lecture = lectureService.createLecture(request, event, principal.userId)
 
             return lectureConverter.convert(lecture)
+        }
+
+        @GraphQLDescription("Create lecture speaker invite")
+        fun createLectureInvite(lectureId: String, request: LectureInviteRequest, env: DataFetchingEnvironment): LectureInviteResponse {
+            val principal = env.principal()
+            val lecture = transaction { LectureDAO.findById(lectureId)?.toLecture() }
+                ?: throw LectureNotFoundException(lectureId)
+
+            principal.assertLectureWriteAccess(lecture)
+
+            val invite = lectureService.createLectureInvite(lecture, request)
+
+            return lectureConverter.convert(invite)
+        }
+
+        @GraphQLDescription("Use lecture invitation")
+        fun useLectureInvite(inviteId: String, env: DataFetchingEnvironment): Boolean {
+            val principal = env.principal()
+
+            val invite = transaction { LectureInviteDAO.findById(inviteId)?.toInvite() }
+                ?: throw LectureInviteNotFoundException(inviteId)
+
+            val lectureId = invite.lectureId
+
+            val lecture = transaction { LectureDAO.findById(lectureId)?.toLecture() }
+                ?: throw LectureNotFoundException(lectureId)
+
+            lectureService.useLectureInvite(lecture, invite, principal)
+
+            return true
+        }
+
+        @GraphQLDescription("Delete lecture invite by id")
+        fun deleteLectureInvite(inviteId: String, env: DataFetchingEnvironment): Boolean {
+            val principal = env.principal()
+
+            val invite = transaction { LectureInviteDAO.findById(inviteId)?.toInvite() }
+                ?: throw LectureInviteNotFoundException(inviteId)
+
+            val lectureId = invite.lectureId
+
+            val lecture = transaction { LectureDAO.findById(lectureId)?.toLecture() }
+                ?: throw LectureNotFoundException(lectureId)
+
+            principal.assertLectureWriteAccess(lecture)
+
+            lectureService.deleteLectureInvite(invite)
+
+            return true
         }
 
         @GraphQLDescription("Replace lecture data with new data (PUT equivalent)")
@@ -115,6 +166,44 @@ class LectureSchema(
 
                     lectureIds.map {
                         ratesMap.getOrDefault(it, emptyList())
+                    }
+                }
+            }
+    }
+
+    inner class LectureInvitesDataLoader : KotlinDataLoader<String, List<LectureInviteResponse>> {
+        override val dataLoaderName: String = "LectureInvitesDataLoader"
+
+        override fun getDataLoader(): DataLoader<String, List<LectureInviteResponse>> =
+            DataLoaderFactory.newDataLoader { lectureIds, env ->
+                CompletableFuture.supplyAsync {
+                    val principal = env.principal()
+
+                    val invites = transaction {
+                        LectureInviteDAO.find {
+                            LectureRates.lecture inList lectureIds
+                        }
+                            .map { it.toInvite() }
+                    }
+
+                    val lectures = transaction {
+                        LectureDAO.find {
+                            Lectures.id inList lectureIds
+                        }.map { it.toLecture() }
+                    }
+
+                    val invitesMap = invites.map { lectureConverter.convert(it) }
+                        .groupBy { it.lectureId }
+
+                    lectureIds.map {
+                        val lecture = lectures.firstOrNull { lecture: Lecture -> lecture.id == it }
+                            ?: return@map emptyList()
+
+                        if (!principal.hasLectureWriteAccess(lecture)) {
+                            return@map emptyList()
+                        }
+
+                        invitesMap.getOrDefault(it, emptyList())
                     }
                 }
             }

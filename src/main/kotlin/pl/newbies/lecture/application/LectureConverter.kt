@@ -1,8 +1,10 @@
 package pl.newbies.lecture.application
 
 import pl.newbies.event.application.model.TimeFrameResponse
+import pl.newbies.lecture.application.model.LectureInviteResponse
 import pl.newbies.lecture.application.model.LectureResponse
 import pl.newbies.lecture.domain.model.Lecture
+import pl.newbies.lecture.domain.model.LectureInvite
 import pl.newbies.user.application.UserConverter
 
 class LectureConverter(
@@ -24,5 +26,13 @@ class LectureConverter(
             updateDate = lecture.updateDate,
             author = userConverter.convert(lecture.author),
             speakers = lecture.speakers.map { userConverter.convert(it) },
+        )
+
+    fun convert(invite: LectureInvite): LectureInviteResponse =
+        LectureInviteResponse(
+            id = invite.id,
+            lectureId = invite.lectureId,
+            name = invite.name,
+            createDate = invite.createDate,
         )
 }

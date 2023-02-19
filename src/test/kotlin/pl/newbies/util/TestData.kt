@@ -9,6 +9,7 @@ import pl.newbies.generated.inputs.AddressRequestInput
 import pl.newbies.generated.inputs.EventRequestInput
 import pl.newbies.generated.inputs.TagRequestInput
 import pl.newbies.generated.inputs.TimeFrameRequestInput
+import pl.newbies.lecture.application.model.LectureInviteRequest
 import pl.newbies.lecture.application.model.LectureRateRequest
 import pl.newbies.lecture.application.model.LectureRequest
 import pl.newbies.tag.application.model.TagRequest
@@ -109,5 +110,11 @@ object TestData {
         topicRate = topicRate,
         presentationRate = presentationRate,
         opinion = opinion,
+    )
+
+    fun createLectureInviteRequest(
+        name: String = "Default lecture invite name",
+    ) = LectureInviteRequest(
+        name = name,
     )
 }

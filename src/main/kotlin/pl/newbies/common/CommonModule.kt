@@ -36,6 +36,7 @@ val commonModule = module {
             get<SchemaBuilder>().getGraphQLObject(),
             KotlinDataLoaderRegistryFactory(
                 get<LectureSchema>().LectureRatesDataLoader(),
+                get<LectureSchema>().LectureInvitesDataLoader(),
                 get<LectureSchema>().LectureRateSummaryDataLoader(),
                 get<EventSchema>().AuthorDataLoader(),
                 get<EventSchema>().IsFollowedDataLoader(),

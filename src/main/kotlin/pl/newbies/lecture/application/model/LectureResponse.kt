@@ -28,6 +28,10 @@ data class LectureResponse(
     fun rates(env: DataFetchingEnvironment): CompletableFuture<List<LectureRateResponse>> =
         env.getValueFromDataLoader("LectureRatesDataLoader", id)
 
+    @GraphQLDescription("Lecture speaker invites")
+    fun invites(env: DataFetchingEnvironment): CompletableFuture<List<LectureInviteResponse>> =
+        env.getValueFromDataLoader("LectureInvitesDataLoader", id)
+
     @Serializable
     data class RateSummary(
         val votesCount: Int,

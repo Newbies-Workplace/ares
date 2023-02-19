@@ -1,12 +1,15 @@
 package pl.newbies.lecture
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import io.ktor.client.request.*
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import pl.newbies.generated.CreateLectureInviteMutation
 import pl.newbies.generated.LectureByEventIdQuery
 import pl.newbies.generated.LectureByIdQuery
 import pl.newbies.generated.inputs.LectureFilterInput
+import pl.newbies.generated.inputs.LectureInviteRequestInput
 import pl.newbies.lecture.application.model.LectureRateRequest
 import pl.newbies.util.*
 
@@ -112,6 +115,66 @@ class LectureGraphQLTest : IntegrationTest() {
 
             val data = response.data?.lectures!!
             assertEquals(2, data.map { it.rates }.flatten().size)
+        }
+    }
+
+    @Nested
+    inner class LectureInvite {
+
+        @Test
+        fun `should create lecture invite when called`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse)
+            val lecture = createLecture(authResponse, event.id)
+
+            // when
+            val response = createLectureInvite(
+                lectureId = lecture.id,
+                authResponse = authResponse,
+                request = TestData.createLectureInviteRequest(
+                    name = "Test",
+                ),
+            )
+
+            // then
+            assertEquals("Test", response.name)
+        }
+
+        @Test
+        fun `should throw when creating too many invites`() = withAres {
+            // given
+            val authResponse = loginAs(TestData.testUser1)
+            val event = createEvent(authResponse)
+            val lecture = createLecture(authResponse, event.id)
+
+            createLectureInvite(
+                lectureId = lecture.id,
+                authResponse = authResponse,
+            )
+            createLectureInvite(
+                lectureId = lecture.id,
+                authResponse = authResponse,
+            )
+
+            // then
+            val response = graphQLClient.execute(
+                CreateLectureInviteMutation(
+                    CreateLectureInviteMutation.Variables(
+                        lectureId = lecture.id,
+                        request = LectureInviteRequestInput(
+                            name = "Test",
+                        ),
+                    ),
+                ),
+            ) {
+                bearerAuth(authResponse.accessToken)
+            }
+
+            // then
+            assertNull(response.data?.createLectureInvite)
+            assertNull(response.data)
+            assertNotNull(response.errorAt("createLectureInvite"))
         }
     }
 
