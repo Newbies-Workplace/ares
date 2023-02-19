@@ -4,5 +4,5 @@ import kotlinx.datetime.Instant
 
 data class TimeFrameDTO(
     var startDate: Instant,
-    var finishDate: Instant? = null,
+    var finishDate: Instant,
 )

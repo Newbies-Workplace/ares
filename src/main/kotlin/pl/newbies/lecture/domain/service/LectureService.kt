@@ -98,7 +98,7 @@ class LectureService {
         val speakersCount = databaseLecture.speakers.count()
 
         if (invitesCount + speakersCount >= LECTURE_SPEAKERS_LIMIT) {
-            throw TooManyLectureInvitesException()
+            throw TooManyLectureInvitesException(lectureId = lecture.id)
         }
 
         LectureInviteDAO.new(nanoId()) {
@@ -161,16 +161,13 @@ class LectureService {
 
     private fun assertLectureTimeFrameFitsEvent(
         lectureStartDate: Instant,
-        lectureFinishDate: Instant?,
+        lectureFinishDate: Instant,
         eventStartDate: Instant,
-        eventFinishDate: Instant?,
+        eventFinishDate: Instant,
     ) {
         if (
-            lectureStartDate.toEpochMilliseconds() < eventStartDate.toEpochMilliseconds() || (
-                    lectureFinishDate != null &&
-                            eventFinishDate != null &&
-                            lectureFinishDate.toEpochMilliseconds() > eventFinishDate.toEpochMilliseconds()
-                    )
+            lectureStartDate.toEpochMilliseconds() < eventStartDate.toEpochMilliseconds() ||
+            lectureFinishDate.toEpochMilliseconds() > eventFinishDate.toEpochMilliseconds()
         ) {
             throw BadRequestException("lecture timeframe not in event timeframe")
         }
