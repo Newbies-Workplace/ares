@@ -56,7 +56,7 @@ class LectureDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
 
     var author by UserDAO referencedOn Lectures.author
     var speakers by UserDAO via LectureSpeakers
-    var invites by LectureInviteDAO via LectureInvites
+    val invites by LectureInviteDAO referrersOn LectureInvites.lecture
 
     var startDate by Lectures.startDate
     var finishDate by Lectures.finishDate
@@ -68,7 +68,7 @@ class LectureDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
 class LectureInviteDAO(id: EntityID<String>) : StringNanoIdEntity(id) {
     companion object : StringNanoIdEntityClass<LectureInviteDAO>(LectureInvites)
 
-    var lecture by LectureDAO referencedOn LectureSpeakers.lecture
+    var lecture by LectureDAO referencedOn LectureInvites.lecture
 
     var name by LectureInvites.name
 
