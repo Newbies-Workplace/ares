@@ -86,7 +86,7 @@ class LectureSchema(
             val lecture = transaction { LectureDAO.findById(lectureId)?.toLecture() }
                 ?: throw LectureNotFoundException(lectureId)
 
-            lectureService.useLectureInvite(lecture, invite)
+            lectureService.useLectureInvite(lecture, invite, principal)
 
             return true
         }
