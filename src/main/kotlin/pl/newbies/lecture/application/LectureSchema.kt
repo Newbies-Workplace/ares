@@ -181,7 +181,7 @@ class LectureSchema(
 
                     val invites = transaction {
                         LectureInviteDAO.find {
-                            LectureRates.lecture inList lectureIds
+                            LectureInvites.lecture inList lectureIds
                         }
                             .map { it.toInvite() }
                     }
