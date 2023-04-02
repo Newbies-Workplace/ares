@@ -13,6 +13,8 @@ services:
       MYSQL_DATABASE: ares
     ports:
       - "3306:3306"
+    networks:
+      - ares-back-local
   ares-service:
     image: ghcr.io/newbies-workplace/ares:latest
     restart: unless-stopped
@@ -34,8 +36,17 @@ services:
       - ARES_STORAGE_URL
     ports:
       - "8080:8080"
+    networks:
+      - ares-back-local
+      - reverse-proxy_global
     depends_on:
       - ares-db
+
+networks:
+  ares-back-local:
+  reverse-proxy_global:
+    external: true
+
 volumes:
   ares-db:
   ares-storage:
