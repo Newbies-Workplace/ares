@@ -18,7 +18,7 @@ class GithubAuthTest : IntegrationTest() {
         @Test
         fun `should redirect when login called`() = withAres {
             // when
-            val response = httpClient.get("/oauth/login/github")
+            val response = httpClient.get("/api/oauth/login/github")
 
             // then
             assertEquals(HttpStatusCode.OK, response.status)
@@ -65,7 +65,7 @@ class GithubAuthTest : IntegrationTest() {
         fun `should return 401 when called with invalid data`() = withAres {
             // then
             val response = client.submitForm(
-                url = "/oauth/callback/github",
+                url = "/api/oauth/callback/github",
                 formParameters = Parameters.build {
                     append("code", "valid")
                     append("state", "invalid")
