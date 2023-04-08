@@ -46,9 +46,9 @@ fun Application.googleAuthentication(oauthClient: HttpClient) {
 
     routing {
         authenticate("google") {
-            get("/oauth/login/google") { /* handled automatically */ }
+            get("/api/oauth/login/google") { /* handled automatically */ }
 
-            get("/oauth/callback/google") {
+            get("/api/oauth/callback/google") {
                 val token = call.principal<OAuthAccessTokenResponse.OAuth2>()?.accessToken
                     ?: throw UnauthorizedException("Failed to get google auth token")
 
