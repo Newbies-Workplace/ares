@@ -49,9 +49,9 @@ fun Application.githubAuthentication(oauthClient: HttpClient) {
 
     routing {
         authenticate("github") {
-            get("/oauth/login/github") { /* handled automatically */ }
+            get("/api/oauth/login/github") { /* handled automatically */ }
 
-            get("/oauth/callback/github") {
+            get("/api/oauth/callback/github") {
                 val token = call.principal<OAuthAccessTokenResponse.OAuth2>()?.accessToken
                     ?: throw UnauthorizedException("Failed to get github auth token")
 

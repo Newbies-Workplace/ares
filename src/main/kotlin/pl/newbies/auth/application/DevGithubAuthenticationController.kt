@@ -52,9 +52,9 @@ fun Application.devGithubAuthentication(oauthClient: HttpClient) {
 
     routing {
         authenticate("devgithub") {
-            get("/oauth/login/devgithub") { /* handled automatically */ }
+            get("/api/oauth/login/devgithub") { /* handled automatically */ }
 
-            get("/oauth/callback/devgithub") {
+            get("/api/oauth/callback/devgithub") {
                 val token = call.principal<OAuthAccessTokenResponse.OAuth2>()?.accessToken
                     ?: throw UnauthorizedException("Failed to get github auth token")
 

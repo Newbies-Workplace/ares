@@ -34,7 +34,7 @@ suspend fun ApplicationTestBuilder.loginAs(
     githubUser: GithubUser,
 ): AuthResponse {
     val response = httpClient.submitForm(
-        url = "/oauth/callback/github",
+        url = "/api/oauth/callback/github",
         formParameters = Parameters.build {
             append("code", "valid")
             append("state", githubUser.id)
